@@ -1,0 +1,67 @@
+# Wordpress - ignore core, configuration, examples, uploads and logs.
+# https://github.com/github/gitignore/blob/main/WordPress.gitignore
+
+# Core
+#
+# Note: if you want to stage/commit WP core files
+# you can delete this whole section/until Configuration.
+/wp-admin/
+/wp-content/index.php
+/wp-content/languages
+/wp-content/plugins/index.php
+/wp-content/themes/index.php
+/wp-includes/
+/index.php
+/license.txt
+/readme.html
+/wp-*.php
+/xmlrpc.php
+
+# Configuration
+wp-config.php
+
+# Example themes
+/wp-content/themes/twenty*/
+
+# Example plugin
+/wp-content/plugins/ai-engine/
+/wp-content/plugins/boldgrid-backup/
+/wp-content/plugins/boldgrid-backup-premium/
+/wp-content/plugins/code-engine/
+/wp-content/plugins/code-snippets/
+/wp-content/plugins/contact-form-block/
+/wp-content/plugins/ewww-image-optimizer/
+/wp-content/plugins/meow-analytics/
+/wp-content/plugins/meow-gallery-pro/
+/wp-content/plugins/meow-lightbox/
+/wp-content/plugins/nginx-helper/
+/wp-content/plugins/no-right-click-images-plugin/
+/wp-content/plugins/simple-custom-css/
+/wp-content/plugins/wplr-sync/
+
+# Uploads
+/wp-content/uploads/
+
+# Maintenance
+/wp-content/maintenance/
+/wp-content/maintenance.php
+
+# Log files
+*.log
+
+# htaccess
+/.htaccess
+/.htaccess.bgb
+
+
+# All plugins
+#
+# Note: If you wish to whitelist plugins,
+# uncomment the next line
+#/wp-content/plugins
+
+# All themes
+#
+# Note: If you wish to whitelist themes,
+# uncomment the next line
+#/wp-content/themes
