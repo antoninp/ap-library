@@ -1,3 +1,4 @@
+<?php
 /**
  * Plugin Name:       Antonin Puleo Library
  * Description:       Photo Library System based on post for photography website.
@@ -11,23 +12,16 @@
  * Requires Plugins:  meow-gallery
  */
 
- /**
- * Register the "uploads" custom post type
- */
-function pluginprefix_setup_post_type() {
-	register_post_type( 'uploads', ['public' => true ] ); 
-    register_post_type( 'library', ['public' => true ] );
-} 
-add_action( 'init', 'pluginprefix_setup_post_type' );
-
-
-/**
- * Activate the plugin.
- */
-function pluginprefix_activate() { 
-	// Trigger our function that registers the custom post type plugin.
-	pluginprefix_setup_post_type(); 
-	// Clear the permalinks after the post type has been registered.
-	flush_rewrite_rules(); 
+if ( !defined( 'APLB_VERSION' ) ) {
+  define( 'APLB_VERSION', '0.0.1' );
+  define( 'APLB_PREFIX', 'aplb' );
+  define( 'APLB_DOMAIN', ' ap-library' );
+  define( 'APLB_ENTRY', __FILE__ );
+  define( 'APLB_PATH', dirname( __FILE__ ) );
+  define( 'APLB_URL', plugin_dir_url( __FILE__ ) );
+  define( 'APLB_ITEM_ID', 6242 );
 }
-register_activation_hook( __FILE__, 'pluginprefix_activate' );
+
+require_once( 'classes/init.php');
+
+?>
