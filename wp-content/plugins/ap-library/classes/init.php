@@ -1,7 +1,7 @@
 <?php
 /**
-Initialization file for the AP Library plugin.
-*/
+ * Initialization file for the AP Library plugin.
+ */
 
  /**
  * Register the "uploads" and "library" custom post type
@@ -22,7 +22,7 @@ function aplb_activate() {
 	// Clear the permalinks after the post type has been registered.
 	flush_rewrite_rules(); 
 }
-register_activation_hook( __FILE__, 'aplb_activate' );
+register_activation_hook( APLB_ENTRY, 'aplb_activate' );
 
 /**
  * Deactivation hook.
@@ -34,6 +34,6 @@ function aplb_deactivate() {
 	// Clear the permalinks to remove our post type's rules from the database.
 	flush_rewrite_rules();
 }
-register_deactivation_hook( __FILE__, 'aplb_deactivate' );
+register_deactivation_hook( APLB_ENTRY, 'aplb_deactivate' );
 
 ?>
