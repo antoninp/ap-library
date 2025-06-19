@@ -195,10 +195,12 @@ class AP_Library {
      * @access   private
      */
     private function define_custom_post_type_hooks() {
+
         $plugin_custom_post_types = new AP_Library_Custom_Post_Types();
+		
         $this->loader->add_action( 'init', $plugin_custom_post_types, 'register_post_types' );
     }
-	
+
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
 	 *
