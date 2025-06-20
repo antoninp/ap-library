@@ -67,6 +67,7 @@ class Ap_Library {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
+		
 		if ( defined( 'AP_LIBRARY_VERSION' ) ) {
 			$this->version = AP_LIBRARY_VERSION;
 		} else {
@@ -79,6 +80,7 @@ class Ap_Library {
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 		$this->define_custom_post_type_hooks();
+		$this->define_taxonomy_hooks();
 
 	}
 
@@ -127,6 +129,11 @@ class Ap_Library {
          * The class responsible for defining custom post types.
          */
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-cpt.php';
+
+		/**
+         * The class responsible for defining taxonomies.
+         */
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-taxonomy.php';
 
 		$this->loader = new Ap_Library_Loader();
 
@@ -194,6 +201,19 @@ class Ap_Library {
         $plugin_custom_post_types = new Ap_Library_Custom_Post_Types();
 		
         $this->loader->add_action( 'init', $plugin_custom_post_types, 'register_post_types' );
+    }
+
+	/**
+     * Register all of the hooks related to custom post types.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function define_taxonomy_hooks() {
+
+        $plugin_taxonomies = new Ap_Library_Taxonomy();
+		
+        $this->loader->add_action( 'init', $plugin_taxonomies, 'register_taxonomies' );
     }
 
 	/**
