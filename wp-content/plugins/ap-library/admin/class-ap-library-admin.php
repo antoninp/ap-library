@@ -100,4 +100,28 @@ class Ap_Library_Admin {
 
 	}
 
+	/**
+	 * Register the admin menu for the plugin.
+	 *
+	 * @since    1.0.0
+	 */
+	public function add_plugin_admin_menu() {
+		add_menu_page(
+			__( 'AP Library', 'ap-library' ), // Page title
+			__( 'AP Library', 'ap-library' ), // Menu title
+			'manage_options',                 // Capability
+			'ap-library',                     // Menu slug
+			array( $this, 'display_plugin_admin_page' ), // Callback
+			'dashicons-images-alt2',          // Icon
+			25                                // Position
+		);
+	}
+
+	/**
+	 * Display the plugin admin page content.
+	 */
+	public function display_plugin_admin_page() {
+		include_once plugin_dir_path( __FILE__ ) . 'partials/ap-library-admin-display.php';
+	}
+
 }
