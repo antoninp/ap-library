@@ -20,7 +20,9 @@
  * @subpackage Ap_Library/admin
  * @author     Antonin Puleo <a@antoninpuleo.com>
  */
-require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-actions.php';
+
+ require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-actions.php';
+
 
 class Ap_Library_Admin {
 
@@ -64,7 +66,7 @@ class Ap_Library_Admin {
 		$this->version = $version;
 
 		// Initialize actions manager and register actions
-		$this->actions_manager = new Ap_Library_Admin_Actions();
+		$this->actions_manager = new Ap_Library_Admin_Actions($this->version, $this->plugin_name);
 		$this->actions_manager->register_action(
 			'first_action',
 			'Run First Action',
