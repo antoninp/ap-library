@@ -124,4 +124,18 @@ class Ap_Library_Admin {
 		include_once plugin_dir_path( __FILE__ ) . 'partials/ap-library-admin-display.php';
 	}
 
+	public function handle_admin_actions() {
+		if (
+			isset( $_POST['ap_library_run_code'] ) &&
+			check_admin_referer( 'ap_library_run_action', 'ap_library_nonce' )
+		) {
+			// Your code to run when the button is clicked
+			// For example:
+			// update_option( 'ap_library_last_run', current_time( 'mysql' ) );
+			add_action( 'admin_notices', function() {
+				echo '<div class="notice notice-success is-dismissible"><p>Code executed successfully!</p></div>';
+			} );
+		}
+	}
+
 }
