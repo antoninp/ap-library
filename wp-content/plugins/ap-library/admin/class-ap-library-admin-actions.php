@@ -1,0 +1,46 @@
+<?php
+
+class Ap_Library_Admin_Actions {
+    private $actions = array();
+
+    public function register_action( $key, $label, $callback ) {
+        $this->actions[ $key ] = array(
+            'label'    => $label,
+            'callback' => $callback,
+        );
+    }
+
+    public function render_buttons() {
+        foreach ( $this->actions as $key => $action ) {
+            ?>
+            <form method="post" style="display:inline;">
+                <?php wp_nonce_field( 'ap_library_action_' . $key, 'ap_library_nonce_' . $key ); ?>
+                <input type="submit" name="ap_library_run_<?php echo esc_attr( $key ); ?>" class="button button-primary" value="<?php echo esc_attr( $action['label'] ); ?>">
+            </form>
+            <?php
+        }
+    }
+
+    public function handle_actions() {
+        foreach ( $this->actions as $key => $action ) {
+            if (
+                isset( $_POST[ 'ap_library_run_' . $key ] ) &&
+                check_admin_referer( 'ap_library_action_' . $key, 'ap_library_nonce_' . $key )
+            ) {
+                try {
+                    $result = call_user_func( $action['callback'] );
+                    if ( is_wp_error( $result ) ) {
+                        throw new Exception( $result->get_error_message() );
+                    }
+                    add_action( 'admin_notices', function() use ( $action ) {
+                        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html( $action['label'] ) . ' executed successfully!</p></div>';
+                    } );
+                } catch ( Exception $e ) {
+                    add_action( 'admin_notices', function() use ( $e, $action ) {
+                        echo '<div class="notice notice-error is-dismissible"><p>Error running ' . esc_html( $action['label'] ) . ': ' . esc_html( $e->getMessage() ) . '</p></div>';
+                    } );
+                }
+            }
+        }
+    }
+}

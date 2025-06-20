@@ -14,10 +14,3 @@
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
-
-<?php if ( current_user_can( 'manage_options' ) ) : ?>
-    <form method="post">
-        <?php wp_nonce_field( 'ap_library_run_action', 'ap_library_nonce' ); ?>
-        <input type="submit" name="ap_library_run_code" class="button button-primary" value="Run My Code">
-    </form>
-<?php endif; ?>

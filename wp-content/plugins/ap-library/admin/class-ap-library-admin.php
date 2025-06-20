@@ -20,6 +20,8 @@
  * @subpackage Ap_Library/admin
  * @author     Antonin Puleo <a@antoninpuleo.com>
  */
+require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-actions.php';
+
 class Ap_Library_Admin {
 
 	/**
@@ -40,6 +42,15 @@ class Ap_Library_Admin {
 	 */
 	private $version;
 
+    /**
+     * The actions manager of admin menu.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string    $actions_manager    The actions manager of admin menu.
+     */
+    private $actions_manager;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -52,6 +63,18 @@ class Ap_Library_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+		// Initialize actions manager and register actions
+		$this->actions_manager = new Ap_Library_Admin_Actions();
+		$this->actions_manager->register_action(
+			'first_action',
+			'Run First Action',
+			array( $this, 'run_first_action' )
+		);
+		$this->actions_manager->register_action(
+			'second_action',
+			'Run Second Action',
+			array( $this, 'run_second_action' )
+		);
 	}
 
 	/**
@@ -121,21 +144,26 @@ class Ap_Library_Admin {
 	 * Display the plugin admin page content.
 	 */
 	public function display_plugin_admin_page() {
-		include_once plugin_dir_path( __FILE__ ) . 'partials/ap-library-admin-display.php';
+		echo '<div class="wrap"><h1>' . esc_html__( 'AP Library Admin', 'ap-library' ) . '</h1>';
+		$this->actions_manager->render_buttons();
+		echo '</div>';
 	}
 
 	public function handle_admin_actions() {
-		if (
-			isset( $_POST['ap_library_run_code'] ) &&
-			check_admin_referer( 'ap_library_run_action', 'ap_library_nonce' )
-		) {
-			// Your code to run when the button is clicked
-			// For example:
-			// update_option( 'ap_library_last_run', current_time( 'mysql' ) );
-			add_action( 'admin_notices', function() {
-				echo '<div class="notice notice-success is-dismissible"><p>Code executed successfully!</p></div>';
-			} );
-		}
+		$this->actions_manager->handle_actions();
+	}
+
+	// Example action callbacks
+	public function run_first_action() {
+		// ...your code...
+		return true;
+	}
+
+	public function run_second_action() {
+		// ...your code...
+		// Example error:
+		// return new WP_Error('ap_library_error', 'Something went wrong.');
+		return true;
 	}
 
 }
