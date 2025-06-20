@@ -78,6 +78,7 @@ class Ap_Library {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
+		$this->define_custom_post_type_hooks();
 
 	}
 
