@@ -112,7 +112,7 @@ class Ap_Library_Admin {
 			'manage_options',                 // Capability
 			'ap-library',                     // Menu slug
 			array( $this, 'display_plugin_admin_page' ), // Callback
-			'dashicons-images-alt2',          // Icon
+			'dashicons-open-folder',          // Icon
 			25                                // Position
 		);
 	}
