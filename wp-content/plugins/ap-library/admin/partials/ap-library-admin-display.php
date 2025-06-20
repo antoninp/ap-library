@@ -5,11 +5,11 @@
  *
  * This file is used to markup the admin-facing aspects of the plugin.
  *
- * @link       https://antoninpuleo.com/
+ * @link       https://antoninpuleo.com
  * @since      1.0.0
  *
- * @package    AP_Library
- * @subpackage AP_Library/admin/partials
+ * @package    Ap_Library
+ * @subpackage Ap_Library/admin/partials
  */
 ?>
 

@@ -3,11 +3,11 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       https://antoninpuleo.com/
+ * @link       https://antoninpuleo.com
  * @since      1.0.0
  *
- * @package    AP_Library
- * @subpackage AP_Library/public
+ * @package    Ap_Library
+ * @subpackage Ap_Library/public
  */
 
 /**
@@ -16,20 +16,20 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
- * @package    AP_Library
- * @subpackage AP_Library/public
- * @author     Antonin Puleo <
+ * @package    Ap_Library
+ * @subpackage Ap_Library/public
+ * @author     Antonin Puleo <a@antoninpuleo.com>
  */
-class AP_Library_Public {
+class Ap_Library_Public {
 
 	/**
 	 * The ID of this plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $ap_library    The ID of this plugin.
+	 * @var      string    $plugin_name    The ID of this plugin.
 	 */
-	private $ap_library;
+	private $plugin_name;
 
 	/**
 	 * The version of this plugin.
@@ -44,12 +44,12 @@ class AP_Library_Public {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
-	 * @param      string    $ap_library       The name of the plugin.
+	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $ap_library, $version ) {
+	public function __construct( $plugin_name, $version ) {
 
-		$this->ap_library = $ap_library;
+		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
 	}
@@ -65,15 +65,15 @@ class AP_Library_Public {
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in AP_Library_Loader as all of the hooks are defined
+		 * defined in Ap_Library_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The AP_Library_Loader will then create the relationship
+		 * The Ap_Library_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->ap_library, plugin_dir_url( APLB_ENTRY ) . 'css/'. APLB_DOMAIN . '-public.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/ap-library-public.css', array(), $this->version, 'all' );
 
 	}
 
@@ -88,15 +88,15 @@ class AP_Library_Public {
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in AP_Library_Loader as all of the hooks are defined
+		 * defined in Ap_Library_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The AP_Library_Loader will then create the relationship
+		 * The Ap_Library_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->ap_library, plugin_dir_url( APLB_ENTRY ) . 'js/'. APLB_DOMAIN . '-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/ap-library-public.js', array( 'jquery' ), $this->version, false );
 
 	}
 

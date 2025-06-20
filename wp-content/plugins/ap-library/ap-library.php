@@ -8,13 +8,13 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://antoninpuleo.com/
+ * @link              https://antoninpuleo.com
  * @since             1.0.0
- * @package           AP_Library
+ * @package           Ap_Library
  *
  * @wordpress-plugin
  * Plugin Name:       AP Library
- * Plugin URI:        http://example.com/plugin-name-uri/
+ * Plugin URI:        https://antoninpuleo.com
  * Description:       Photo Library System based on post for photography website.
  * Version:           1.0.0
  * Author:            Antonin Puleo
@@ -30,28 +30,20 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-if ( ! defined( 'APLB_VERSION' ) ) {
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
+ * Rename this for your plugin and update it as you release new versions.
  */
-  define( 'APLB_VERSION', '1.0.0' );
-
-  define( 'APLB_PREFIX', 'aplb' );
-  define( 'APLB_DOMAIN', 'ap-library' );
-  define( 'APLB_ENTRY', __FILE__ );
-  define( 'APLB_PATH', dirname( __FILE__ ) );
-  define( 'APLB_URL', plugin_dir_url( __FILE__ ) );
-  define( 'APLB_ITEM_ID', 6242 );
-}
+define( 'AP_LIBRARY_VERSION', '1.0.0' );
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-ap-library-activator.php
  */
 function activate_ap_library() {
-	require_once plugin_dir_path( APLB_ENTRY ) . 'includes/class-' . APLB_DOMAIN . '-activator.php';
-	AP_Library_Activator::activate();
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ap-library-activator.php';
+	Ap_Library_Activator::activate();
 }
 
 /**
@@ -59,18 +51,18 @@ function activate_ap_library() {
  * This action is documented in includes/class-ap-library-deactivator.php
  */
 function deactivate_ap_library() {
-	require_once plugin_dir_path( APLB_ENTRY ) . 'includes/class-' . APLB_DOMAIN . '-deactivator.php';
-	AP_Library_Deactivator::deactivate();
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ap-library-deactivator.php';
+	Ap_Library_Deactivator::deactivate();
 }
 
-register_activation_hook( APLB_ENTRY, 'activate_ap_library' );
-register_deactivation_hook( APLB_ENTRY, 'deactivate_ap_library' );
+register_activation_hook( __FILE__, 'activate_ap_library' );
+register_deactivation_hook( __FILE__, 'deactivate_ap_library' );
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( APLB_ENTRY ) . 'includes/class-' . APLB_DOMAIN . '.php';
+require plugin_dir_path( __FILE__ ) . 'includes/class-ap-library.php';
 
 /**
  * Begins execution of the plugin.
@@ -83,11 +75,8 @@ require plugin_dir_path( APLB_ENTRY ) . 'includes/class-' . APLB_DOMAIN . '.php'
  */
 function run_ap_library() {
 
-	$plugin = new AP_Library();
+	$plugin = new Ap_Library();
 	$plugin->run();
 
 }
 run_ap_library();
-
-
-?>

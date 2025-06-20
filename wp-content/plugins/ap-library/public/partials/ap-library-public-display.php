@@ -5,11 +5,11 @@
  *
  * This file is used to markup the public-facing aspects of the plugin.
  *
- * @link       https://antoninpuleo.com/
+ * @link       https://antoninpuleo.com
  * @since      1.0.0
  *
- * @package    AP_Library
- * @subpackage AP_Library/public/partials
+ * @package    Ap_Library
+ * @subpackage Ap_Library/public/partials
  */
 ?>
 

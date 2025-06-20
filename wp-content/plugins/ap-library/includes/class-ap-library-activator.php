@@ -3,11 +3,11 @@
 /**
  * Fired during plugin activation
  *
- * @link       https://antoninpuleo.com/
+ * @link       https://antoninpuleo.com
  * @since      1.0.0
  *
- * @package    AP_Library
- * @subpackage AP_Library/includes
+ * @package    Ap_Library
+ * @subpackage Ap_Library/includes
  */
 
 /**
@@ -16,11 +16,11 @@
  * This class defines all code necessary to run during the plugin's activation.
  *
  * @since      1.0.0
- * @package    AP_Library
- * @subpackage AP_Library/includes
- * @author     Antonin Puleo
+ * @package    Ap_Library
+ * @subpackage Ap_Library/includes
+ * @author     Antonin Puleo <a@antoninpuleo.com>
  */
-class AP_Library_Activator {
+class Ap_Library_Activator {
 
 	/**
 	 * Short Description. (use period)
@@ -31,7 +31,7 @@ class AP_Library_Activator {
 	 */
 	public static function activate() {
 
-        // Flush rewrite rules to apply changes
+		// Flush rewrite rules to apply changes
         flush_rewrite_rules();
 
 	}

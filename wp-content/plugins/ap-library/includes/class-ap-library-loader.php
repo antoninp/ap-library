@@ -3,11 +3,11 @@
 /**
  * Register all actions and filters for the plugin
  *
- * @link       http://example.com
+ * @link       https://antoninpuleo.com
  * @since      1.0.0
  *
- * @package    AP_Library
- * @subpackage AP_Library/includes
+ * @package    Ap_Library
+ * @subpackage Ap_Library/includes
  */
 
 /**
@@ -17,11 +17,11 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    AP_Library
- * @subpackage AP_Library/includes
- * @author     Antonin Puleo
+ * @package    Ap_Library
+ * @subpackage Ap_Library/includes
+ * @author     Antonin Puleo <a@antoninpuleo.com>
  */
-class AP_Library_Loader {
+class Ap_Library_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.

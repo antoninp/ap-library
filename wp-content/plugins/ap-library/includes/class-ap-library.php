@@ -1,18 +1,16 @@
 <?php
 
-use Psr\Log\AbstractLogger;
-
 /**
  * The file that defines the core plugin class
  *
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       https://antoninpuleo.com/
+ * @link       https://antoninpuleo.com
  * @since      1.0.0
  *
- * @package    AP_Library
- * @subpackage AP_Library/includes
+ * @package    Ap_Library
+ * @subpackage Ap_Library/includes
  */
 
 /**
@@ -25,11 +23,11 @@ use Psr\Log\AbstractLogger;
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    AP_Library
- * @subpackage AP_Library/includes
- * @author     Antonin Puleo <
+ * @package    Ap_Library
+ * @subpackage Ap_Library/includes
+ * @author     Antonin Puleo <a@antoninpuleo.com>
  */
-class AP_Library {
+class Ap_Library {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -37,7 +35,7 @@ class AP_Library {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      AP_Library_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      Ap_Library_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -46,9 +44,9 @@ class AP_Library {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      string    $ap_library    The string used to uniquely identify this plugin.
+	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
 	 */
-	protected $ap_library;
+	protected $plugin_name;
 
 	/**
 	 * The current version of the plugin.
@@ -69,17 +67,12 @@ class AP_Library {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'APLB_VERSION' ) ) {
-			$this->version = APLB_VERSION;
+		if ( defined( 'AP_LIBRARY_VERSION' ) ) {
+			$this->version = AP_LIBRARY_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
-
-		if ( defined( 'APLB_DOMAIN' ) ) {
-			$this->ap_library = APLB_DOMAIN;
-		} else {
-			$this->ap_library = 'ap-library';
-		}
+		$this->plugin_name = 'ap-library';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -93,10 +86,10 @@ class AP_Library {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - AP_Library_Loader. Orchestrates the hooks of the plugin.
-	 * - AP_Library_i18n. Defines internationalization functionality.
-	 * - AP_Library_Admin. Defines all hooks for the admin area.
-	 * - AP_Library_Public. Defines all hooks for the public side of the site.
+	 * - Ap_Library_Loader. Orchestrates the hooks of the plugin.
+	 * - Ap_Library_i18n. Defines internationalization functionality.
+	 * - Ap_Library_Admin. Defines all hooks for the admin area.
+	 * - Ap_Library_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -110,39 +103,38 @@ class AP_Library {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( APLB_ENTRY ) ) . 'includes/class-' . APLB_DOMAIN . '-loader.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( APLB_ENTRY ) ) . 'includes/class-' . APLB_DOMAIN . '-i18n.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( APLB_ENTRY ) ) . 'admin/class-' . APLB_DOMAIN . '-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( APLB_ENTRY ) ) . 'public/class-' . APLB_DOMAIN . '-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-ap-library-public.php';
 
 		/**
          * The class responsible for defining custom post types.
          */
-        require_once plugin_dir_path( dirname( APLB_ENTRY ) ) . 'includes/class-' . APLB_DOMAIN . '-cpt.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-cpt.php';
 
-
-		$this->loader = new AP_Library_Loader();
+		$this->loader = new Ap_Library_Loader();
 
 	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the AP_Library_i18n class in order to set the domain and to register the hook
+	 * Uses the Ap_Library_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -150,7 +142,7 @@ class AP_Library {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new AP_Library_i18n();
+		$plugin_i18n = new Ap_Library_i18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
 
@@ -165,7 +157,7 @@ class AP_Library {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new AP_Library_Admin( $this->get_ap_library(), $this->get_version() );
+		$plugin_admin = new Ap_Library_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -181,7 +173,7 @@ class AP_Library {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new AP_Library_Public( $this->get_ap_library(), $this->get_version() );
+		$plugin_public = new Ap_Library_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
@@ -196,7 +188,7 @@ class AP_Library {
      */
     private function define_custom_post_type_hooks() {
 
-        $plugin_custom_post_types = new AP_Library_Custom_Post_Types();
+        $plugin_custom_post_types = new Ap_Library_Custom_Post_Types();
 		
         $this->loader->add_action( 'init', $plugin_custom_post_types, 'register_post_types' );
     }
@@ -217,15 +209,15 @@ class AP_Library {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_ap_library() {
-		return $this->ap_library;
+	public function get_plugin_name() {
+		return $this->plugin_name;
 	}
 
 	/**
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    AP_Library_Loader    Orchestrates the hooks of the plugin.
+	 * @return    Ap_Library_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
 		return $this->loader;

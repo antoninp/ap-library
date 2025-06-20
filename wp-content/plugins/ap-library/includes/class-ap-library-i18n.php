@@ -6,11 +6,11 @@
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link       https://antoninpuleo.com/
+ * @link       https://antoninpuleo.com
  * @since      1.0.0
  *
- * @package    AP_Library
- * @subpackage AP_Library/includes
+ * @package    Ap_Library
+ * @subpackage Ap_Library/includes
  */
 
 /**
@@ -20,11 +20,11 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    AP_Library
- * @subpackage AP_Library/includes
- * @author     Antonin Puleo <
+ * @package    Ap_Library
+ * @subpackage Ap_Library/includes
+ * @author     Antonin Puleo <a@antoninpuleo.com>
  */
-class AP_Library_i18n {
+class Ap_Library_i18n {
 
 
 	/**
@@ -35,9 +35,9 @@ class AP_Library_i18n {
 	public function load_plugin_textdomain() {
 
 		load_plugin_textdomain(
-			APLB_DOMAIN,
+			'ap-library',
 			false,
-			dirname( dirname( plugin_basename( APLB_ENTRY ) ) ) . '/languages/'
+			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);
 
 	}
