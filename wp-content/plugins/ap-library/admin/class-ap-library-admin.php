@@ -426,8 +426,18 @@ class Ap_Library_Admin {
 
 		$tax_input = array();
 
+		$aplb_uploads_tdate_terms = array();
+		if ( ! empty( $year_term_id ) ) {
+		    $aplb_uploads_tdate_terms[] = $year_term_id;
+		}
+		if ( ! empty( $month_term_id ) ) {
+		    $aplb_uploads_tdate_terms[] = $month_term_id;
+		}
 		if ( ! empty( $day_term_id ) ) {
-		    $tax_input['aplb_uploads_tdate'] = array( $day_term_id );
+		    $aplb_uploads_tdate_terms[] = $day_term_id;
+		}
+		if ( ! empty( $aplb_uploads_tdate_terms ) ) {
+		    $tax_input['aplb_uploads_tdate'] = $aplb_uploads_tdate_terms;
 		}
 
 		if ( ! empty( $genre_term_id ) ) {
@@ -459,7 +469,7 @@ class Ap_Library_Admin {
 			'post_status'   => 'draft',
 			'post_author'   => get_current_user_id(),
 			'post_type'     => 'aplb_uploads',
-			'tax_input'     => $tax_input, // <-- assign taxonomies here
+			'tax_input'     => $tax_input,
 		);
 
 		$post_id = wp_insert_post( $new_post );
