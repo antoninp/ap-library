@@ -373,27 +373,65 @@ class Ap_Library_Admin {
 		$parts = explode( '-', $filename );
 		if ( isset( $parts[0] ) ) {
 			$term_slug = sanitize_title( $parts[0] );
-			$term_date = substr($term_slug, 0, 4);
+			$term_year  = substr($term_slug, 0, 4);
+			$term_month = substr($term_slug, 4, 2);
+			$term_day   = substr($term_slug, 6, 2);
 
-			$existing_term = term_exists( $term_date, 'aplb_uploads_tdate' );
-			if ( $existing_term && is_array( $existing_term ) ) {
-				$tdate_term_id = $existing_term['term_id'];
+			// 1. Year term (parent: 0)
+			$year_term = term_exists( $term_year, 'aplb_uploads_tdate' );
+			if ( $year_term && is_array( $year_term ) ) {
+				$year_term_id = $year_term['term_id'];
 			} else {
-				$new_term = wp_insert_term( $term_date, 'aplb_uploads_tdate' );
-				if ( ! is_wp_error( $new_term ) ) {
-					$tdate_term_id = $new_term['term_id'];
-				}
+				$new_year = wp_insert_term( $term_year, 'aplb_uploads_tdate' );
+				$year_term_id = ! is_wp_error( $new_year ) ? $new_year['term_id'] : 0;
 			}
 
-			$existing_term = term_exists( $term_genre, 'aplb_uploads_genre' );
-			if ( $existing_term && is_array( $existing_term ) ) {
-				$genre_term_id = $existing_term['term_id'];
+			// 2. Month term (parent: year)
+			$month_slug = $term_year . '-' . $term_month;
+			$month_term = term_exists( $month_slug, 'aplb_uploads_tdate' );
+			if ( $month_term && is_array( $month_term ) ) {
+				$month_term_id = $month_term['term_id'];
 			} else {
-				$new_term = wp_insert_term( $term_genre, 'aplb_uploads_genre' );
-				if ( ! is_wp_error( $new_term ) ) {
-					$genre_term_id = $new_term['term_id'];
-				}
+				$new_month = wp_insert_term( $month_slug, 'aplb_uploads_tdate', array(
+					'parent' => $year_term_id,
+					'description' => $term_year . '-' . $term_month
+				) );
+				$month_term_id = ! is_wp_error( $new_month ) ? $new_month['term_id'] : 0;
 			}
+
+			// 3. Day term (parent: month)
+			$day_slug = $term_year . '-' . $term_month . '-' . $term_day;
+			$day_term = term_exists( $day_slug, 'aplb_uploads_tdate' );
+			if ( $day_term && is_array( $day_term ) ) {
+				$day_term_id = $day_term['term_id'];
+			} else {
+				$new_day = wp_insert_term( $day_slug, 'aplb_uploads_tdate', array(
+					'parent' => $month_term_id,
+					'description' => $term_year . '-' . $term_month . '-' . $term_day
+				) );
+				$day_term_id = ! is_wp_error( $new_day ) ? $new_day['term_id'] : 0;
+			}
+		}
+
+		// 4. Genre term (default to 'all' if not specified)
+		$existing_term = term_exists( $term_genre, 'aplb_uploads_genre' );
+		if ( $existing_term && is_array( $existing_term ) ) {
+			$genre_term_id = $existing_term['term_id'];
+		} else {
+			$new_term = wp_insert_term( $term_genre, 'aplb_uploads_genre' );
+			if ( ! is_wp_error( $new_term ) ) {
+				$genre_term_id = $new_term['term_id'];
+			}
+		}
+
+		$tax_input = array();
+
+		if ( ! empty( $day_term_id ) ) {
+		    $tax_input['aplb_uploads_tdate'] = array( $day_term_id );
+		}
+
+		if ( ! empty( $genre_term_id ) ) {
+		    $tax_input['aplb_uploads_genre'] = array( $genre_term_id );
 		}
 
 		$meow_options = array(
@@ -421,15 +459,8 @@ class Ap_Library_Admin {
 			'post_status'   => 'draft',
 			'post_author'   => get_current_user_id(),
 			'post_type'     => 'aplb_uploads',
-			'tax_input'     => array(),
+			'tax_input'     => $tax_input, // <-- assign taxonomies here
 		);
-
-		if ( ! empty( $tdate_term_id ) ) {
-			$new_post['tax_input']['aplb_uploads_tdate'] = array( $tdate_term_id );
-		}
-		if ( ! empty( $genre_term_id ) ) {
-			$new_post['tax_input']['aplb_uploads_genre'] = array( $genre_term_id );
-		}
 
 		$post_id = wp_insert_post( $new_post );
 		if ( is_wp_error( $post_id ) ) {
