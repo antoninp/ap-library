@@ -46,7 +46,7 @@ class Ap_Library_Admin_Actions {
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $version    The actions of this admin menu.
+	 * @var      string    $actions    The actions of this admin menu.
 	 */
     private $actions;
 
