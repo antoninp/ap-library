@@ -235,16 +235,23 @@ class Ap_Library_Admin {
 
 	    // 2. Group uploads by uploads_genre
 	    $uploads_by_genre = array();
+	    $tdate_terms_by_genre = array();
 	    foreach ( $uploads as $upload ) {
 	        $genres = wp_get_post_terms( $upload->ID, 'aplb_uploads_genre', array( 'fields' => 'ids' ) );
+	        $tdate_terms = wp_get_post_terms( $upload->ID, 'aplb_uploads_tdate', array( 'fields' => 'ids' ) );
 	        if ( empty( $genres ) ) {
 	            $genres = array( 0 ); // Use 0 for "no genre"
 	        }
 	        foreach ( $genres as $genre_id ) {
 	            if ( ! isset( $uploads_by_genre[ $genre_id ] ) ) {
 	                $uploads_by_genre[ $genre_id ] = array();
+	                $tdate_terms_by_genre[ $genre_id ] = array();
 	            }
 	            $uploads_by_genre[ $genre_id ][] = $upload;
+	            $tdate_terms_by_genre[ $genre_id ] = array_merge(
+	                $tdate_terms_by_genre[ $genre_id ],
+	                $tdate_terms
+	            );
 	        }
 	    }
 
@@ -318,6 +325,9 @@ class Ap_Library_Admin {
 	            $library_cat_id = 0;
 	        }
 
+	        // Collect all tdate terms for this genre
+	        $tdate_terms = array_unique( $tdate_terms_by_genre[ $genre_id ] );
+
 	        if ( ! empty( $library_posts ) ) {
 	            // Update existing aplb_library post for this genre and today
 	            $library_post = $library_posts[0];
@@ -334,6 +344,13 @@ class Ap_Library_Admin {
 	            $new_image_ids = array_diff( $image_ids, $existing_ids );
 
 	            if ( empty( $new_image_ids ) ) {
+	                // Still update tdate terms if needed
+	                if ( $library_cat_id ) {
+	                    wp_set_post_terms( $library_post->ID, array( $library_cat_id ), 'aplb_library_category', false );
+	                }
+	                if ( ! empty( $tdate_terms ) ) {
+	                    wp_set_post_terms( $library_post->ID, $tdate_terms, 'aplb_uploads_tdate', false );
+	                }
 	                continue; // No new images to add
 	            }
 
@@ -363,6 +380,9 @@ class Ap_Library_Admin {
 	            if ( $library_cat_id ) {
 	                wp_set_post_terms( $library_post->ID, array( $library_cat_id ), 'aplb_library_category', false );
 	            }
+	            if ( ! empty( $tdate_terms ) ) {
+	                wp_set_post_terms( $library_post->ID, $tdate_terms, 'aplb_uploads_tdate', false );
+	            }
 	            $created++;
 	        } else {
 	            // Create new aplb_library post for this genre and today
@@ -376,6 +396,9 @@ class Ap_Library_Admin {
 	            $post_id = wp_insert_post( $new_post );
 	            if ( $post_id && $library_cat_id ) {
 	                wp_set_post_terms( $post_id, array( $library_cat_id ), 'aplb_library_category', false );
+	            }
+	            if ( $post_id && ! empty( $tdate_terms ) ) {
+	                wp_set_post_terms( $post_id, $tdate_terms, 'aplb_uploads_tdate', false );
 	            }
 	            if ( $post_id ) {
 	                $created++;
