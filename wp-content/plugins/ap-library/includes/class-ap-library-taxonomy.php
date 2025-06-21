@@ -29,18 +29,19 @@ class Ap_Library_Taxonomy {
      */
     public function register_taxonomies() {
 
-        $this->register_aplb_uploads_taxonomies();
-        $this->register_aplb_library_taxonomies();
+        $this->register_aplb_library_cat_taxonomy();
+        $this->register_aplb_uploads_tdate_taxonomy();
+        $this->register_aplb_uploads_genre_taxonomy();
 
     }
 
     /**
-     * Register the library taxonomies.
+     * Register the library category taxonomy.
      *
      * @since    1.0.0
      * @access   private
      */
-    private function register_aplb_library_taxonomies() {
+    private function register_aplb_library_cat_taxonomy() {
         
         $args = [
             'label'  => esc_html__( 'Library Categories', 'text-domain' ),
@@ -67,13 +68,13 @@ class Ap_Library_Taxonomy {
         register_taxonomy( 'aplb_library_category', 'aplb_library', $args );
     }
 
-        /**
-     * Register the uploads taxonomies.
+    /**
+     * Register the tdate taxonomy.
      *
      * @since    1.0.0
      * @access   private
      */
-    private function register_aplb_uploads_taxonomies() {
+    private function register_aplb_uploads_tdate_taxonomy() {
 
         $args = [
             'label'  => esc_html__( 'Uploads', 'text-domain' ),
@@ -99,17 +100,27 @@ class Ap_Library_Taxonomy {
 
         register_taxonomy( 'aplb_uploads_tdate', 'aplb_uploads', $args );
         
+    }
+
+    /**
+     * Register the genre taxonomy.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function register_aplb_uploads_genre_taxonomy() {
+        
         $args = [
             'label'  => esc_html__( 'Uploads', 'text-domain' ),
             'labels' => [
                 'menu_name'          => esc_html__( 'Photo Genres', 'ap_uploads' ),
                 'name'               => esc_html__( 'Photo Genres', 'ap_uploads' ),
                 'singular_name'      => esc_html__( 'Genre', 'ap_uploads' ),
-                'add_new_item'       => esc_html__( 'Add new Genres', 'ap_uploads' ),
+                'add_new_item'       => esc_html__( 'Add new Genre', 'ap_uploads' ),
                 'new_item'           => esc_html__( 'New Genre', 'ap_uploads' ),
                 'view_item'          => esc_html__( 'View Genres', 'ap_uploads' ),
                 'not_found'          => esc_html__( 'No Genre found', 'ap_uploads' ),
-                'not_found_in_trash' => esc_html__( 'No Genres found in trash', 'ap_uploads' ),
+                'not_found_in_trash' => esc_html__( 'No Genre found in trash', 'ap_uploads' ),
                 'all_items'          => esc_html__( 'All Photo Genres', 'ap_uploads' ),
             ],
             'public'              => true,
@@ -121,7 +132,7 @@ class Ap_Library_Taxonomy {
             'rewrite'             => array( 'slug' => 'uploads-genre' ),
         ];
 
-        register_taxonomy( 'aplb_uploads_genre', 'aplb_uploads', $args );
+        register_taxonomy( 'aplb_uploads_genre',  'aplb_uploads', $args );
 
     }
 }
