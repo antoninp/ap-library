@@ -172,6 +172,7 @@ class Ap_Library {
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_admin_actions' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_auto_create_post_option' );
 		$this->loader->add_action( 'add_attachment', $plugin_admin, 'maybe_create_post_on_image_upload');
+		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_back_to_top_option' );
 
 	}
 
@@ -188,6 +189,7 @@ class Ap_Library {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'wp_footer', $plugin_public, 'maybe_add_back_to_top_button' );
 
 	}
 

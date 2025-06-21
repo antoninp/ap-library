@@ -164,6 +164,18 @@ class Ap_Library_Admin {
 		    <input type="submit" class="ap-library-admin-save-btn" value="<?php esc_attr_e( 'Save', 'ap-library' ); ?>">
 		</form>
 		<?php
+
+		$back_to_top_enabled = get_option( 'ap_library_enable_back_to_top', false );
+		?>
+		<form method="post" class="ap-library-checkbox-row">
+		    <?php wp_nonce_field( 'ap_library_enable_back_to_top_action', 'ap_library_enable_back_to_top_nonce' ); ?>
+		    <input type="checkbox" id="ap_library_enable_back_to_top" name="ap_library_enable_back_to_top" value="1" <?php checked( $back_to_top_enabled, true ); ?> />
+		    <label for="ap_library_enable_back_to_top">
+		        <?php esc_html_e( 'Enable "Back to Top" button on public pages', 'ap-library' ); ?>
+		    </label>
+		    <input type="submit" class="ap-library-admin-save-btn" value="<?php esc_attr_e( 'Save', 'ap-library' ); ?>">
+		</form>
+		<?php
 		echo '</div>';
 	}
 
@@ -184,10 +196,69 @@ class Ap_Library_Admin {
 		}
 	}
 
+	public function handle_back_to_top_option() {
+		if (
+			isset( $_POST['ap_library_enable_back_to_top_nonce'] ) &&
+			wp_verify_nonce( $_POST['ap_library_enable_back_to_top_nonce'], 'ap_library_enable_back_to_top_action' )
+		) {
+			$enabled = isset( $_POST['ap_library_enable_back_to_top'] ) ? true : false;
+			update_option( 'ap_library_enable_back_to_top', $enabled );
+			add_action( 'admin_notices', function() {
+				echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'ap-library' ) . '</p></div>';
+			} );
+		}
+	}
+
 	// Example action callbacks
 	public function run_first_action() {
-		// ...your code...
-		return true;
+
+		//Search uploads for images of the day
+		$target_date = '2025-06-17'; // Example date
+		$args = array(
+			'post_type' => 'attachment',
+			'post_mime_type' => 'image',
+			'post_status' => 'inherit',
+			'posts_per_page' => -1,
+			'date_query' => array(
+				array(
+					'year'  => date('Y', strtotime($target_date)),
+					'month' => date('m', strtotime($target_date)),
+					'day'   => date('d', strtotime($target_date)),
+				),
+			),
+		);
+
+		$query = new WP_Query( $args );
+		$image_ids = array();
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$image_ids[] = get_the_ID();
+			}
+			wp_reset_postdata();
+		}
+
+		//Create new gallery post with post of the day
+		$post_title = 'Gallery from ' . $target_date;
+		$post_content = '[gallery ids="' . implode( ',', $image_ids ) . '"]'; // The gallery shortcode
+
+		$new_post = array(
+			'post_title'    => $post_title,
+			'post_content'  => $post_content,
+			'post_status'   => 'draft',
+			'post_type'     => 'aplb_library', // Or your custom post type
+		);
+
+		$post_id = wp_insert_post( $new_post );
+
+		if ( $post_id ) {
+			echo 'Post created with ID: ' . $post_id;
+			return true;
+		} else {
+			echo 'Error creating post.';
+			return new WP_Error('ap_library_error', 'Something went wrong.');
+		}
 	}
 
 	public function run_second_action() {

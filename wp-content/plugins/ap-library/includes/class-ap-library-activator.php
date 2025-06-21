@@ -36,6 +36,7 @@ class Ap_Library_Activator {
 
         // Register the option with default value 'false'
         add_option( 'ap_library_auto_create_post_on_upload', false );
+        add_option( 'ap_library_enable_back_to_top', false );
 	}
 
 }
