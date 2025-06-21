@@ -34,6 +34,8 @@ class Ap_Library_Activator {
 		// Flush rewrite rules to apply changes
         flush_rewrite_rules();
 
+        // Register the option with default value 'false'
+        add_option( 'ap_library_auto_create_post_on_upload', false );
 	}
 
 }

@@ -146,13 +146,42 @@ class Ap_Library_Admin {
 	 * Display the plugin admin page content.
 	 */
 	public function display_plugin_admin_page() {
-		echo '<div class="wrap"><h1>' . esc_html__( 'AP Library Admin', 'ap-library' ) . '</h1>';
+		echo '<div class="ap-library-admin-wrap">';
+		echo '<h1 class="ap-library-admin-title">' . esc_html__( 'AP Library Admin', 'ap-library' ) . '</h1>';
+
+		echo '<div class="ap-library-admin-actions">';
 		$this->actions_manager->render_buttons();
+		echo '</div>';
+
+		$enabled = get_option( 'ap_library_auto_create_post_on_upload', false );
+		?>
+		<form method="post" class="ap-library-checkbox-row">
+		    <?php wp_nonce_field( 'ap_library_auto_create_post_on_upload_action', 'ap_library_auto_create_post_on_upload_nonce' ); ?>
+		    <input type="checkbox" id="ap_library_auto_create_post_on_upload" name="ap_library_auto_create_post_on_upload" value="1" <?php checked( $enabled, true ); ?> />
+		    <label for="ap_library_auto_create_post_on_upload">
+		        <?php esc_html_e( 'Automatically create a post when an image is uploaded', 'ap-library' ); ?>
+		    </label>
+		    <input type="submit" class="ap-library-admin-save-btn" value="<?php esc_attr_e( 'Save', 'ap-library' ); ?>">
+		</form>
+		<?php
 		echo '</div>';
 	}
 
 	public function handle_admin_actions() {
 		$this->actions_manager->handle_actions();
+	}
+
+	public function handle_auto_create_post_option() {
+		if (
+			isset( $_POST['ap_library_auto_create_post_on_upload_nonce'] ) &&
+			wp_verify_nonce( $_POST['ap_library_auto_create_post_on_upload_nonce'], 'ap_library_auto_create_post_on_upload_action' )
+		) {
+			$enabled = isset( $_POST['ap_library_auto_create_post_on_upload'] ) ? true : false;
+			update_option( 'ap_library_auto_create_post_on_upload', $enabled );
+			add_action( 'admin_notices', function() {
+				echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'ap-library' ) . '</p></div>';
+			} );
+		}
 	}
 
 	// Example action callbacks
@@ -168,4 +197,103 @@ class Ap_Library_Admin {
 		return true;
 	}
 
+	/**
+	 * Create a post on image upload if enabled in settings.
+	 */
+	public function maybe_create_post_on_image_upload( $image_id ) {
+		if ( ! get_option( 'ap_library_auto_create_post_on_upload', false ) ) {
+			return;
+		}
+
+		// Only fire for images.
+		if ( ! wp_attachment_is_image( $image_id ) ) {
+			return;
+		}
+
+		$attachment = get_post( $image_id );
+		$tdate_term_id = null;
+		$genre_term_id = null;
+		$term_genre = 'all';
+
+		$full_path = get_attached_file( $image_id );
+		$filename = basename( $full_path, '.' . pathinfo( $full_path, PATHINFO_EXTENSION ) );
+		$parts = explode( '-', $filename );
+		if ( isset( $parts[0] ) ) {
+			$term_slug = sanitize_title( $parts[0] );
+			$term_date = substr($term_slug, 0, 4);
+
+			$existing_term = term_exists( $term_date, 'aplb_uploads_tdate' );
+			if ( $existing_term && is_array( $existing_term ) ) {
+				$tdate_term_id = $existing_term['term_id'];
+			} else {
+				$new_term = wp_insert_term( $term_date, 'aplb_uploads_tdate' );
+				if ( ! is_wp_error( $new_term ) ) {
+					$tdate_term_id = $new_term['term_id'];
+				}
+			}
+
+			$existing_term = term_exists( $term_genre, 'aplb_uploads_genre' );
+			if ( $existing_term && is_array( $existing_term ) ) {
+				$genre_term_id = $existing_term['term_id'];
+			} else {
+				$new_term = wp_insert_term( $term_genre, 'aplb_uploads_genre' );
+				if ( ! is_wp_error( $new_term ) ) {
+					$genre_term_id = $new_term['term_id'];
+				}
+			}
+		}
+
+		$meow_options = array(
+			'ids'       => '"' . $image_id  . '"',
+			'layout'    => 'tiles',
+			'link'      => 'none',
+			'imageSize' => 'full',
+			'captions'  => false
+		);
+
+		$gallery_shortcode = '[gallery ids="' . $image_id . '" layout="tiles"]';
+		$gallery_html = '<!-- wp:meow-gallery/gallery {
+			"images": [{
+				"alt":"",
+				"id":'. $image_id . ',
+				"url":"'. esc_url( wp_get_attachment_url( $image_id ) ) .'",
+				"caption":""
+				}],
+			"layout":"tiles"} -->
+				'. $gallery_shortcode .'
+			<!-- /wp:meow-gallery/gallery -->';
+
+		$new_post = array(
+			'post_title'    => sanitize_text_field( $attachment->post_title ),
+			'post_status'   => 'draft',
+			'post_author'   => get_current_user_id(),
+			'post_type'     => 'aplb_uploads',
+			'tax_input'     => array(),
+		);
+
+		if ( ! empty( $tdate_term_id ) ) {
+			$new_post['tax_input']['aplb_uploads_tdate'] = array( $tdate_term_id );
+		}
+		if ( ! empty( $genre_term_id ) ) {
+			$new_post['tax_input']['aplb_uploads_genre'] = array( $genre_term_id );
+		}
+
+		$post_id = wp_insert_post( $new_post );
+		if ( is_wp_error( $post_id ) ) {
+			return;
+		}
+
+		set_post_thumbnail($post_id, $image_id);
+
+		$attachment_args = array(
+			'ID'           => $image_id,
+			'post_parent'  => $post_id
+		);
+		wp_update_post( $attachment_args );
+
+		wp_update_post( array(
+			'ID'           => $post_id,
+			'post_content' => $gallery_html
+		) );
+	}
 }
