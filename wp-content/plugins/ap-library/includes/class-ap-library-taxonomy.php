@@ -98,7 +98,7 @@ class Ap_Library_Taxonomy {
             'rewrite'             => array( 'slug' => 'uploads-tdate' ),
         ];
 
-        register_taxonomy( 'aplb_uploads_tdate', 'aplb_uploads', $args );
+        register_taxonomy( 'aplb_uploads_tdate', array( 'aplb_uploads', 'aplb_library' ), $args );
         
     }
 
