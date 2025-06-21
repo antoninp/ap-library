@@ -69,7 +69,7 @@ class Ap_Library_Custom_Post_Types {
             'rewrite_no_front'    => false,
             'show_in_menu'        => true,
             'menu_position'         => 4,
-            'menu_icon'           => 'dashicons-images-alt2',
+            'menu_icon'           => 'dashicons-upload',
             'supports' => [
                 'title',
                 'editor',
