@@ -112,61 +112,7 @@ class Ap_Library_Public {
 				<path stroke="#AEACA6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5 15 7-7 7 7"/>
 				</svg>
 				';
-		?>
-			<a href="#" class="back-to-top"><div><?= $icon ?></div></a>
-			<style>
-			.back-to-top svg {
-				transform: scale(<?= esc_attr($scale) ?>);
-			}
-			.back-to-top {
-				width: 48px;
-				position: fixed;
-				bottom: 0px;
-				<?= esc_html($location) ?>: 1rem;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				font-size: 1rem;
-				text-decoration: none;
-				opacity: 0;
-				pointer-events: none;
-				transition: all 0.4s;
-				z-index: 20;
-			}
-			.back-to-top.active-to-top {
-				bottom: 16px;
-				pointer-events: auto;
-				opacity: 1;
-			}
-			html {
-				scroll-behavior: smooth;
-			}
-			.back-to-top div:hover {
-				animation: btt 1s linear infinite alternate;
-			}
-			@keyframes btt {
-			0%   {transform: scale(1);}
-			50%  {transform: scale(1.1);}
-			100% {transform: scale(1);}
-			}
-			</style>
-			<script>
-			document.addEventListener('DOMContentLoaded', function() {
-				const toTop = document.querySelector('.back-to-top');
-				window.addEventListener("scroll", function() {
-					if(window.pageYOffset > 100) {
-						toTop.classList.add('active-to-top');
-					} else {
-						toTop.classList.remove('active-to-top');
-					}
-				});
-				toTop.addEventListener('click', function(e) {
-					e.preventDefault();
-					window.scrollTo({top: 0, behavior: 'smooth'});
-				});
-			});
-			</script>
-		<?php
+		?><a href="#" class="back-to-top"><div><?= $icon ?></div></a><?php
 	}
 
 }
