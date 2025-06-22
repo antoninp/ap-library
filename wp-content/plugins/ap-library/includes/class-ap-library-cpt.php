@@ -132,7 +132,8 @@ class Ap_Library_Custom_Post_Types {
                 'thumbnail'
             ],
             'taxonomies' => [
-                'library_category'
+                'library_category',
+                'library_pdate'
             ],
             'rewrite' => array( 'slug' => 'library' ),
         ];
