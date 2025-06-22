@@ -30,6 +30,7 @@ class Ap_Library_Taxonomy {
     public function register_taxonomies() {
 
         $this->register_aplb_library_cat_taxonomy();
+        $this->register_aplb_library_pdate_taxonomy();
         $this->register_aplb_uploads_tdate_taxonomy();
         $this->register_aplb_uploads_genre_taxonomy();
 
@@ -68,8 +69,43 @@ class Ap_Library_Taxonomy {
         register_taxonomy( 'aplb_library_category', 'aplb_library', $args );
     }
 
+    
     /**
-     * Register the tdate taxonomy.
+     * Register the published date taxonomy.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function register_aplb_library_pdate_taxonomy() {
+
+        $args = [
+            'label'  => esc_html__( 'Uploads', 'text-domain' ),
+            'labels' => [
+                'menu_name'          => esc_html__( 'Published Date', 'ap_library' ),
+                'name'               => esc_html__( 'Published Date', 'ap_library' ),
+                'singular_name'      => esc_html__( 'Published Date', 'ap_library' ),
+                'add_new_item'       => esc_html__( 'Add new Published Date', 'ap_library' ),
+                'new_item'           => esc_html__( 'New Published Date', 'ap_library' ),
+                'view_item'          => esc_html__( 'View Published Date', 'ap_library' ),
+                'not_found'          => esc_html__( 'No Published Date found', 'ap_library' ),
+                'not_found_in_trash' => esc_html__( 'No Published Date found in trash', 'ap_library' ),
+                'all_items'          => esc_html__( 'All Published Dates', 'ap_library' ),
+            ],
+            'public'              => true,
+            'show_ui'             => true,
+            'show_in_nav_menus'   => true,
+            'show_admin_column'   => true,
+            'show_in_rest'        => true,
+            'hierarchical'        => true,
+            'rewrite'             => array( 'slug' => 'library-pdate' ),
+        ];
+
+        register_taxonomy( 'aplb_library_pdate', 'aplb_library', $args );
+
+    }
+
+    /**
+     * Register the taken date taxonomy.
      *
      * @since    1.0.0
      * @access   private
@@ -98,7 +134,7 @@ class Ap_Library_Taxonomy {
             'rewrite'             => array( 'slug' => 'uploads-tdate' ),
         ];
 
-        register_taxonomy( 'aplb_uploads_tdate', array( 'aplb_uploads', 'aplb_library' ), $args );
+        register_taxonomy( 'aplb_uploads_tdate', 'aplb_uploads', $args );
         
     }
 
@@ -135,4 +171,5 @@ class Ap_Library_Taxonomy {
         register_taxonomy( 'aplb_uploads_genre',  'aplb_uploads', $args );
 
     }
+
 }
