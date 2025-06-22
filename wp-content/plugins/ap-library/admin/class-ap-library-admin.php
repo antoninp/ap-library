@@ -213,16 +213,26 @@ class Ap_Library_Admin {
 	public function run_first_action() {
 	    $today = date( 'Y-m-d' );
 
-	    // 1. Get all aplb_uploads posts published today
+	    // Get the term ID for today's pdate
+	    $pdate_term = term_exists( $today, 'aplb_library_pdate' );
+	    if ( $pdate_term && is_array( $pdate_term ) ) {
+	        $pdate_term_id = $pdate_term['term_id'];
+	    } else {
+	        // If no posts have this pdate, nothing to do
+	        echo esc_html__( 'No uploads found for today.', 'ap-library' );
+	        return new WP_Error('ap_library_error', 'No uploads found for today.');
+	    }
+
+	    // 1. Get all aplb_uploads posts published with pdate set as today
 	    $args = array(
 	        'post_type'      => 'aplb_uploads',
 	        'post_status'    => 'publish',
 	        'posts_per_page' => -1,
-	        'date_query'     => array(
+	        'tax_query'      => array(
 	            array(
-	                'after'     => $today . ' 00:00:00',
-	                'before'    => $today . ' 23:59:59',
-	                'inclusive' => true,
+	                'taxonomy' => 'aplb_library_pdate',
+	                'field'    => 'term_id',
+	                'terms'    => $pdate_term_id,
 	            ),
 	        ),
 	    );
@@ -235,23 +245,16 @@ class Ap_Library_Admin {
 
 	    // 2. Group uploads by uploads_genre
 	    $uploads_by_genre = array();
-	    $tdate_terms_by_genre = array();
 	    foreach ( $uploads as $upload ) {
 	        $genres = wp_get_post_terms( $upload->ID, 'aplb_uploads_genre', array( 'fields' => 'ids' ) );
-	        $tdate_terms = wp_get_post_terms( $upload->ID, 'aplb_uploads_tdate', array( 'fields' => 'ids' ) );
 	        if ( empty( $genres ) ) {
 	            $genres = array( 0 ); // Use 0 for "no genre"
 	        }
 	        foreach ( $genres as $genre_id ) {
 	            if ( ! isset( $uploads_by_genre[ $genre_id ] ) ) {
 	                $uploads_by_genre[ $genre_id ] = array();
-	                $tdate_terms_by_genre[ $genre_id ] = array();
 	            }
 	            $uploads_by_genre[ $genre_id ][] = $upload;
-	            $tdate_terms_by_genre[ $genre_id ] = array_merge(
-	                $tdate_terms_by_genre[ $genre_id ],
-	                $tdate_terms
-	            );
 	        }
 	    }
 
@@ -325,9 +328,6 @@ class Ap_Library_Admin {
 	            $library_cat_id = 0;
 	        }
 
-	        // Collect all tdate terms for this genre
-	        $tdate_terms = array_unique( $tdate_terms_by_genre[ $genre_id ] );
-
 	        if ( ! empty( $library_posts ) ) {
 	            // Update existing aplb_library post for this genre and today
 	            $library_post = $library_posts[0];
@@ -344,12 +344,12 @@ class Ap_Library_Admin {
 	            $new_image_ids = array_diff( $image_ids, $existing_ids );
 
 	            if ( empty( $new_image_ids ) ) {
-	                // Still update tdate terms if needed
+	                // Still update library_category and pdate terms if needed
 	                if ( $library_cat_id ) {
 	                    wp_set_post_terms( $library_post->ID, array( $library_cat_id ), 'aplb_library_category', false );
 	                }
-	                if ( ! empty( $tdate_terms ) ) {
-	                    wp_set_post_terms( $library_post->ID, $tdate_terms, 'aplb_uploads_tdate', false );
+	                if ( ! empty( $pdate_term_id ) ) {
+	                    wp_set_post_terms( $library_post->ID, array( $pdate_term_id ), 'aplb_library_pdate', false );
 	                }
 	                continue; // No new images to add
 	            }
@@ -380,13 +380,13 @@ class Ap_Library_Admin {
 	            if ( $library_cat_id ) {
 	                wp_set_post_terms( $library_post->ID, array( $library_cat_id ), 'aplb_library_category', false );
 	            }
-	            if ( ! empty( $tdate_terms ) ) {
-	                wp_set_post_terms( $library_post->ID, $tdate_terms, 'aplb_uploads_tdate', false );
+	            if ( ! empty( $pdate_term_id ) ) {
+	                wp_set_post_terms( $library_post->ID, array( $pdate_term_id ), 'aplb_library_pdate', false );
 	            }
 	            $created++;
 	        } else {
 	            // Create new aplb_library post for this genre and today
-	            $post_title = sprintf( __( 'Gallery from Uploads - %s - %s', 'ap-library' ), $genre_name, $today );
+	            $post_title = sprintf( __( '%s - %s', 'ap-library' ), $today, $genre_name );
 	            $new_post = array(
 	                'post_title'    => $post_title,
 	                'post_content'  => $gallery_html,
@@ -397,8 +397,8 @@ class Ap_Library_Admin {
 	            if ( $post_id && $library_cat_id ) {
 	                wp_set_post_terms( $post_id, array( $library_cat_id ), 'aplb_library_category', false );
 	            }
-	            if ( $post_id && ! empty( $tdate_terms ) ) {
-	                wp_set_post_terms( $post_id, $tdate_terms, 'aplb_uploads_tdate', false );
+	            if ( $post_id && ! empty( $pdate_term_id ) ) {
+	                wp_set_post_terms( $post_id, array( $pdate_term_id ), 'aplb_library_pdate', false );
 	            }
 	            if ( $post_id ) {
 	                $created++;
@@ -496,6 +496,16 @@ class Ap_Library_Admin {
 			}
 		}
 
+		// 5. Create or get the pdate term based on the upload date of the image
+		$upload_date = date( 'Y-m-d', strtotime( $attachment->post_date ) );
+		$pdate_term = term_exists( $upload_date, 'aplb_library_pdate' );
+		if ( $pdate_term && is_array( $pdate_term ) ) {
+		    $pdate_term_id = $pdate_term['term_id'];
+		} else {
+		    $new_pdate = wp_insert_term( $upload_date, 'aplb_library_pdate' );
+		    $pdate_term_id = ! is_wp_error( $new_pdate ) ? $new_pdate['term_id'] : 0;
+		}
+
 		$tax_input = array();
 
 		$aplb_uploads_tdate_terms = array();
@@ -514,6 +524,10 @@ class Ap_Library_Admin {
 
 		if ( ! empty( $genre_term_id ) ) {
 		    $tax_input['aplb_uploads_genre'] = array( $genre_term_id );
+		}
+
+		if ( ! empty( $pdate_term_id ) ) {
+		    $tax_input['aplb_library_pdate'] = array( $pdate_term_id );
 		}
 
 		$meow_options = array(

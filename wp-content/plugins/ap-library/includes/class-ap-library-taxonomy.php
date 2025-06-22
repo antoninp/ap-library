@@ -100,7 +100,7 @@ class Ap_Library_Taxonomy {
             'rewrite'             => array( 'slug' => 'library-pdate' ),
         ];
 
-        register_taxonomy( 'aplb_library_pdate', 'aplb_library', $args );
+        register_taxonomy( 'aplb_library_pdate', array( 'aplb_library' , 'aplb_uploads' ), $args );
 
     }
 

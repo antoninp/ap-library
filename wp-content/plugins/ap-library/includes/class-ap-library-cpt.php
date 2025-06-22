@@ -79,7 +79,8 @@ class Ap_Library_Custom_Post_Types {
             ],
             'taxonomies' => [
                 'uploads_tdate',
-                'uploads_genre'
+                'uploads_genre',
+                'library_pdate'
             ],
             'rewrite' => array( 'slug' => 'lastest-uploads' ),
         ];
