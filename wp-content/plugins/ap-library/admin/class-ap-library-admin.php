@@ -31,7 +31,9 @@
  * @author     Antonin Puleo <a@antoninpuleo.com>
  */
 
- require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-actions.php';
+require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-actions.php';
+require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-bulk-actions.php';
+require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-columns.php';
 
 
 class Ap_Library_Admin {
@@ -118,6 +120,8 @@ class Ap_Library_Admin {
 			'Run Second Action',
 			array( $this->actions_manager, 'run_second_action' )
 		);
+
+        $this->columns_manager = new Ap_Library_Admin_Columns();
 	}
 
 	/**
@@ -446,69 +450,6 @@ class Ap_Library_Admin {
 			'ID'           => $post_id,
 			'post_content' => $gallery_html
 		) );
-	}
-
-    public function add_aplb_uploads_thumbnail_column( $columns ) {
-        $new = array();
-        foreach ( $columns as $key => $value ) {
-            $new[ $key ] = $value;
-            if ( $key === 'cb' ) {
-                $new['thumbnail'] = __( 'Thumbnail', 'ap-library' );
-            }
-        }
-        return $new;
-    }
-
-	/**
-	 * Render the thumbnail for aplb_uploads post list.
-	 */
-	public function render_aplb_uploads_thumbnail_column( $column, $post_id ) {
-	    if ( $column === 'thumbnail' ) {
-	        if ( has_post_thumbnail( $post_id ) ) {
-	            echo get_the_post_thumbnail( $post_id, array( 60, 60 ) );
-	        } else {
-	            echo '&mdash;';
-	        }
-	    }
-	}
-
-	// Add custom bulk action to the dropdown
-	public function register_uploads_bulk_actions( $bulk_actions ) {
-	    $bulk_actions['publish_aplb_uploads'] = __( 'Publish Uploads', 'ap-library' );
-	    return $bulk_actions;
-	}
-
-	public function handle_uploads_bulk_action( $redirect_to, $doaction, $post_ids ) {
-		if ( $doaction !== 'publish_aplb_uploads' ) {
-			return $redirect_to;
-		}
-
-		$published = 0;
-		foreach ( $post_ids as $post_id ) {
-			$post = get_post( $post_id );
-			if ( $post && $post->post_type === 'aplb_uploads' && $post->post_status !== 'publish' ) {
-				wp_update_post( array(
-					'ID' => $post_id,
-					'post_status' => 'publish'
-				) );
-				$published++;
-			}
-		}
-
-		$redirect_to = add_query_arg( 'bulk_published_uploads', $published, $redirect_to );
-		return $redirect_to;
-	}
-
-	public function bulk_action_admin_notice() {
-		if ( ! empty( $_REQUEST['bulk_published_uploads'] ) ) {
-			$count = intval( $_REQUEST['bulk_published_uploads'] );
-			printf(
-				'<div id="message" class="updated notice notice-success is-dismissible"><p>' .
-				esc_html__( 'Published %d uploads.', 'ap-library' ) .
-				'</p></div>',
-				$count
-			);
-		}
 	}
 
 }

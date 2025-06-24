@@ -57,6 +57,9 @@ class Ap_Library {
 	 */
 	protected $version;
 
+	protected $columns_manager;
+	protected $bulk_actions;
+
 	/**
 	 * Define the core functionality of the plugin.
 	 *
@@ -134,6 +137,16 @@ class Ap_Library {
          */
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-taxonomy.php';
 
+		/**
+		 * The class responsible for defining columns in the admin area.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-admin-columns.php';
+
+		/**
+		 * The class responsible for defining bulk actions in the admin area.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-admin-bulk-actions.php';
+
 		$this->loader = new Ap_Library_Loader();
 
 	}
@@ -165,6 +178,8 @@ class Ap_Library {
 	private function define_admin_hooks() {
 
 		$plugin_admin = new Ap_Library_Admin( $this->get_plugin_name(), $this->get_version() );
+		$columns_manager = new Ap_Library_Admin_Columns();
+		$bulk_actions = new Ap_Library_Admin_Bulk_Actions();
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -173,11 +188,11 @@ class Ap_Library {
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_auto_create_post_option' );
 		$this->loader->add_action( 'add_attachment', $plugin_admin, 'maybe_create_post_on_image_upload');
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_back_to_top_option' );
-		$this->loader->add_filter( 'manage_aplb_uploads_posts_columns', $plugin_admin, 'add_aplb_uploads_thumbnail_column' );
-		$this->loader->add_action( 'manage_aplb_uploads_posts_custom_column', $plugin_admin, 'render_aplb_uploads_thumbnail_column', 10, 2 );
-		$this->loader->add_filter( 'bulk_actions-edit-aplb_uploads', $plugin_admin, 'register_uploads_bulk_actions' );
-		$this->loader->add_filter( 'handle_bulk_actions-edit-aplb_uploads', $plugin_admin, 'handle_uploads_bulk_action', 10, 3 );
-		$this->loader->add_action( 'admin_notices', $plugin_admin, 'bulk_action_admin_notice' );
+		$this->loader->add_filter( 'manage_aplb_uploads_posts_columns', [ $columns_manager, 'add_aplb_uploads_thumbnail_column' ] );
+		$this->loader->add_action( 'manage_aplb_uploads_posts_custom_column', [ $columns_manager, 'render_aplb_uploads_thumbnail_column' ], 10, 2 );
+		$this->loader->add_filter( 'bulk_actions-edit-aplb_uploads', [ $bulk_actions, 'register_uploads_bulk_actions' ] );
+		$this->loader->add_filter( 'handle_bulk_actions-edit-aplb_uploads', [ $bulk_actions, 'handle_uploads_bulk_action' ], 10, 3 );
+		$this->loader->add_action( 'admin_notices', [ $bulk_actions, 'bulk_action_admin_notice' ] );
 
 	}
 
