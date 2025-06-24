@@ -29,10 +29,11 @@ class Ap_Library_Taxonomy {
      */
     public function register_taxonomies() {
 
-        $this->register_aplb_library_cat_taxonomy();
-        $this->register_aplb_library_pdate_taxonomy();
-        $this->register_aplb_uploads_tdate_taxonomy();
         $this->register_aplb_uploads_genre_taxonomy();
+        $this->register_aplb_uploads_tdate_taxonomy();
+        $this->register_aplb_library_pdate_taxonomy();
+        $this->register_aplb_library_cat_taxonomy();
+ 
 
     }
 
