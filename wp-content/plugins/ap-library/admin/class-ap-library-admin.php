@@ -281,6 +281,25 @@ class Ap_Library_Admin {
 	            continue;
 	        }
 
+			// Get the genre term object for naming and taxonomy assignment
+			if ( $genre_id && $genre_id !== 0 ) {
+				$genre_term = get_term( $genre_id, 'aplb_uploads_genre' );
+				$genre_name = $genre_term ? $genre_term->name : __( 'All', 'ap-library' );
+				$genre_slug = $genre_term ? $genre_term->slug : 'all';
+			} else {
+				$genre_name = __( 'All', 'ap-library' );
+				$genre_slug = 'all';
+			}
+
+			// Ensure the genre exists in aplb_library_category and get its ID
+			$library_cat_term = term_exists( $genre_slug, 'aplb_library_category' );
+			if ( $library_cat_term && is_array( $library_cat_term ) ) {
+				$library_cat_id = $library_cat_term['term_id'];
+			} else {
+				$new_cat = wp_insert_term( $genre_name, 'aplb_library_category', array( 'slug' => $genre_slug ) );
+				$library_cat_id = ! is_wp_error( $new_cat ) ? $new_cat['term_id'] : 0;
+			}
+
 	        // Find any aplb_library post for this genre and today (any status)
 	        $library_args = array(
 	            'post_type'      => 'aplb_library',
