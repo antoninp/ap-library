@@ -36,3 +36,20 @@ html {
   50%  {transform: scale(1.1);}
   100% {transform: scale(1);}
 }
+
+.wp-block-group.single-image {
+    max-height: 400px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.wp-block-group.single-image img {
+    max-height: 400px;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
