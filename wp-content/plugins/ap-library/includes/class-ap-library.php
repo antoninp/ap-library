@@ -175,6 +175,9 @@ class Ap_Library {
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_back_to_top_option' );
 		$this->loader->add_filter( 'manage_aplb_uploads_posts_columns', $plugin_admin, 'add_aplb_uploads_thumbnail_column' );
 		$this->loader->add_action( 'manage_aplb_uploads_posts_custom_column', $plugin_admin, 'render_aplb_uploads_thumbnail_column', 10, 2 );
+		$this->loader->add_filter( 'bulk_actions-edit-aplb_uploads', $plugin_admin, 'register_uploads_bulk_actions' );
+		$this->loader->add_filter( 'handle_bulk_actions-edit-aplb_uploads', $plugin_admin, 'handle_uploads_bulk_action', 10, 3 );
+		$this->loader->add_action( 'admin_notices', $plugin_admin, 'bulk_action_admin_notice' );
 
 	}
 
