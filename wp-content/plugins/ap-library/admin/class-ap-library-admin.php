@@ -281,10 +281,10 @@ class Ap_Library_Admin {
 	            continue;
 	        }
 
-	        // 3. Check if a aplb_library post for this genre and today already exists
+	        // Find any aplb_library post for this genre and today (any status)
 	        $library_args = array(
 	            'post_type'      => 'aplb_library',
-	            'post_status'    => array('draft', 'publish', 'pending', 'private'),
+	            'post_status'    => array('publish', 'draft', 'pending', 'private'),
 	            'posts_per_page' => 1,
 	            'date_query'     => array(
 	                array(
@@ -305,32 +305,14 @@ class Ap_Library_Admin {
 	        );
 	        $library_posts = get_posts( $library_args );
 
-	        $gallery_shortcode = '[gallery ids="' . implode( ',', $image_ids ) . '" layout="tiles"]';
-	        $gallery_html = '<!-- wp:meow-gallery/gallery ' . json_encode( array(
-	            'images' => $images_json,
-	            'layout' => 'tiles'
-	        ) ) . ' -->' . $gallery_shortcode . '<!-- /wp:meow-gallery/gallery -->';
+	        // Find any published aplb_library post for this genre and today
+	        $published_library_args = $library_args;
+	        $published_library_args['post_status'] = 'publish';
+	        $published_library_posts = get_posts( $published_library_args );
 
-	        // Get the genre term object for naming and taxonomy assignment
-	        $genre_term = $genre_id ? get_term( $genre_id, 'aplb_uploads_genre' ) : null;
-	        $genre_name = $genre_term ? $genre_term->name : __( 'No Genre', 'ap-library' );
-
-	        // Ensure the genre exists in aplb_library_category and get its ID
-	        if ( $genre_term ) {
-	            $library_cat_term = term_exists( $genre_term->slug, 'aplb_library_category' );
-	            if ( $library_cat_term && is_array( $library_cat_term ) ) {
-	                $library_cat_id = $library_cat_term['term_id'];
-	            } else {
-	                $new_cat = wp_insert_term( $genre_term->name, 'aplb_library_category', array( 'slug' => $genre_term->slug ) );
-	                $library_cat_id = ! is_wp_error( $new_cat ) ? $new_cat['term_id'] : 0;
-	            }
-	        } else {
-	            $library_cat_id = 0;
-	        }
-
-	        if ( ! empty( $library_posts ) ) {
-	            // Update existing aplb_library post for this genre and today
-	            $library_post = $library_posts[0];
+	        // If a published post exists, update it; otherwise, create a new one
+	        if ( ! empty( $published_library_posts ) ) {
+	            $library_post = $published_library_posts[0];
 	            $existing_content = $library_post->post_content;
 
 	            // Extract existing image IDs from the gallery shortcode in the content
@@ -365,11 +347,19 @@ class Ap_Library_Admin {
 	                    'caption' => ''
 	                );
 	            }
+	            $gallery_class = (count($merged_ids) === 1) ? 'single-image' : '';
 	            $merged_gallery_shortcode = '[gallery ids="' . implode( ',', $merged_ids ) . '" layout="tiles"]';
-	            $merged_gallery_html = '<!-- wp:meow-gallery/gallery ' . json_encode( array(
-	                'images' => $merged_images_json,
-	                'layout' => 'tiles'
-	            ) ) . ' -->' . $merged_gallery_shortcode . '<!-- /wp:meow-gallery/gallery -->';
+	            $merged_gallery_html =
+	                '<!-- wp:group {"className":"' . esc_attr($gallery_class) . '"} -->' .
+	                    '<div class="wp-block-group ' . esc_attr($gallery_class) . '">' .
+	                        '<!-- wp:meow-gallery/gallery ' . json_encode([
+	                            'images' => $merged_images_json,
+	                            'layout' => 'tiles'
+	                        ]) . ' -->' .
+	                        $merged_gallery_shortcode .
+	                        '<!-- /wp:meow-gallery/gallery -->' .
+	                    '</div>' .
+	                '<!-- /wp:group -->';
 
 	            // Update the aplb_library post
 	            wp_update_post( array(
@@ -387,10 +377,24 @@ class Ap_Library_Admin {
 	        } else {
 	            // Create new aplb_library post for this genre and today
 	            $post_title = sprintf( __( '%s - %s', 'ap-library' ), $today, $genre_name );
+	            $gallery_class = (count($image_ids) === 1) ? 'single-image' : '';
+	            $gallery_shortcode = '[gallery ids="' . implode( ',', $image_ids ) . '" layout="tiles"]';
+	            $gallery_html =
+	                '<!-- wp:group {"className":"' . esc_attr($gallery_class) . '"} -->' .
+	                    '<div class="wp-block-group ' . esc_attr($gallery_class) . '">' .
+	                        '<!-- wp:meow-gallery/gallery ' . json_encode([
+	                            'images' => $images_json,
+	                            'layout' => 'tiles'
+	                        ]) . ' -->' .
+	                        $gallery_shortcode .
+	                        '<!-- /wp:meow-gallery/gallery -->' .
+	                    '</div>' .
+	                '<!-- /wp:group -->';
+
 	            $new_post = array(
 	                'post_title'    => $post_title,
 	                'post_content'  => $gallery_html,
-	                'post_status'   => 'draft',
+	                'post_status'   => 'publish',
 	                'post_type'     => 'aplb_library',
 	            );
 	            $post_id = wp_insert_post( $new_post );
