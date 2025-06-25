@@ -175,7 +175,7 @@ class Ap_Library {
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_auto_create_post_option' );
 		$this->loader->add_action( 'add_attachment', $plugin_admin, 'maybe_create_post_on_image_upload' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_back_to_top_option' );
-		$this->loader->add_action( 'admin_notices', $plugin_admin, 'show_admin_notice' );
+		$this->loader->add_action( 'admin_notices', $plugin_admin, 'show_admin_notices' );
 
 		// Columns hooks
 		$columns_manager = $plugin_admin->get_columns_manager();

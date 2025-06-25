@@ -357,4 +357,8 @@ class Ap_Library_Admin_Actions {
         return get_posts( $args );
     }
 
+    public function get_last_notice() {
+        return $this->last_notice;
+    }
+
 }

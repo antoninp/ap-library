@@ -83,12 +83,13 @@ class Ap_Library_Admin {
 	private $bulk_actions_manager;
 
 	/**
-	 * Initialize the class and set its properties.
+	 * The last notice to display.
 	 *
 	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @access   private
+	 * @var      array    $last_notice    The last notice to display.
 	 */
+	private $last_notice;
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -101,6 +102,7 @@ class Ap_Library_Admin {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		$this->last_notice = null;
 
 		$this->load_dependencies();
 
@@ -264,9 +266,10 @@ class Ap_Library_Admin {
 		) {
 			$enabled = isset( $_POST['ap_library_auto_create_post_on_upload'] ) ? true : false;
 			update_option( 'ap_library_auto_create_post_on_upload', $enabled );
-			add_action( 'admin_notices', function() {
-				echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'ap-library' ) . '</p></div>';
-			} );
+			$this->last_notice = [
+				'type' => 'success',
+				'message' => __( 'Settings saved.', 'ap-library' )
+			];
 		}
 	}
 
@@ -277,9 +280,10 @@ class Ap_Library_Admin {
 		) {
 			$enabled = isset( $_POST['ap_library_enable_back_to_top'] ) ? true : false;
 			update_option( 'ap_library_enable_back_to_top', $enabled );
-			add_action( 'admin_notices', function() {
-				echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Settings saved.', 'ap-library' ) . '</p></div>';
-			} );
+			$this->last_notice = [
+				'type' => 'success',
+				'message' => __( 'Settings saved.', 'ap-library' )
+			];
 		}
 	}
 
@@ -438,16 +442,28 @@ class Ap_Library_Admin {
 		) );
 	}
 
-	public function show_admin_notice() {
-		if ($this->actions_manager->last_notice) {
-			$notice = $this->actions_manager->last_notice;
+	public function show_admin_notices() {
+		$notices = [];
+
+		// Collect notice from actions manager
+		if ($this->actions_manager && $this->actions_manager->get_last_notice()) {
+			$notices[] = $this->actions_manager->get_last_notice();
+			$this->actions_manager->last_notice = null;
+		}
+
+		// Collect notice from admin class itself
+		if ($this->last_notice) {
+			$notices[] = $this->last_notice;
+			$this->last_notice = null;
+		}
+
+		// Display all collected notices
+		foreach ($notices as $notice) {
 			printf(
 				'<div class="notice notice-%s is-dismissible"><p>%s</p></div>',
 				esc_attr($notice['type']),
 				esc_html($notice['message'])
 			);
-			// Optionally clear the notice after displaying
-			$this->actions_manager->last_notice = null;
 		}
 	}
 
