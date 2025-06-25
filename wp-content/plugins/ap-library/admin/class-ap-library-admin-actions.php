@@ -21,26 +21,22 @@
  * @author     Antonin Puleo <a@antoninpuleo.com>
  */
 class Ap_Library_Admin_Actions {
-
-	/**
+    /**
 	 * The ID of this plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   private
 	 * @var      string    $plugin_name    The ID of this plugin.
 	 */
-	private $plugin_name;
-
-	/**
+    private $plugin_name;
+    /**
 	 * The version of this plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   private
 	 * @var      string    $version    The current version of this plugin.
 	 */
-	private $version;
-
-
+    private $version;
     /**
 	 * The actions of this admin menu.
 	 *
@@ -48,8 +44,7 @@ class Ap_Library_Admin_Actions {
 	 * @access   private
 	 * @var      string    $actions    The actions of this admin menu.
 	 */
-    private $actions;
-
+    private $actions = [];
     /**
      * The last admin notice message.
      *
@@ -57,9 +52,9 @@ class Ap_Library_Admin_Actions {
      * @access   public
      * @var      array    $last_notice    The last admin notice message.
      */
-    public $last_notice;
+    public $last_notice = null;
 
-	/**
+    /**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
@@ -70,10 +65,14 @@ class Ap_Library_Admin_Actions {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-        $this->actions = array();
-        $this->last_notice = null;
-
+        $this->register_default_actions();
 	}
+
+    private function register_default_actions() {
+        $this->register_action('first_action', __('Run First Action', 'ap-library'), [$this, 'run_first_action']);
+        $this->register_action('second_action', __('Run Second Action', 'ap-library'), [$this, 'run_second_action']);
+    }
+
     public function register_action( $key, $label, $callback ) {
         $this->actions[ $key ] = array(
             'label'    => $label,
@@ -98,21 +97,23 @@ class Ap_Library_Admin_Actions {
                 isset( $_POST[ 'ap_library_run_' . $key ] ) &&
                 check_admin_referer( 'ap_library_action_' . $key, 'ap_library_nonce_' . $key )
             ) {
-                try {
-                    $result = call_user_func( $action['callback'] );
-                    if ( is_wp_error( $result ) ) {
-                        throw new Exception( $result->get_error_message() );
-                    }
-                    // Store the notice in a property or return it, so the admin class or loader can display it.
-                    $this->last_notice = [
-                        'type' => 'success',
-                        'message' => sprintf('%s executed successfully!', esc_html($action['label']))
-                    ];
-                } catch ( Exception $e ) {
-                    // Store the error message in a property or return it, so the admin class or loader can display it.
+                $result = call_user_func( $action['callback'] );
+                if ( is_wp_error( $result ) ) {
                     $this->last_notice = [
                         'type' => 'error',
-                        'message' => sprintf( esc_html__( '%s failed: %s', 'ap-library' ), esc_html( $action['label'] ), esc_html( $e->getMessage() ) )
+                        'message' => sprintf(
+                            esc_html__('%s failed: %s', 'ap-library'),
+                            esc_html( $action['label'] ),
+                            esc_html( $result->get_error_message() )
+                        ),
+                    ];
+                } else {
+                    $this->last_notice = [
+                        'type' => 'success',
+                        'message' => sprintf(
+                            '%s executed successfully!',
+                            esc_html( $action['label'] )
+                        ),
                     ];
                 }
             }
