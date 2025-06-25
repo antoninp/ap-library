@@ -31,10 +31,6 @@
  * @author     Antonin Puleo <a@antoninpuleo.com>
  */
 
-require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-actions.php';
-require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-bulk-actions.php';
-require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-columns.php';
-
 
 class Ap_Library_Admin {
 
@@ -45,22 +41,8 @@ class Ap_Library_Admin {
 	 * @access   private
 	 * @var      string    $plugin_name    The ID of this plugin.
 	 */
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
 	private $plugin_name;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
 
 	/**
 	 * The version of this plugin.
@@ -71,13 +53,6 @@ class Ap_Library_Admin {
 	 */
 	private $version;
 
-    /**
-     * The actions manager of admin menu.
-     *
-     * @since    1.0.0
-     * @access   private
-     * @var      string    $actions_manager    The actions manager of admin menu.
-     */
 
     /**
      * The actions manager of admin menu.
@@ -87,6 +62,25 @@ class Ap_Library_Admin {
      * @var      string    $actions_manager    The actions manager of admin menu.
      */
     private $actions_manager;
+
+	
+    /**
+     * The columns manager of admin menu.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string    $columns_manager    The columns manager of admin menu.
+     */
+    private $columns_manager;
+
+	/**
+	 * The bulk actions manager of admin menu.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $bulk_actions_manager    The bulk actions manager of admin menu.
+	 */
+	private $bulk_actions_manager;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -108,6 +102,8 @@ class Ap_Library_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+		$this->load_dependencies();
+
 		// Initialize actions manager and register actions
 		$this->actions_manager = new Ap_Library_Admin_Actions($this->version, $this->plugin_name);
 		$this->actions_manager->register_action(
@@ -122,20 +118,10 @@ class Ap_Library_Admin {
 		);
 
         $this->columns_manager = new Ap_Library_Admin_Columns();
+		$this->bulk_actions_manager = new Ap_Library_Admin_Bulk_Actions();
 	}
 
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_styles() {
-
+	public function load_dependencies() {
 		/**
 		 * This function is provided for demonstration purposes only.
 		 *
@@ -148,6 +134,29 @@ class Ap_Library_Admin {
 		 * class.
 		 */
 
+		require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-actions.php';
+		require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-bulk-actions.php';
+		require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-columns.php';
+
+	}
+
+	// Add public getter methods for loader access
+    public function get_actions_manager() {
+        return (object) $this->actions_manager;
+    }
+    public function get_columns_manager() {
+        return (object) $this->columns_manager;
+    }
+    public function get_bulk_actions_manager() {
+        return (object) $this->bulk_actions_manager;
+    }
+
+	/**
+	 * Register the stylesheets for the admin area.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_styles() {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -171,25 +180,7 @@ class Ap_Library_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
 	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Ap_Library_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Ap_Library_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -208,11 +199,6 @@ class Ap_Library_Admin {
 
 	}
 
-	/**
-	 * Register the admin menu for the plugin.
-	 *
-	 * @since    1.0.0
-	 */
 	/**
 	 * Register the admin menu for the plugin.
 	 *
@@ -450,6 +436,19 @@ class Ap_Library_Admin {
 			'ID'           => $post_id,
 			'post_content' => $gallery_html
 		) );
+	}
+
+	public function show_admin_notice() {
+		if ($this->actions_manager->last_notice) {
+			$notice = $this->actions_manager->last_notice;
+			printf(
+				'<div class="notice notice-%s is-dismissible"><p>%s</p></div>',
+				esc_attr($notice['type']),
+				esc_html($notice['message'])
+			);
+			// Optionally clear the notice after displaying
+			$this->actions_manager->last_notice = null;
+		}
 	}
 
 }
