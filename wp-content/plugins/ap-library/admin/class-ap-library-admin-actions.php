@@ -50,6 +50,15 @@ class Ap_Library_Admin_Actions {
 	 */
     private $actions;
 
+    /**
+     * The last admin notice message.
+     *
+     * @since    1.0.0
+     * @access   public
+     * @var      array    $last_notice    The last admin notice message.
+     */
+    public $last_notice;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -62,6 +71,7 @@ class Ap_Library_Admin_Actions {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
         $this->actions = array();
+        $this->last_notice = null;
 
 	}
     public function register_action( $key, $label, $callback ) {
@@ -93,13 +103,17 @@ class Ap_Library_Admin_Actions {
                     if ( is_wp_error( $result ) ) {
                         throw new Exception( $result->get_error_message() );
                     }
-                    add_action( 'admin_notices', function() use ( $action ) {
-                        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html( $action['label'] ) . ' executed successfully!</p></div>';
-                    } );
+                    // Store the notice in a property or return it, so the admin class or loader can display it.
+                    $this->last_notice = [
+                        'type' => 'success',
+                        'message' => sprintf('%s executed successfully!', esc_html($action['label']))
+                    ];
                 } catch ( Exception $e ) {
-                    add_action( 'admin_notices', function() use ( $e, $action ) {
-                        echo '<div class="notice notice-error is-dismissible"><p>Error running ' . esc_html( $action['label'] ) . ': ' . esc_html( $e->getMessage() ) . '</p></div>';
-                    } );
+                    // Store the error message in a property or return it, so the admin class or loader can display it.
+                    $this->last_notice = [
+                        'type' => 'error',
+                        'message' => sprintf( esc_html__( '%s failed: %s', 'ap-library' ), esc_html( $action['label'] ), esc_html( $e->getMessage() ) )
+                    ];
                 }
             }
         }
@@ -342,4 +356,5 @@ class Ap_Library_Admin_Actions {
         );
         return get_posts( $args );
     }
+
 }
