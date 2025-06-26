@@ -186,7 +186,6 @@ class Ap_Library {
 		$bulk_actions_manager = $plugin_admin->get_bulk_actions_manager();
 		$this->loader->add_filter( 'bulk_actions-edit-aplb_uploads', $bulk_actions_manager, 'register_uploads_bulk_actions' );
 		$this->loader->add_filter( 'handle_bulk_actions-edit-aplb_uploads', $bulk_actions_manager, 'handle_uploads_bulk_action', 10, 3 );
-		$this->loader->add_action( 'admin_notices', $bulk_actions_manager, 'bulk_action_admin_notice' );
 		$this->loader->add_action( 'admin_init', $bulk_actions_manager, 'maybe_set_bulk_action_notice' );
 	}
 
