@@ -92,8 +92,12 @@ trait LibraryActionHelpers {
         $image_ids = [];
         $images_json = [];
         foreach ($genre_uploads as $upload) {
+            // Only include published uploads
+            if (get_post_status($upload->ID) !== 'publish') {
+                continue;
+            }
             $thumb_id = get_post_thumbnail_id($upload->ID);
-            if ($thumb_id) {
+            if ($thumb_id && get_post_status($thumb_id) === 'publish') {
                 $image_ids[] = $thumb_id;
                 $images_json[] = [
                     'alt'     => '',
@@ -104,42 +108,36 @@ trait LibraryActionHelpers {
             }
         }
         $image_ids = array_unique($image_ids);
-        if (empty($image_ids)) {
-            return false;
-        }
 
+        // Remove unpublished images from the gallery
         $existing_content = $library_post->post_content;
         preg_match('/\[gallery ids="([^"]*)"/', $existing_content, $matches);
         $existing_ids = isset($matches[1]) ? array_map('intval', explode(',', $matches[1])) : [];
-        $new_image_ids = array_diff($image_ids, $existing_ids);
-        if (empty($new_image_ids)) {
-            // Still update taxonomy if needed
-            if ($library_cat_id) {
-                wp_set_post_terms($library_post->ID, [$library_cat_id], 'aplb_library_category', false);
-            }
-            if (!empty($pdate_term_id)) {
-                wp_set_post_terms($library_post->ID, [$pdate_term_id], 'aplb_library_pdate', false);
-            }
-            return false;
-        }
+        // Only keep images that are still published and in the new set
+        $merged_ids = array_intersect($existing_ids, $image_ids);
+        // Add any new published images
+        $merged_ids = array_unique(array_merge($merged_ids, $image_ids));
 
-        // Merge and rebuild gallery
-        $merged_ids = array_unique(array_merge($existing_ids, $image_ids));
-        $merged_images_json = [];
-        foreach ($merged_ids as $id) {
-            $merged_images_json[] = [
-                'alt'     => '',
-                'id'      => $id,
-                'url'     => esc_url(wp_get_attachment_url($id)),
-                'caption' => ''
-            ];
+        // If no images remain, optionally set content to empty or a notice
+        if (empty($merged_ids)) {
+            $gallery_html = '';
+        } else {
+            $merged_images_json = [];
+            foreach ($merged_ids as $id) {
+                $merged_images_json[] = [
+                    'alt'     => '',
+                    'id'      => $id,
+                    'url'     => esc_url(wp_get_attachment_url($id)),
+                    'caption' => ''
+                ];
+            }
+            $gallery_html = $this->build_gallery_html($merged_ids, $merged_images_json);
         }
-        $merged_gallery_html = $this->build_gallery_html($merged_ids, $merged_images_json);
 
         // Update the aplb_library post
         wp_update_post([
             'ID'           => $library_post->ID,
-            'post_content' => $merged_gallery_html,
+            'post_content' => $gallery_html,
         ]);
         // Update taxonomy
         if ($library_cat_id) {
