@@ -2,6 +2,17 @@
 
 class UploadTermHelper {
     public static function ensure_tdate_terms($year, $month, $day) {
+        if ($year === 'unknown') {
+            $unknown_term = term_exists('unknown', 'aplb_uploads_tdate');
+            $unknown_term_id = ($unknown_term && is_array($unknown_term)) ? $unknown_term['term_id'] : 0;
+            if (!$unknown_term_id) {
+                $new_unknown = wp_insert_term('unknown', 'aplb_uploads_tdate');
+                $unknown_term_id = !is_wp_error($new_unknown) ? $new_unknown['term_id'] : 0;
+            }
+            // Only return the unknown term, no month/day
+            return [$unknown_term_id, null, null];
+        }
+
         // Year
         $year_term = term_exists($year, 'aplb_uploads_tdate');
         $year_term_id = ($year_term && is_array($year_term)) ? $year_term['term_id'] : 0;

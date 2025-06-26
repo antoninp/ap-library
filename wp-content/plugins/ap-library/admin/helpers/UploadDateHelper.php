@@ -24,6 +24,7 @@ class UploadDateHelper {
             ];
         }
 
-        return ['unknown', 'unknown', 'unknown'];
+        // Only one "unknown" if nothing found
+        return ['unknown', null, null];
     }
 }
