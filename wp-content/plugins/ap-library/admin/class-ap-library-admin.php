@@ -371,7 +371,7 @@ class Ap_Library_Admin {
 
 		$new_post = array(
 			'post_title'    => sanitize_text_field( $attachment->post_title ),
-			'post_status'   => 'draft',
+			'post_status'   => 'pending',
 			'post_author'   => get_current_user_id(),
 			'post_type'     => 'aplb_uploads',
 			'tax_input'     => $tax_input,
