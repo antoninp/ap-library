@@ -107,7 +107,7 @@ class Ap_Library_Admin {
 		$this->load_dependencies();
 
 		// Initialize actions manager and register actions
-		$this->actions_manager = new Ap_Library_Admin_Actions($this->version, $this->plugin_name);
+		$this->actions_manager = new Ap_Library_Admin_Actions($this->plugin_name, $this->version);
         $this->columns_manager = new Ap_Library_Admin_Columns();
 		$this->bulk_actions_manager = new Ap_Library_Admin_Bulk_Actions();
 	}
