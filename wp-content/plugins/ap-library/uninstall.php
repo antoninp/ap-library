@@ -31,8 +31,8 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // 1. Delete all custom posts
-$post_types = ['aplb_uploads', 'aplb_library'];
-foreach ( $post_types as $post_type ) {
+$aplb_post_types = ['aplb_uploads', 'aplb_library'];
+foreach ( $aplb_post_types as $post_type ) {
     $posts = get_posts([
         'post_type'      => $post_type,
         'posts_per_page' => -1,
@@ -45,13 +45,13 @@ foreach ( $post_types as $post_type ) {
 }
 
 // 2. Delete all custom taxonomy terms
-$taxonomies = [
+$aplb_taxonomies = [
     'aplb_uploads_tdate',
     'aplb_uploads_genre',
     'aplb_library_pdate',
     'aplb_library_category'
 ];
-foreach ( $taxonomies as $taxonomy ) {
+foreach ( $aplb_taxonomies as $taxonomy ) {
     $terms = get_terms( [ 'taxonomy' => $taxonomy, 'hide_empty' => false ] );
     if ( ! is_wp_error( $terms ) ) {
         foreach ( $terms as $term ) {
