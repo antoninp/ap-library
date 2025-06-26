@@ -27,5 +27,39 @@
 
 // If uninstall not called from WordPress, then exit.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit;
+    exit;
 }
+
+// 1. Delete all custom posts
+$post_types = ['aplb_uploads', 'aplb_library'];
+foreach ( $post_types as $post_type ) {
+    $posts = get_posts([
+        'post_type'      => $post_type,
+        'posts_per_page' => -1,
+        'post_status'    => 'any',
+        'fields'         => 'ids',
+    ]);
+    foreach ( $posts as $post_id ) {
+        wp_delete_post( $post_id, true );
+    }
+}
+
+// 2. Delete all custom taxonomy terms
+$taxonomies = [
+    'aplb_uploads_tdate',
+    'aplb_uploads_genre',
+    'aplb_library_pdate',
+    'aplb_library_category'
+];
+foreach ( $taxonomies as $taxonomy ) {
+    $terms = get_terms( [ 'taxonomy' => $taxonomy, 'hide_empty' => false ] );
+    if ( ! is_wp_error( $terms ) ) {
+        foreach ( $terms as $term ) {
+            wp_delete_term( $term->term_id, $taxonomy );
+        }
+    }
+}
+
+// 3. Delete plugin options (add your option names here)
+delete_option( 'ap_library_auto_create_post_on_upload' );
+// Add more delete_option() calls as needed for your plugin
