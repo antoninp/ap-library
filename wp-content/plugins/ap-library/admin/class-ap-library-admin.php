@@ -270,46 +270,63 @@ class Ap_Library_Admin {
 		$full_path = get_attached_file( $image_id );
 		$filename = basename( $full_path, '.' . pathinfo( $full_path, PATHINFO_EXTENSION ) );
 		$parts = explode( '-', $filename );
-		if ( isset( $parts[0] ) ) {
+
+		// --- Date extraction logic ---
+		$term_year = $term_month = $term_day = null;
+
+		if ( isset( $parts[0] ) && preg_match('/^\d{8}/', $parts[0]) ) {
+			// Filename starts with date
 			$term_slug = sanitize_title( $parts[0] );
 			$term_year  = substr($term_slug, 0, 4);
 			$term_month = substr($term_slug, 4, 2);
 			$term_day   = substr($term_slug, 6, 2);
-
-			// 1. Year term (parent: 0)
-			$year_term = term_exists( $term_year, 'aplb_uploads_tdate' );
-			if ( $year_term && is_array( $year_term ) ) {
-				$year_term_id = $year_term['term_id'];
+		} else {
+			// Try to get date from image metadata
+			$meta = wp_read_image_metadata( $full_path );
+			if ( !empty($meta['created_timestamp']) ) {
+				$date = date('Y-m-d', $meta['created_timestamp']);
+				$term_year  = date('Y', $meta['created_timestamp']);
+				$term_month = date('m', $meta['created_timestamp']);
+				$term_day   = date('d', $meta['created_timestamp']);
 			} else {
-				$new_year = wp_insert_term( $term_year, 'aplb_uploads_tdate' );
-				$year_term_id = ! is_wp_error( $new_year ) ? $new_year['term_id'] : 0;
+				// Fallback to "unknown"
+				$term_year = $term_month = $term_day = 'unknown';
 			}
+		}
 
-			// 2. Month term (parent: year)
-			$month_slug = $term_year . '-' . $term_month;
-			$month_term = term_exists( $month_slug, 'aplb_uploads_tdate' );
-			if ( $month_term && is_array( $month_term ) ) {
-				$month_term_id = $month_term['term_id'];
-			} else {
-				$new_month = wp_insert_term( $month_slug, 'aplb_uploads_tdate', array(
-					'parent' => $year_term_id,
-					'description' => $term_year . '-' . $term_month
-				) );
-				$month_term_id = ! is_wp_error( $new_month ) ? $new_month['term_id'] : 0;
-			}
+		// 1. Year term (parent: 0)
+		$year_term = term_exists( $term_year, 'aplb_uploads_tdate' );
+		if ( $year_term && is_array( $year_term ) ) {
+			$year_term_id = $year_term['term_id'];
+		} else {
+			$new_year = wp_insert_term( $term_year, 'aplb_uploads_tdate' );
+			$year_term_id = ! is_wp_error( $new_year ) ? $new_year['term_id'] : 0;
+		}
 
-			// 3. Day term (parent: month)
-			$day_slug = $term_year . '-' . $term_month . '-' . $term_day;
-			$day_term = term_exists( $day_slug, 'aplb_uploads_tdate' );
-			if ( $day_term && is_array( $day_term ) ) {
-				$day_term_id = $day_term['term_id'];
-			} else {
-				$new_day = wp_insert_term( $day_slug, 'aplb_uploads_tdate', array(
-					'parent' => $month_term_id,
-					'description' => $term_year . '-' . $term_month . '-' . $term_day
-				) );
-				$day_term_id = ! is_wp_error( $new_day ) ? $new_day['term_id'] : 0;
-			}
+		// 2. Month term (parent: year)
+		$month_slug = $term_year . '-' . $term_month;
+		$month_term = term_exists( $month_slug, 'aplb_uploads_tdate' );
+		if ( $month_term && is_array( $month_term ) ) {
+			$month_term_id = $month_term['term_id'];
+		} else {
+			$new_month = wp_insert_term( $month_slug, 'aplb_uploads_tdate', array(
+				'parent' => $year_term_id,
+				'description' => $term_year . '-' . $term_month
+			) );
+			$month_term_id = ! is_wp_error( $new_month ) ? $new_month['term_id'] : 0;
+		}
+
+		// 3. Day term (parent: month)
+		$day_slug = $term_year . '-' . $term_month . '-' . $term_day;
+		$day_term = term_exists( $day_slug, 'aplb_uploads_tdate' );
+		if ( $day_term && is_array( $day_term ) ) {
+			$day_term_id = $day_term['term_id'];
+		} else {
+			$new_day = wp_insert_term( $day_slug, 'aplb_uploads_tdate', array(
+				'parent' => $month_term_id,
+				'description' => $term_year . '-' . $term_month . '-' . $term_day
+			) );
+			$day_term_id = ! is_wp_error( $new_day ) ? $new_day['term_id'] : 0;
 		}
 
 		// 4. Genre term (default to 'all' if not specified)
