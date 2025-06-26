@@ -1,7 +1,11 @@
 <?php
 require_once __DIR__ . '/ActionInterface.php';
 
-class FirstAction implements ActionInterface {
+/**
+ * ProcessLibrary class that implements ActionInterface.
+ * This action processes today's uploads and creates or updates library posts.
+ */
+class ProcessLibrary implements ActionInterface {
     public function execute() {
         $today = date( 'Y-m-d' );
 

@@ -63,13 +63,13 @@ class Ap_Library_Admin_Actions {
     public function load_dependencies() {
         // Load action classes
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/ActionInterface.php';
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/FirstAction.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/ProcessLibrary.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/SecondAction.php';
     }
 
     private function register_default_actions() {
         
-        $this->register_action('first_action', __('Run First Action', 'ap-library'), [new FirstAction(), 'execute']);
+        $this->register_action('process_library', __('Process Library', 'ap-library'), [new ProcessLibrary(), 'execute']);
         $this->register_action('second_action', __('Run Second Action', 'ap-library'), [new SecondAction(), 'execute']);
     
     }
