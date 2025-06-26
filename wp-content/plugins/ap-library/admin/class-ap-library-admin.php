@@ -108,33 +108,16 @@ class Ap_Library_Admin {
 
 		// Initialize actions manager and register actions
 		$this->actions_manager = new Ap_Library_Admin_Actions($this->version, $this->plugin_name);
-		$this->actions_manager->register_action(
-			'first_action',
-			'Run First Action',
-			array( $this->actions_manager, 'run_first_action' )
-		);
-		$this->actions_manager->register_action(
-			'second_action',
-			'Run Second Action',
-			array( $this->actions_manager, 'run_second_action' )
-		);
-
         $this->columns_manager = new Ap_Library_Admin_Columns();
 		$this->bulk_actions_manager = new Ap_Library_Admin_Bulk_Actions();
 	}
 
+	/**
+	 * Load the required dependencies for the admin area of the plugin.
+	 *
+	 * @since    1.0.0
+	 */
 	public function load_dependencies() {
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Ap_Library_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Ap_Library_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
 
 		require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-actions.php';
 		require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-admin-bulk-actions.php';
@@ -160,20 +143,7 @@ class Ap_Library_Admin {
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Ap_Library_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Ap_Library_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/ap-library-admin.css', array(), $this->version, 'all' );
-
 
 	}
 
@@ -184,20 +154,7 @@ class Ap_Library_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Ap_Library_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Ap_Library_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/ap-library-admin.js', array( 'jquery' ), $this->version, false );
-
 
 	}
 
@@ -273,6 +230,12 @@ class Ap_Library_Admin {
 		}
 	}
 
+	/**
+	 * Handle the "Back to Top" button option.
+	 *
+	 * This method checks if the nonce is set and valid, then updates the option
+	 * to enable or disable the "Back to Top" button based on the form submission.
+	 */
 	public function handle_back_to_top_option() {
 		if (
 			isset( $_POST['ap_library_enable_back_to_top_nonce'] ) &&
@@ -301,7 +264,6 @@ class Ap_Library_Admin {
 		}
 
 		$attachment = get_post( $image_id );
-		$tdate_term_id = null;
 		$genre_term_id = null;
 		$term_genre = 'All';
 
@@ -395,14 +357,6 @@ class Ap_Library_Admin {
 		    $tax_input['aplb_library_pdate'] = array( $pdate_term_id );
 		}
 
-		$meow_options = array(
-			'ids'       => '"' . $image_id  . '"',
-			'layout'    => 'tiles',
-			'link'      => 'none',
-			'imageSize' => 'full',
-			'captions'  => false
-		);
-
         $gallery_shortcode = '[gallery ids="' . $image_id . '" layout="tiles"]';
         $gallery_html = '<!-- wp:meow-gallery/gallery {
             "images": [{
@@ -442,6 +396,14 @@ class Ap_Library_Admin {
 		) );
 	}
 
+	/**
+	 * Show admin notices collected from actions manager and admin class.
+	 *
+	 * This method collects notices from both the actions manager and the admin class,
+	 * then displays them in the WordPress admin area.
+	 *
+	 * @since    1.0.0
+	 */
 	public function show_admin_notices() {
 		$notices = [];
 
@@ -449,6 +411,12 @@ class Ap_Library_Admin {
 		if ($this->actions_manager && $this->actions_manager->get_last_notice()) {
 			$notices[] = $this->actions_manager->get_last_notice();
 			$this->actions_manager->last_notice = null;
+		}
+
+		// Collect notice from bulk actions manager
+		if ($this->bulk_actions_manager && $this->bulk_actions_manager->get_last_notice()) {
+			$notices[] = $this->bulk_actions_manager->get_last_notice();
+			$this->bulk_actions_manager->last_notice = null;
 		}
 
 		// Collect notice from admin class itself

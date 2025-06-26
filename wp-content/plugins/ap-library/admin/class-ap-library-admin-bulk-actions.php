@@ -10,6 +10,12 @@
  */
 class Ap_Library_Admin_Bulk_Actions {
 
+    public $last_notice = null;
+
+    public function __construct() {
+
+    }
+
     public function register_uploads_bulk_actions( $bulk_actions ) {
         $bulk_actions['publish_aplb_uploads'] = __( 'Publish Uploads', 'ap-library' );
         return $bulk_actions;
@@ -36,15 +42,20 @@ class Ap_Library_Admin_Bulk_Actions {
         return $redirect_to;
     }
 
-    public function bulk_action_admin_notice() {
+    public function maybe_set_bulk_action_notice() {
         if ( ! empty( $_REQUEST['bulk_published_uploads'] ) ) {
             $count = intval( $_REQUEST['bulk_published_uploads'] );
-            printf(
-                '<div id="message" class="updated notice notice-success is-dismissible"><p>' .
-                esc_html__( 'Published %d uploads.', 'ap-library' ) .
-                '</p></div>',
-                $count
-            );
+            $this->last_notice = [
+                'type' => 'success',
+                'message' => sprintf(
+                    esc_html__( 'Published %d uploads.', 'ap-library' ),
+                    $count
+                ),
+            ];
         }
+    }
+
+    public function get_last_notice() {
+        return $this->last_notice;
     }
 }
