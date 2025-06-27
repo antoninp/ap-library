@@ -1,5 +1,5 @@
 <?php
-<?php
+
 require_once __DIR__ . '/ActionInterface.php';
 require_once __DIR__ . '/LibraryActionHelpers.php';
 
