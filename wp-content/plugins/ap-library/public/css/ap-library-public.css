@@ -37,19 +37,20 @@ html {
   100% {transform: scale(1);}
 }
 
-.wp-block-group.single-image {
-    max-height: 400px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.wp-block-group.single-image img {
-    max-height: 400px;
-    height: auto;
-    width: auto;
+.wp-block-meow-gallery-gallery .mg-images img:only-child {
+    max-height: 400px !important;
+    height: auto !important;
+    width: auto !important;
     object-fit: contain;
-    display: block;
     margin-left: auto;
     margin-right: auto;
+    display: block;
+}
+.wp-block-meow-gallery-gallery .mg-images {
+    max-height: 400px !important;
+    height: auto !important;
+}
+.wp-block-meow-gallery-gallery .mg-images .mgl-row:only-child {
+    max-height: 400px !important;
+    height: auto !important;
 }
