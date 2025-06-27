@@ -163,6 +163,7 @@ class Ap_Library {
 		$this->loader->add_action( 'add_attachment', $plugin_admin, 'maybe_create_post_on_image_upload' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_back_to_top_option' );
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'show_admin_notices' );
+		$this->loader->add_action('quick_edit_custom_box', $plugin_admin, 'add_quick_edit_thumbnail_box', 10, 2);
 
 		// Columns hooks
 		$columns_manager = $plugin_admin->get_columns_manager();
@@ -174,6 +175,7 @@ class Ap_Library {
 		$this->loader->add_filter( 'bulk_actions-edit-aplb_uploads', $bulk_actions_manager, 'register_uploads_bulk_actions' );
 		$this->loader->add_filter( 'handle_bulk_actions-edit-aplb_uploads', $bulk_actions_manager, 'handle_uploads_bulk_action', 10, 3 );
 		$this->loader->add_action( 'admin_init', $bulk_actions_manager, 'maybe_set_bulk_action_notice' );
+		
 	}
 
 	/**

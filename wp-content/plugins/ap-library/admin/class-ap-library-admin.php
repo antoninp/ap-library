@@ -154,8 +154,13 @@ class Ap_Library_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/ap-library-admin.js', array( 'jquery' ), $this->version, false );
-
+		wp_enqueue_script(
+			$this->plugin_name,
+			plugin_dir_url(__FILE__) . 'js/ap-library-admin.js',
+			array('jquery'),
+			$this->version,
+			false
+		);
 	}
 
 	/**
@@ -296,6 +301,22 @@ class Ap_Library_Admin {
 				esc_html($notice['message'])
 			);
 		}
+	}
+
+	public function add_quick_edit_thumbnail_box($column_name, $post_type) {
+		if ($post_type !== 'aplb_uploads' || $column_name !== 'thumbnail') return;
+		?>
+		<fieldset class="inline-edit-col-right">
+			<div class="inline-edit-col">
+				<label>
+					<span class="title"><?php _e('Thumbnail', 'ap-library'); ?></span>
+					<span class="input-text-wrap">
+						<span id="aplb-quickedit-thumbnail"></span>
+					</span>
+				</label>
+			</div>
+		</fieldset>
+		<?php
 	}
 
 }
