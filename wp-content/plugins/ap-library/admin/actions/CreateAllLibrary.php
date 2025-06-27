@@ -4,7 +4,7 @@ require_once __DIR__ . '/ActionInterface.php';
 require_once __DIR__ . '/LibraryActionHelpers.php';
 
 /**
- * ProcessAllLibrary class that implements ActionInterface.
+ * CreateAllLibrary class that implements ActionInterface.
  * This action processes all uploads and creates missing library posts for each date/genre.
  */
 class CreateAllLibrary implements ActionInterface {
@@ -25,10 +25,13 @@ class CreateAllLibrary implements ActionInterface {
         foreach ($uploads as $upload) {
             $pdates = wp_get_post_terms($upload->ID, 'aplb_library_pdate', ['fields' => 'slugs']);
             $genres = wp_get_post_terms($upload->ID, 'aplb_uploads_genre', ['fields' => 'ids']);
-            $pdate = !empty($pdates) ? $pdates[0] : null;
-            $genre = !empty($genres) ? $genres[0] : 0;
-            if ($pdate) {
-                $uploads_by_date_genre[$pdate][$genre][] = $upload;
+            if (empty($pdates) || empty($genres)) {
+                continue;
+            }
+            foreach ($pdates as $pdate) {
+                foreach ($genres as $genre) {
+                    $uploads_by_date_genre[$pdate][$genre][] = $upload;
+                }
             }
         }
 
@@ -40,7 +43,7 @@ class CreateAllLibrary implements ActionInterface {
 
             foreach ($genres as $genre_id => $genre_uploads) {
                 // Check if a library post exists for this date/genre
-                $existing_posts = $this->get_library_post_for_genre_today($genre_id, $pdate);
+                $existing_posts = $this->get_library_post_for_genre_and_date($genre_id, $pdate);
                 if (empty($existing_posts)) {
                     $result = $this->create_new_library_post($genre_id, $genre_uploads, $pdate, $pdate_term_id);
                     if ($result) {

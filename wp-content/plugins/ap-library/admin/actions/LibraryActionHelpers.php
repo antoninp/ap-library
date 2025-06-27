@@ -55,6 +55,27 @@ trait LibraryActionHelpers {
         return get_posts($args);
     }
 
+    public function get_library_post_for_genre_and_date($genre_id, $pdate) {
+        $args = [
+            'post_type'      => 'aplb_library',
+            'post_status'    => array('publish', 'draft', 'pending', 'private'),
+            'posts_per_page' => -1,
+            'tax_query'      => [
+                [
+                    'taxonomy' => 'aplb_uploads_genre',
+                    'field'    => 'term_id',
+                    'terms'    => $genre_id,
+                ],
+                [
+                    'taxonomy' => 'aplb_library_pdate',
+                    'field'    => 'slug',
+                    'terms'    => $pdate,
+                ],
+            ],
+        ];
+        return get_posts($args);
+    }
+
     private function build_gallery_html($image_ids, $images_json) {
         $gallery_class = (count($image_ids) === 1) ? 'single-image' : '';
         $gallery_shortcode = '[gallery ids="' . implode(',', $image_ids) . '" layout="tiles"]';
