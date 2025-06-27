@@ -155,7 +155,7 @@ trait LibraryActionHelpers {
 
         $gallery_html = $this->build_gallery_html($image_ids, $images_json);
 
-        $post_title = sprintf(__('Library %s - %s', 'ap_library'), $pdate, get_term($genre_id)->name);
+        $post_title = sprintf(__('%s - %s', 'ap_library'), $pdate, get_term($genre_id)->name);
 
         $new_post = [
             'post_title'    => $post_title,
