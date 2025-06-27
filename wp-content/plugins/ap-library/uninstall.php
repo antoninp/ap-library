@@ -59,6 +59,6 @@ foreach ( $aplb_taxonomies as $taxonomy ) {
     }
 }
 
-// 3. Delete plugin options (add your option names here)
+// 3. Delete plugin options
 delete_option( 'ap_library_auto_create_post_on_upload' );
-// Add more delete_option() calls as needed for your plugin
+delete_option( 'ap_library_enable_back_to_top' );
