@@ -67,14 +67,17 @@ class Ap_Library_Admin_Actions {
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/CreateAllLibrary.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/UpdateLibraryPost.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/UpdateAllLibraryPosts.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/CreateAllUploadPosts.php';
     }
 
     private function register_default_actions() {
         
         $this->register_action('create_today_library', __('Create Today Galleries', 'ap-library'), [new CreateTodayLibrary(), 'execute']);
         $this->register_action('create_all_library', __('Create All Galleries', 'ap-library'), [new CreateAllLibrary(), 'execute']);
-        $this->register_action('update_today_library', __('Update Today Library Posts', 'ap-library'), [new UpdateLibraryPost(), 'execute']);
-        $this->register_action('update_all_library', __('Update All Library Posts', 'ap-library'), [new UpdateAllLibraryPosts(), 'execute']);
+        $this->register_action('update_today_library', __('Update Today Galleries', 'ap-library'), [new UpdateLibraryPost(), 'execute']);
+        $this->register_action('update_all_library', __('Update All Galleries', 'ap-library'), [new UpdateAllLibraryPosts(), 'execute']);
+        $this->register_action('create_all_upload_posts', __('Create Missing Upload Posts', 'ap-library'), [new CreateAllUploadPosts(), 'execute']
+);
     }
 
     public function register_action( $key, $label, $callback ) {

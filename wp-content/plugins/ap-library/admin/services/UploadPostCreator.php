@@ -3,8 +3,9 @@ require_once plugin_dir_path(__FILE__) . '../helpers/UploadDateHelper.php';
 require_once plugin_dir_path(__FILE__) . '../helpers/UploadTermHelper.php';
 
 class UploadPostCreator {
-    public function create_post_on_image_upload($image_id) {
-        if (!get_option('ap_library_auto_create_post_on_upload', false)) return;
+    public function create_post_on_image_upload($image_id, $force = false) {
+        // Only check the option if not forcing
+        if (!$force && !get_option('ap_library_auto_create_post_on_upload', false)) return;
         if (!wp_attachment_is_image($image_id)) return;
 
         $attachment = get_post($image_id);
