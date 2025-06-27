@@ -114,8 +114,8 @@ class Ap_Library_Taxonomy {
         $args = [
             'label'  => esc_html__( 'Photo Genre', 'ap_uploads' ),
             'labels' => [
-                'menu_name'          => esc_html__( 'Photo Genres', 'ap_uploads' ),
-                'name'               => esc_html__( 'Photo Genres', 'ap_uploads' ),
+                'menu_name'          => esc_html__( 'Photo Genre', 'ap_uploads' ),
+                'name'               => esc_html__( 'Photo Genre', 'ap_uploads' ),
                 'singular_name'      => esc_html__( 'Genre', 'ap_uploads' ),
                 'add_new_item'       => esc_html__( 'Add new Genre', 'ap_uploads' ),
                 'new_item'           => esc_html__( 'New Genre', 'ap_uploads' ),
