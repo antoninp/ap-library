@@ -58,11 +58,24 @@ class UploadTermHelper {
     }
 
     public static function ensure_pdate_term($date) {
-        $pdate_term = term_exists($date, 'aplb_library_pdate');
+        // $date is expected to be 'Y-m-d'
+        $timestamp = strtotime($date);
+        if ($timestamp && $date !== 'unknown') {
+            $human_name = date_i18n('F j, Y', $timestamp); // e.g., "July 1, 2024"
+            $slug = date('Y-m-d', $timestamp);
+        } else {
+            $human_name = __('Unknown', 'ap-library');
+            $slug = 'unknown';
+        }
+
+        $pdate_term = term_exists($slug, 'aplb_library_pdate');
         if ($pdate_term && is_array($pdate_term)) {
             return $pdate_term['term_id'];
         }
-        $new_pdate = wp_insert_term($date, 'aplb_library_pdate');
+        $new_pdate = wp_insert_term($human_name, 'aplb_library_pdate', [
+            'slug'        => $slug,
+            'description' => $human_name,
+        ]);
         return !is_wp_error($new_pdate) ? $new_pdate['term_id'] : 0;
     }
 }

@@ -46,7 +46,7 @@ class Ap_Library_Taxonomy {
     private function register_aplb_library_cat_taxonomy() {
         
         $args = [
-            'label'  => esc_html__( 'Library Categories', 'text-domain' ),
+            'label'  => esc_html__( 'Library Categories', 'ap_library' ),
             'labels' => [
                 'menu_name'          => esc_html__( 'Library Categories', 'ap_library' ),
                 'name'               => esc_html__( 'Library Categories', 'ap_library' ),
@@ -80,7 +80,7 @@ class Ap_Library_Taxonomy {
     private function register_aplb_library_pdate_taxonomy() {
 
         $args = [
-            'label'  => esc_html__( 'Uploads', 'text-domain' ),
+            'label'  => esc_html__( 'Published Date', 'ap_library' ),
             'labels' => [
                 'menu_name'          => esc_html__( 'Published Date', 'ap_library' ),
                 'name'               => esc_html__( 'Published Date', 'ap_library' ),
@@ -114,17 +114,17 @@ class Ap_Library_Taxonomy {
     private function register_aplb_uploads_tdate_taxonomy() {
 
         $args = [
-            'label'  => esc_html__( 'Uploads', 'text-domain' ),
+            'label'  => esc_html__( 'Taken Date', 'ap_uploads' ),
             'labels' => [
-                'menu_name'          => esc_html__( 'Uploads Taken Date', 'ap_uploads' ),
-                'name'               => esc_html__( 'Uploads Taken Date', 'ap_uploads' ),
-                'singular_name'      => esc_html__( 'Uploads Taken Date', 'ap_uploads' ),
-                'add_new_item'       => esc_html__( 'Add new Uploads Taken Date', 'ap_uploads' ),
-                'new_item'           => esc_html__( 'New Uploads Taken Date', 'ap_uploads' ),
-                'view_item'          => esc_html__( 'View Uploads Taken Date', 'ap_uploads' ),
-                'not_found'          => esc_html__( 'No Uploads Taken Date found', 'ap_uploads' ),
-                'not_found_in_trash' => esc_html__( 'No Uploads Taken Date found in trash', 'ap_uploads' ),
-                'all_items'          => esc_html__( 'All Uploads Taken Date', 'ap_uploads' ),
+                'menu_name'          => esc_html__( 'Taken Date', 'ap_uploads' ),
+                'name'               => esc_html__( 'Taken Date', 'ap_uploads' ),
+                'singular_name'      => esc_html__( 'Taken Date', 'ap_uploads' ),
+                'add_new_item'       => esc_html__( 'Add new Taken Date', 'ap_uploads' ),
+                'new_item'           => esc_html__( 'New Taken Date', 'ap_uploads' ),
+                'view_item'          => esc_html__( 'View Taken Date', 'ap_uploads' ),
+                'not_found'          => esc_html__( 'No Taken Date found', 'ap_uploads' ),
+                'not_found_in_trash' => esc_html__( 'No Taken Date found in trash', 'ap_uploads' ),
+                'all_items'          => esc_html__( 'All Taken Dates', 'ap_uploads' ),
             ],
             'public'              => true,
             'show_ui'             => true,
@@ -148,7 +148,7 @@ class Ap_Library_Taxonomy {
     private function register_aplb_uploads_genre_taxonomy() {
         
         $args = [
-            'label'  => esc_html__( 'Uploads', 'text-domain' ),
+            'label'  => esc_html__( 'Photo Genre', 'ap_uploads' ),
             'labels' => [
                 'menu_name'          => esc_html__( 'Photo Genres', 'ap_uploads' ),
                 'name'               => esc_html__( 'Photo Genres', 'ap_uploads' ),
