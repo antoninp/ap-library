@@ -20,7 +20,7 @@ class UpdateAllLibraryPosts implements ActionInterface {
         $updated = 0;
         foreach ($library_posts as $library_post) {
             // Get the genre/category term for this post
-            $genre_terms = wp_get_post_terms($library_post->ID, 'aplb_library_category', ['fields' => 'ids']);
+            $genre_terms = wp_get_post_terms($library_post->ID, 'aplb_uploads_genre', ['fields' => 'ids']);
             $genre_id = !empty($genre_terms) ? $genre_terms[0] : 0;
 
             // Get the pdate term for this post (if you want to update by date as well)

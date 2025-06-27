@@ -30,24 +30,6 @@ trait LibraryActionHelpers {
         return $uploads_by_genre;
     }
 
-    private function get_or_create_library_category_id($genre_id) {
-        if ($genre_id && $genre_id !== 0) {
-            $genre_term = get_term($genre_id, 'aplb_uploads_genre');
-            $genre_name = $genre_term ? $genre_term->name : __('All', 'ap-library');
-            $genre_slug = $genre_term ? $genre_term->slug : 'all';
-        } else {
-            $genre_name = __('All', 'ap-library');
-            $genre_slug = 'all';
-        }
-        $library_cat_term = term_exists($genre_slug, 'aplb_library_category');
-        if ($library_cat_term && is_array($library_cat_term)) {
-            return $library_cat_term['term_id'];
-        } else {
-            $new_cat = wp_insert_term($genre_name, 'aplb_library_category', array('slug' => $genre_slug));
-            return !is_wp_error($new_cat) ? $new_cat['term_id'] : 0;
-        }
-    }
-
     private function get_library_post_for_genre_today($genre_id, $today) {
         $args = array(
             'post_type'      => 'aplb_library',
@@ -62,7 +44,7 @@ trait LibraryActionHelpers {
             ),
             'tax_query' => array(
                 array(
-                    'taxonomy' => 'aplb_library_category',
+                    'taxonomy' => 'aplb_uploads_genre',
                     'field'    => 'term_id',
                     'terms'    => $genre_id,
                 ),
@@ -88,7 +70,7 @@ trait LibraryActionHelpers {
         '<!-- /wp:group -->';
     }
 
-    public function update_existing_library_post($library_post, $genre_uploads, $library_cat_id, $pdate_term_id) {
+    public function update_existing_library_post($library_post, $genre_uploads, $genre_id, $pdate_term_id) {
         $image_ids = [];
         $images_json = [];
         foreach ($genre_uploads as $upload) {
@@ -140,8 +122,8 @@ trait LibraryActionHelpers {
             'post_content' => $gallery_html,
         ]);
         // Update taxonomy
-        if ($library_cat_id) {
-            wp_set_post_terms($library_post->ID, [$library_cat_id], 'aplb_library_category', false);
+        if ($genre_id) {
+            wp_set_post_terms($library_post->ID, [$genre_id], 'aplb_uploads_genre', false);
         }
         if (!empty($pdate_term_id)) {
             wp_set_post_terms($library_post->ID, [$pdate_term_id], 'aplb_library_pdate', false);

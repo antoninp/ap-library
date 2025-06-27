@@ -48,8 +48,7 @@ foreach ( $aplb_post_types as $post_type ) {
 $aplb_taxonomies = [
     'aplb_uploads_tdate',
     'aplb_uploads_genre',
-    'aplb_library_pdate',
-    'aplb_library_category'
+    'aplb_library_pdate'
 ];
 foreach ( $aplb_taxonomies as $taxonomy ) {
     $terms = get_terms( [ 'taxonomy' => $taxonomy, 'hide_empty' => false ] );

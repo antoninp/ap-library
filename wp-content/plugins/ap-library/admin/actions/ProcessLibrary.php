@@ -25,12 +25,11 @@ class ProcessLibrary implements ActionInterface {
 
         $created = 0;
         foreach ($uploads_by_genre as $genre_id => $genre_uploads) {
-            $library_cat_id = $this->get_or_create_library_category_id($genre_id);
-            $existing_posts = $this->get_library_post_for_genre_today($library_cat_id, $today);
+            $existing_posts = $this->get_library_post_for_genre_today($genre_id, $today);
 
             // Only create if no post exists for today/genre
             if (empty($existing_posts)) {
-                $result = $this->create_new_library_post($genre_id, $genre_uploads, $today, $library_cat_id, $pdate_term_id);
+                $result = $this->create_new_library_post($genre_id, $genre_uploads, $today, $pdate_term_id);
                 if ($result) {
                     $created++;
                 }
@@ -44,7 +43,7 @@ class ProcessLibrary implements ActionInterface {
         }
     }
 
-    private function create_new_library_post($genre_id, $genre_uploads, $today, $library_cat_id, $pdate_term_id) {
+    private function create_new_library_post($genre_id, $genre_uploads, $today, $pdate_term_id) {
         $image_ids = [];
         $images_json = [];
         foreach ($genre_uploads as $upload) {
@@ -76,8 +75,8 @@ class ProcessLibrary implements ActionInterface {
             'post_type'     => 'aplb_library',
         ];
         $post_id = wp_insert_post($new_post);
-        if ($post_id && $library_cat_id) {
-            wp_set_post_terms($post_id, [$library_cat_id], 'aplb_library_category', false);
+        if ($post_id && $genre_id) {
+            wp_set_post_terms($post_id, [$genre_id], 'aplb_uploads_genre', false);
         }
         if ($post_id && !empty($pdate_term_id)) {
             wp_set_post_terms($post_id, [$pdate_term_id], 'aplb_library_pdate', false);

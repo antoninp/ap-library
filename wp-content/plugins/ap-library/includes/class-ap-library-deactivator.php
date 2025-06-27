@@ -38,7 +38,6 @@ class Ap_Library_Deactivator {
 		// Unregister taxonomies if needed
 		unregister_taxonomy( 'aplb_uploads_tdate' );
 		unregister_taxonomy( 'aplb_uploads_genre' );
-		unregister_taxonomy( 'aplb_library_category' );
 
 		// Flush rewrite rules to remove CPT/taxonomy permalinks
 		flush_rewrite_rules();

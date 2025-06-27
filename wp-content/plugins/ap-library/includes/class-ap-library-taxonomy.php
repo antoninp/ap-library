@@ -32,44 +32,8 @@ class Ap_Library_Taxonomy {
         $this->register_aplb_uploads_genre_taxonomy();
         $this->register_aplb_uploads_tdate_taxonomy();
         $this->register_aplb_library_pdate_taxonomy();
-        $this->register_aplb_library_cat_taxonomy();
  
-
     }
-
-    /**
-     * Register the library category taxonomy.
-     *
-     * @since    1.0.0
-     * @access   private
-     */
-    private function register_aplb_library_cat_taxonomy() {
-        
-        $args = [
-            'label'  => esc_html__( 'Library Categories', 'ap_library' ),
-            'labels' => [
-                'menu_name'          => esc_html__( 'Library Categories', 'ap_library' ),
-                'name'               => esc_html__( 'Library Categories', 'ap_library' ),
-                'singular_name'      => esc_html__( 'Library Category', 'ap_library' ),
-                'add_new_item'       => esc_html__( 'Add new Library Category', 'ap_library' ),
-                'new_item'           => esc_html__( 'New Library Category', 'ap_library' ),
-                'view_item'          => esc_html__( 'View Library Category', 'ap_library' ),
-                'not_found'          => esc_html__( 'No Library Category found', 'ap_library' ),
-                'not_found_in_trash' => esc_html__( 'No Library Category found in trash', 'ap_library' ),
-                'all_items'          => esc_html__( 'All Library Categories', 'ap_library' ),
-            ],
-            'public'              => true,
-            'show_ui'             => true,
-            'show_in_nav_menus'   => true,
-            'show_admin_column'   => true,
-            'show_in_rest'        => true,
-            'hierarchical'        => true,
-            'rewrite'             => array( 'slug' => 'library-category' ),
-        ];
-
-        register_taxonomy( 'aplb_library_category', 'aplb_library', $args );
-    }
-
     
     /**
      * Register the published date taxonomy.
@@ -169,7 +133,7 @@ class Ap_Library_Taxonomy {
             'rewrite'             => array( 'slug' => 'uploads-genre' ),
         ];
 
-        register_taxonomy( 'aplb_uploads_genre',  'aplb_uploads', $args );
+        register_taxonomy( 'aplb_uploads_genre', [ 'aplb_uploads', 'aplb_library' ], $args );
 
     }
 

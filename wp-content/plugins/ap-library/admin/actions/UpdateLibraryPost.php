@@ -21,11 +21,10 @@ class UpdateLibraryPost implements ActionInterface {
 
         $updated = 0;
         foreach ($uploads_by_genre as $genre_id => $genre_uploads) {
-            $library_cat_id = $this->get_or_create_library_category_id($genre_id);
-            $existing_posts = $this->get_library_post_for_genre_today($library_cat_id, $today);
+            $existing_posts = $this->get_library_post_for_genre_today($genre_id, $today);
 
             if (!empty($existing_posts)) {
-                $result = $this->update_existing_library_post($existing_posts[0], $genre_uploads, $library_cat_id, $pdate_term_id);
+                $result = $this->update_existing_library_post($existing_posts[0], $genre_uploads, $genre_id, $pdate_term_id);
                 if ($result) {
                     $updated++;
                 }
