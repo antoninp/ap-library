@@ -63,15 +63,17 @@ class Ap_Library_Admin_Actions {
     public function load_dependencies() {
         // Load action classes
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/ActionInterface.php';
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/ProcessLibrary.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/CreateTodayLibrary.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/CreateAllLibrary.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/UpdateLibraryPost.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/UpdateAllLibraryPosts.php';
     }
 
     private function register_default_actions() {
         
-        $this->register_action('process_library', __('Process Library', 'ap-library'), [new ProcessLibrary(), 'execute']);
-        $this->register_action('update_library', __('Update Library Posts', 'ap-library'), [new UpdateLibraryPost(), 'execute']);
+        $this->register_action('create_today_library', __('Create Today Galleries', 'ap-library'), [new CreateTodayLibrary(), 'execute']);
+        $this->register_action('create_all_library', __('Create All Galleries', 'ap-library'), [new CreateAllLibrary(), 'execute']);
+        $this->register_action('update_today_library', __('Update Today Library Posts', 'ap-library'), [new UpdateLibraryPost(), 'execute']);
         $this->register_action('update_all_library', __('Update All Library Posts', 'ap-library'), [new UpdateAllLibraryPosts(), 'execute']);
     }
 

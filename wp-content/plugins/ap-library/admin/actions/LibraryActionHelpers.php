@@ -130,4 +130,47 @@ trait LibraryActionHelpers {
         }
         return true;
     }
+
+    public function create_new_library_post($genre_id, $genre_uploads, $pdate, $pdate_term_id) {
+        // Build gallery HTML and other post data as needed
+        $image_ids = [];
+        $images_json = [];
+        foreach ($genre_uploads as $upload) {
+            $thumb_id = get_post_thumbnail_id($upload->ID);
+            if ($thumb_id && get_post_status($thumb_id) === 'publish') {
+                $image_ids[] = $thumb_id;
+                $images_json[] = [
+                    'alt'     => '',
+                    'id'      => $thumb_id,
+                    'url'     => esc_url(wp_get_attachment_url($thumb_id)),
+                    'caption' => ''
+                ];
+            }
+        }
+        $image_ids = array_unique($image_ids);
+
+        if (empty($image_ids)) {
+            return false;
+        }
+
+        $gallery_html = $this->build_gallery_html($image_ids, $images_json);
+
+        $post_title = sprintf(__('Library %s - %s', 'ap_library'), $pdate, get_term($genre_id)->name);
+
+        $new_post = [
+            'post_title'    => $post_title,
+            'post_content'  => $gallery_html,
+            'post_status'   => 'publish',
+            'post_type'     => 'aplb_library',
+        ];
+        $post_id = wp_insert_post($new_post);
+
+        if ($post_id && $genre_id) {
+            wp_set_post_terms($post_id, [$genre_id], 'aplb_uploads_genre', false);
+        }
+        if ($post_id && !empty($pdate_term_id)) {
+            wp_set_post_terms($post_id, [$pdate_term_id], 'aplb_library_pdate', false);
+        }
+        return $post_id ? true : false;
+    }
 }
