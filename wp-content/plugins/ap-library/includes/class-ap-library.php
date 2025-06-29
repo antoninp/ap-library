@@ -67,6 +67,7 @@ class Ap_Library {
 		$this->define_public_hooks();
 		$this->define_custom_post_type_hooks();
 		$this->define_taxonomy_hooks();
+		$this->define_block_hooks();
 
 	}
 
@@ -121,6 +122,7 @@ class Ap_Library {
          */
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-taxonomy.php';
 
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-fade-gallery-block.php';
 
 		$this->loader = new Ap_Library_Loader();
 
@@ -219,6 +221,18 @@ class Ap_Library {
         $plugin_taxonomies = new Ap_Library_Taxonomy();
 		
         $this->loader->add_action( 'init', $plugin_taxonomies, 'register_taxonomies' );
+    }
+
+	/**
+     * Register all of the hooks related to block editor functionality.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function define_block_hooks() {
+
+        $fade_gallery_block = new Ap_Library_Fade_Gallery_Block();
+        $this->loader->add_action( 'init', $fade_gallery_block, 'register_block' );
     }
 
 	/**

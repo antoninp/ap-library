@@ -54,3 +54,81 @@ html {
     max-height: 400px !important;
     height: auto !important;
 }
+
+/* Fade Gallery styles */
+.ap-fade-gallery {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  /*background: #000;*/
+}
+.ap-fade-gallery img {
+  position: absolute;
+  top: 0; left: 0;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s;
+  z-index: 1;
+}
+.ap-fade-gallery img.active {
+  opacity: 1;
+  z-index: 2;
+}
+.ap-fade-gallery .ap-fade-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  box-shadow: none;
+  font-size: 2rem;
+  z-index: 10;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 0;
+  user-select: none;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.ap-fade-gallery:hover .ap-fade-arrow {
+  /* Don't show by default on hover, only when near edge */
+  opacity: 0;
+}
+.ap-fade-gallery .ap-fade-arrow.edge-active {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.4s;
+}
+.ap-fade-gallery .ap-fade-arrow.left { left: 10px; }
+.ap-fade-gallery .ap-fade-arrow.right { right: 10px; }
+.ap-fade-gallery .ap-fade-arrow:hover .ap-fade-arrow-svg {
+  stroke: #23282d;
+}
+.ap-fade-arrow-svg {
+  width: 32px;
+  height: 32px;
+  display: block;
+  stroke: #AEACA6;
+  transition: stroke 0.2s;
+}
+.ap-fade-gallery .ap-fade-arrow:focus {
+  outline: none;
+  box-shadow: none;
+}
+.ap-fade-gallery .ap-fade-arrow.edge-active:hover .ap-fade-arrow-svg {
+  animation: fade-arrow-bounce 1s linear infinite alternate;
+}
+@keyframes fade-arrow-bounce {
+  0%   {transform: scale(1);}
+  50%  {transform: scale(1.15);}
+  100% {transform: scale(1);}
+}
