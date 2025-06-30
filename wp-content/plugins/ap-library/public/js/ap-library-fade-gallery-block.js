@@ -6,6 +6,9 @@
     var CheckboxControl = components.CheckboxControl;
     var PanelBody = components.PanelBody;
     var RangeControl = components.RangeControl || blockEditor.RangeControl; // fallback
+    var SelectControl = components.SelectControl;
+    var ColorPalette = components.ColorPalette || blockEditor.ColorPalette;
+    var PanelRow = components.PanelRow;
 
     blocks.registerBlockType( 'ap-library/fade-gallery', {
         title: 'Fade Gallery',
@@ -14,12 +17,29 @@
         attributes: {
             images: { type: 'array', default: [] },
             auto: { type: 'boolean', default: false },
-            delay: { type: 'number', default: 4000 }
+            delay: { type: 'number', default: 4000 },
+            effect: { type: 'string', default: 'fade' },
+            showArrows: { type: 'boolean', default: true },
+            showDots: { type: 'boolean', default: false },
+            pauseOnHover: { type: 'boolean', default: true },
+            randomize: { type: 'boolean', default: false },
+            loop: { type: 'boolean', default: true },
+            showCaptions: { type: 'boolean', default: false },
+            arrowColor: { type: 'string', default: '#AEACA6' }
         },
         edit: function( props ) {
             var images = props.attributes.images || [];
             var auto = props.attributes.auto;
             var delay = props.attributes.delay || 4000;
+            var effect = props.attributes.effect || 'fade';
+            var showArrows = props.attributes.showArrows;
+            var showDots = props.attributes.showDots;
+            var pauseOnHover = props.attributes.pauseOnHover;
+            var randomize = props.attributes.randomize;
+            var loop = props.attributes.loop;
+            var showCaptions = props.attributes.showCaptions;
+            var arrowColor = props.attributes.arrowColor || '#AEACA6';
+
             return [
                 el( InspectorControls, {},
                     el( PanelBody, { title: 'Gallery Settings', initialOpen: true },
@@ -35,7 +55,61 @@
                             step: 500,
                             value: delay,
                             onChange: function( val ) { props.setAttributes( { delay: val } ); }
-                        } )
+                        } ),
+                        el( SelectControl, {
+                            label: 'Transition Effect',
+                            value: effect,
+                            options: [
+                                { label: 'Fade', value: 'fade' },
+                                { label: 'Slide', value: 'slide' },
+                                { label: 'Zoom', value: 'zoom' }
+                            ],
+                            onChange: function( val ) { props.setAttributes( { effect: val } ); }
+                        } ),
+                        el( CheckboxControl, {
+                            label: 'Show arrows',
+                            checked: !!showArrows,
+                            onChange: function( val ) { props.setAttributes( { showArrows: val } ); }
+                        } ),
+                        el( CheckboxControl, {
+                            label: 'Show dots/pagination',
+                            checked: !!showDots,
+                            onChange: function( val ) { props.setAttributes( { showDots: val } ); }
+                        } ),
+                        el( CheckboxControl, {
+                            label: 'Pause on hover',
+                            checked: !!pauseOnHover,
+                            onChange: function( val ) { props.setAttributes( { pauseOnHover: val } ); }
+                        } ),
+                        el( CheckboxControl, {
+                            label: 'Randomize image order',
+                            checked: !!randomize,
+                            onChange: function( val ) { props.setAttributes( { randomize: val } ); }
+                        } ),
+                        el( CheckboxControl, {
+                            label: 'Loop images',
+                            checked: !!loop,
+                            onChange: function( val ) { props.setAttributes( { loop: val } ); }
+                        } ),
+                        el( CheckboxControl, {
+                            label: 'Show captions',
+                            checked: !!showCaptions,
+                            onChange: function( val ) { props.setAttributes( { showCaptions: val } ); }
+                        } ),
+                        el( PanelRow, {},
+                            el( 'span', {}, 'Arrow color:' ),
+                            el( ColorPalette, {
+                                value: arrowColor,
+                                onChange: function( val ) { props.setAttributes( { arrowColor: val } ); },
+                                colors: [
+                                    { name: 'Gray', color: '#AEACA6' },
+                                    { name: 'Black', color: '#23282d' },
+                                    { name: 'White', color: '#fff' },
+                                    { name: 'Blue', color: '#007cba' },
+                                    { name: 'Red', color: '#d7263d' }
+                                ]
+                            } )
+                        )
                     )
                 ),
                 el( 'div', { className: 'ap-fade-gallery-block' },

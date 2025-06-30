@@ -83,37 +83,124 @@
             var $right = $gallery.find('.ap-fade-arrow.right');
             var $edgeLeft = $gallery.find('.ap-fade-edge-left');
             var $edgeRight = $gallery.find('.ap-fade-edge-right');
+            var $dots = $gallery.find('.ap-fade-dots');
             var idx = 0;
-            var delay = 4000;
-            var auto = $gallery.data('auto') === true || $gallery.data('auto') === 'true';
             var timer = null;
-            var lastX = null;
-            var arrowTimeout = null;
+
+            // Read options from data attributes
+            var auto = $gallery.data('auto') === true || $gallery.data('auto') === 'true';
+            var delay = parseInt($gallery.data('delay'), 10) || 4000;
+            var effect = $gallery.data('effect') || 'fade';
+            var showArrows = $gallery.data('show-arrows') === true || $gallery.data('show-arrows') === 'true';
+            var showDots = $gallery.data('show-dots') === true || $gallery.data('show-dots') === 'true';
+            var pauseOnHover = $gallery.data('pause-on-hover') === true || $gallery.data('pause-on-hover') === 'true';
+            var randomize = $gallery.data('randomize') === true || $gallery.data('randomize') === 'true';
+            var loop = $gallery.data('loop') === true || $gallery.data('loop') === 'true';
+            var showCaptions = $gallery.data('show-captions') === true || $gallery.data('show-captions') === 'true';
+            var arrowColor = $gallery.data('arrow-color') || '#AEACA6';
+
+            // Apply arrow color
+            $gallery.find('.ap-fade-arrow-svg path').attr('stroke', arrowColor);
+
+            // Randomize images if needed
+            if (randomize && $imgs.length > 1) {
+                $imgs.sort(function(){ return 0.5 - Math.random(); });
+                $imgs.detach().appendTo($gallery);
+            }
+
+            // Dots logic
+            if (showDots && $dots.length) {
+                $dots.empty();
+                for (var i = 0; i < $imgs.length; i++) {
+                    $dots.append('<span class="ap-fade-dot" data-idx="'+i+'"></span>');
+                }
+                $dots.on('click', '.ap-fade-dot', function(){
+                    show(parseInt($(this).data('idx'), 10));
+                });
+            }
+
+            var lastIdx = 0;
+            var direction = 'right';
 
             function show(idxNew) {
-                $imgs.removeClass('active');
+                $imgs.removeClass('active in-out slide-left slide-right zoom-in');
+                direction = (idxNew > lastIdx || (idxNew === 0 && lastIdx === $imgs.length - 1)) ? 'right' : 'left';
                 idx = (idxNew + $imgs.length) % $imgs.length;
-                $imgs.eq(idx).addClass('active');
-            }
-            function next() { show(idx + 1); }
-            function prev() { show(idx - 1); }
+                var $current = $imgs.eq(idx);
 
-            $left.on('click', function(){ prev(); resetAuto(); });
-            $right.on('click', function(){ next(); resetAuto(); });
-            $edgeLeft.on('click', function(e){
-                prev();
-                resetAuto();
-                $left.addClass('edge-active');
-                $right.removeClass('edge-active');
-                scheduleHideArrows();
-            });
-            $edgeRight.on('click', function(e){
-                next();
-                resetAuto();
-                $right.addClass('edge-active');
-                $left.removeClass('edge-active');
-                scheduleHideArrows();
-            });
+                if (effect === 'fade') {
+                    $current.addClass('active');
+                } else if (effect === 'slide') {
+                    $current.addClass('active in-out ' + (direction === 'right' ? 'slide-right' : 'slide-left'));
+                } else if (effect === 'zoom') {
+                    $current.addClass('active zoom-in');
+                } else {
+                    $current.addClass('active');
+                }
+
+                if (showDots && $dots.length) {
+                    $dots.find('.ap-fade-dot').removeClass('active').eq(idx).addClass('active');
+                }
+                if (showCaptions) {
+                    var $captionBox = $gallery.find('.ap-fade-caption');
+                    var caption = $imgs.eq(idx).data('caption') || $imgs.eq(idx).attr('alt') || '';
+                    $captionBox.text(caption);
+                }
+                lastIdx = idx;
+            }
+            function next() {
+                if (!loop && idx + 1 >= $imgs.length) return;
+                show(idx + 1);
+            }
+            function prev() {
+                if (!loop && idx - 1 < 0) return;
+                show(idx - 1);
+            }
+
+            if (showArrows) {
+                $left.on('click', function(){ prev(); resetAuto(); });
+                $right.on('click', function(){ next(); resetAuto(); });
+
+                // Show left arrow when mouse is over left edge
+                $edgeLeft.on('mouseenter mousemove', function() {
+                    $left.addClass('edge-active');
+                    $right.removeClass('edge-active');
+                });
+                $edgeLeft.on('mouseleave', function() {
+                    $left.removeClass('edge-active');
+                });
+
+                // Show right arrow when mouse is over right edge
+                $edgeRight.on('mouseenter mousemove', function() {
+                    $right.addClass('edge-active');
+                    $left.removeClass('edge-active');
+                });
+                $edgeRight.on('mouseleave', function() {
+                    $right.removeClass('edge-active');
+                });
+
+                // Show arrow when mouse moves towards edge (not just overlay)
+                $gallery.on('mousemove', function(e) {
+                    var offset = $gallery.offset();
+                    var x = e.pageX - offset.left;
+                    var width = $gallery.width();
+                    var edgeZone = 75;
+                    if (x < edgeZone) {
+                        $left.addClass('edge-active');
+                        $right.removeClass('edge-active');
+                    } else if (x > width - edgeZone) {
+                        $right.addClass('edge-active');
+                        $left.removeClass('edge-active');
+                    } else {
+                        $left.removeClass('edge-active');
+                        $right.removeClass('edge-active');
+                    }
+                });
+                $gallery.on('mouseleave', function() {
+                    $left.removeClass('edge-active');
+                    $right.removeClass('edge-active');
+                });
+            }
 
             function startAuto() {
                 if(auto && $imgs.length > 1) {
@@ -125,109 +212,14 @@
                 startAuto();
             }
 
-            function isNearArrow(mouseX, arrowX, arrowWidth, threshold) {
-                return Math.abs(mouseX - (arrowX + arrowWidth / 2)) < threshold;
+            if (pauseOnHover) {
+                $gallery.on('mouseenter', function(){ if(timer) clearInterval(timer); });
+                $gallery.on('mouseleave', function(){ startAuto(); });
             }
 
-            $gallery.on('mousemove', function(e){
-                var offset = $gallery.offset();
-                var x = e.pageX - offset.left;
-                var w = $gallery.width();
-
-                if (lastX !== null) {
-                    if (x > lastX + 2) { // moved right
-                        $right.addClass('edge-active');
-                        $left.removeClass('edge-active');
-                    } else if (x < lastX - 2) { // moved left
-                        $left.addClass('edge-active');
-                        $right.removeClass('edge-active');
-                    }
-                }
-                lastX = x;
-
-                mouseX = x; // Save for hide check
-                scheduleHideArrows();
-            }).on('mouseleave', function(){
-                hideArrows();
-                lastX = null;
-                mouseX = null;
-                if (arrowTimeout) clearTimeout(arrowTimeout);
-            });
-
-            var mouseX = null;
-            function hideArrows() {
-                var threshold = 60; // px
-                var leftX = $left.position().left;
-                var rightX = $right.position().left;
-                var leftW = $left.outerWidth();
-                var rightW = $right.outerWidth();
-
-                // Only hide if mouse is not near the visible arrow
-                if (
-                    ($left.hasClass('edge-active') && mouseX !== null && isNearArrow(mouseX, leftX, leftW, threshold)) ||
-                    ($right.hasClass('edge-active') && mouseX !== null && isNearArrow(mouseX, rightX, rightW, threshold))
-                ) {
-                    // Mouse is near an arrow, don't hide
-                    scheduleHideArrows();
-                    return;
-                }
-                $left.removeClass('edge-active');
-                $right.removeClass('edge-active');
-            }
-
-            function scheduleHideArrows() {
-                if (arrowTimeout) clearTimeout(arrowTimeout);
-                arrowTimeout = setTimeout(hideArrows, 2000);
-            }
-
+            // Show first image
             show(0);
             startAuto();
-
-            $gallery.on('mousemove', function(e){
-                var offset = $gallery.offset();
-                var x = e.pageX - offset.left;
-                var w = $gallery.width();
-
-                if (lastX !== null) {
-                    if (x > lastX + 2) { // moved right
-                        $right.addClass('edge-active');
-                        $left.removeClass('edge-active');
-                    } else if (x < lastX - 2) { // moved left
-                        $left.addClass('edge-active');
-                        $right.removeClass('edge-active');
-                    }
-                }
-                lastX = x;
-
-                mouseX = x; // Save for hide check
-                scheduleHideArrows();
-            }).on('mouseleave', function(){
-                hideArrows();
-                lastX = null;
-                mouseX = null;
-                if (arrowTimeout) clearTimeout(arrowTimeout);
-            });
-
-            // Prevent arrows from hiding when hovered
-            $left.add($right).on('mouseenter', function(){
-                if (arrowTimeout) clearTimeout(arrowTimeout);
-            }).on('mouseleave', function(){
-                scheduleHideArrows();
-            });
-
-            // Optional: show arrow on mousemove/enter over edge
-            $edgeLeft.on('mousemove mouseenter', function(){
-                $left.addClass('edge-active');
-                $right.removeClass('edge-active');
-                scheduleHideArrows();
-            });
-            $edgeRight.on('mousemove mouseenter', function(){
-                $right.addClass('edge-active');
-                $left.removeClass('edge-active');
-                scheduleHideArrows();
-            });
-            $edgeLeft.on('mouseleave', function(){ scheduleHideArrows(); });
-            $edgeRight.on('mouseleave', function(){ scheduleHideArrows(); });
         });
 
     });

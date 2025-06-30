@@ -150,3 +150,91 @@ html {
 .ap-fade-gallery .ap-fade-edge-right {
   right: 0;
 }
+
+/* Slide effect */
+.ap-fade-gallery img.in-out {
+    transition: transform 0.7s cubic-bezier(.77,0,.18,1), opacity 0.7s;
+    transform: translateX(100%);
+    opacity: 0;
+    z-index: 1;
+}
+.ap-fade-gallery img.active.in-out {
+    transform: translateX(0);
+    opacity: 1;
+    z-index: 2;
+}
+
+/* Slide right (next) */
+.ap-fade-gallery img.in-out.slide-right {
+    transition: transform 0.7s cubic-bezier(.77,0,.18,1), opacity 0.7s;
+    transform: translateX(100%);
+    opacity: 0;
+    z-index: 1;
+}
+.ap-fade-gallery img.active.in-out.slide-right {
+    transform: translateX(0);
+    opacity: 1;
+    z-index: 2;
+}
+
+/* Slide left (prev) */
+.ap-fade-gallery img.in-out.slide-left {
+    transition: transform 0.7s cubic-bezier(.77,0,.18,1), opacity 0.7s;
+    transform: translateX(-100%);
+    opacity: 0;
+    z-index: 1;
+}
+.ap-fade-gallery img.active.in-out.slide-left {
+    transform: translateX(0);
+    opacity: 1;
+    z-index: 2;
+}
+
+/* Zoom effect */
+.ap-fade-gallery img.zoom-in {
+    transition: transform 1s, opacity 1s;
+    transform: scale(1.1);
+    opacity: 0;
+}
+.ap-fade-gallery img.active.zoom-in {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Dots */
+.ap-fade-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    gap: 8px;
+}
+.ap-fade-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ccc;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.ap-fade-dot.active {
+    background: #23282d;
+}
+
+/* Caption */
+.ap-fade-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 60px;
+    text-align: center;
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    padding: 8px 16px;
+    font-size: 1.1em;
+    z-index: 30;
+    border-radius: 4px;
+    pointer-events: none;
+}
