@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-ap-slideshow-block.php';
 
 function ap_slideshow_register_block() {
-    $block = new Ap_Slideshow_Fade_Gallery_Block();
+    $block = new Ap_Slideshow_Block();
     $block->register_block();
 }
 add_action( 'init', 'ap_slideshow_register_block' );
