@@ -59,7 +59,7 @@ html {
 .ap-fade-gallery {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   overflow: hidden;
   /*background: #000;*/
 }
@@ -91,8 +91,8 @@ html {
   padding: 0;
   border-radius: 0;
   user-select: none;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,10 +103,11 @@ html {
 .ap-fade-gallery:hover .ap-fade-arrow {
   /* Don't show by default on hover, only when near edge */
   opacity: 0;
+  pointer-events: none;
 }
 .ap-fade-gallery .ap-fade-arrow.edge-active {
   opacity: 1;
-  pointer-events: auto;
+  pointer-events: auto; /* <-- allow mouse events when visible */
   transition: opacity 0.4s;
 }
 .ap-fade-gallery .ap-fade-arrow.left { left: 10px; }
@@ -115,8 +116,8 @@ html {
   stroke: #23282d;
 }
 .ap-fade-arrow-svg {
-  width: 32px;
-  height: 32px;
+  width: 45px;
+  height: 45px;
   display: block;
   stroke: #AEACA6;
   transition: stroke 0.2s;
@@ -132,4 +133,20 @@ html {
   0%   {transform: scale(1);}
   50%  {transform: scale(1.15);}
   100% {transform: scale(1);}
+}
+.ap-fade-gallery .ap-fade-edge {
+  position: absolute;
+  top: 0;
+  width: 40%;
+  height: 100% !important;
+  z-index: 5;
+  cursor: pointer;
+  background: transparent;
+  display: block;
+}
+.ap-fade-gallery .ap-fade-edge-left {
+  left: 0;
+}
+.ap-fade-gallery .ap-fade-edge-right {
+  right: 0;
 }

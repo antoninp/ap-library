@@ -40,6 +40,8 @@ class Ap_Library_Fade_Gallery_Block {
         ob_start();
         ?>
         <div class="ap-fade-gallery" data-auto="<?php echo esc_attr($auto); ?>">
+            <div class="ap-fade-edge ap-fade-edge-left"></div>
+            <div class="ap-fade-edge ap-fade-edge-right"></div>
             <button class="ap-fade-arrow left" type="button"><?php echo $arrow_left_svg; ?></button>
             <button class="ap-fade-arrow right" type="button"><?php echo $arrow_right_svg; ?></button>
             <?php foreach ( $attributes['images'] as $img ) : ?>
