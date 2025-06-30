@@ -76,11 +76,17 @@ class Ap_Library_Fade_Gallery_Block {
                 <img src="<?php echo esc_url( $img['url'] ); ?>"
                      alt="<?php echo esc_attr( $img['alt'] ?? '' ); ?>"
                      title="<?php echo esc_attr( $img['title'] ?? '' ); ?>"
-                     <?php if ($showCaptions === 'true' && !empty($img['caption'])): ?>
+                     <?php if (!empty($img['caption'])): ?>
                          data-caption="<?php echo esc_attr($img['caption']); ?>"
                      <?php endif; ?>
-                     <?php if ($showCaptions === 'true' && !empty($img['description'])): ?>
+                     <?php if (!empty($img['description'])): ?>
                          data-description="<?php echo esc_attr($img['description']); ?>"
+                     <?php endif; ?>
+                     <?php if (!empty($img['link'])): ?>
+                         data-link="<?php echo esc_url($img['link']); ?>"
+                     <?php endif; ?>
+                     <?php if (!empty($img['linkTitle'])): ?>
+                         data-link-title="<?php echo esc_attr($img['linkTitle']); ?>"
                      <?php endif; ?>
                 >
             <?php endforeach; ?>
@@ -90,6 +96,7 @@ class Ap_Library_Fade_Gallery_Block {
             <?php if ($showDots === 'true'): ?>
                 <div class="ap-fade-dots"></div>
             <?php endif; ?>
+            <div class="ap-fade-link"></div>
         </div>
         <?php
         return ob_get_clean();

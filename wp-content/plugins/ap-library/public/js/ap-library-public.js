@@ -85,6 +85,10 @@
             var $edgeRight = $gallery.find('.ap-fade-edge-right');
             var $dots = $gallery.find('.ap-fade-dots');
             var idx = 0;
+            var lastIdx = 0;
+            var direction = 'right';
+            var lastMouseX = null;
+            var hideArrowTimer = null;
             var timer = null;
 
             // Read options from data attributes
@@ -107,6 +111,7 @@
             if (randomize && $imgs.length > 1) {
                 $imgs.sort(function(){ return 0.5 - Math.random(); });
                 $imgs.detach().appendTo($gallery);
+                $imgs = $gallery.find('img'); // <-- Update $imgs to match new DOM order
             }
 
             // Dots logic
@@ -120,14 +125,9 @@
                 });
             }
 
-            var lastIdx = 0;
-            var direction = 'right';
-            var lastMouseX = null;
-            var hideArrowTimer = null;
-
             function show(idxNew) {
                 $imgs.removeClass('active in-out slide-left slide-right zoom-in');
-                direction = (idxNew > lastIdx || (idxNew === 0 && lastIdx === $imgs.length - 1)) ? 'right' : 'left';
+                direction = (idxNew > idx || (idxNew === 0 && idx === $imgs.length - 1)) ? 'right' : 'left';
                 idx = (idxNew + $imgs.length) % $imgs.length;
                 var $current = $imgs.eq(idx);
 
@@ -157,6 +157,16 @@
                     }
                     $captionBox.text(caption);
                 }
+                var $linkBox = $gallery.find('.ap-fade-link');
+                var $img = $imgs.eq(idx);
+                var link = $img.data('link') || '';
+                var linkTitle = $img.data('link-title') || '';
+                if (link) {
+                    $linkBox.html('<a href="' + link + '" class="ap-fade-link-inner">' + (linkTitle || link) + '</a>');
+                    $linkBox.show();
+                } else {
+                    $linkBox.hide();
+                }
                 lastIdx = idx;
             }
             function next() {
@@ -169,9 +179,6 @@
             }
 
             if (showArrows) {
-                
-                $left.on('click', function(){ prev(); resetAuto(); });
-                $right.on('click', function(){ next(); resetAuto(); });
 
                 // Show left arrow when mouse is over left edge
                 $edgeLeft.on('mouseenter mousemove', function() {
@@ -241,25 +248,13 @@
                     if (hideArrowTimer) clearTimeout(hideArrowTimer);
                 });
 
-                // Edge overlays still handle their own hover/click as before
-                $edgeLeft.on('mouseenter mousemove', function() {
-                    $left.addClass('edge-active');
-                    $right.removeClass('edge-active');
-                });
-                $edgeLeft.on('mouseleave', function() {
-                    $left.removeClass('edge-active');
-                });
-                $edgeRight.on('mouseenter mousemove', function() {
-                    $right.addClass('edge-active');
-                    $left.removeClass('edge-active');
-                });
-                $edgeRight.on('mouseleave', function() {
-                    $right.removeClass('edge-active');
-                });
-                $left.on('click', function(){ prev(); resetAuto(); });
-                $right.on('click', function(){ next(); resetAuto(); });
+                // Edge overlays: only handle click and not mouseenter/mousemove/mouseleave
                 $edgeLeft.on('click', function(){ prev(); resetAuto(); });
                 $edgeRight.on('click', function(){ next(); resetAuto(); });
+
+                // Arrows clickable as well
+                $left.on('click', function(){ prev(); resetAuto(); });
+                $right.on('click', function(){ next(); resetAuto(); });
             }
 
             function startAuto() {
@@ -273,8 +268,8 @@
             }
 
             if (pauseOnHover) {
-                $gallery.on('mouseenter', function(){ if(timer) clearInterval(timer); });
-                $gallery.on('mouseleave', function(){ startAuto(); });
+                $gallery.on('mouseenter', '.ap-fade-link', function(){ if(timer) clearInterval(timer); });
+                $gallery.on('mouseleave', '.ap-fade-link', function(){ startAuto(); });
             }
 
             // Show first image

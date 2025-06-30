@@ -140,8 +140,32 @@
                         } )
                     ),
                     el( 'div', { className: 'ap-fade-gallery-preview' },
-                        images.map( function( img ) {
-                            return el( 'img', { key: img.id, src: img.url, alt: img.alt, style: { maxWidth: '100px', margin: '5px' } } );
+                        images.map( function( img, i ) {
+                            return el( 'div', { key: img.id, style: { marginBottom: '10px' } },
+                                el( 'img', { src: img.url, style: { maxWidth: '100px', display: 'block' } } ),
+                                el( 'input', {
+                                    type: 'text',
+                                    placeholder: 'Link URL',
+                                    value: img.link || '',
+                                    onChange: function( e ) {
+                                        var newImgs = images.slice();
+                                        newImgs[i] = Object.assign( {}, newImgs[i], { link: e.target.value } );
+                                        props.setAttributes( { images: newImgs } );
+                                    },
+                                    style: { width: '100%' }
+                                } ),
+                                el( 'input', {
+                                    type: 'text',
+                                    placeholder: 'Link Title',
+                                    value: img.linkTitle || '',
+                                    onChange: function( e ) {
+                                        var newImgs = images.slice();
+                                        newImgs[i] = Object.assign( {}, newImgs[i], { linkTitle: e.target.value } );
+                                        props.setAttributes( { images: newImgs } );
+                                    },
+                                    style: { width: '100%', marginTop: '4px' }
+                                } )
+                            );
                         } )
                     )
                 )
