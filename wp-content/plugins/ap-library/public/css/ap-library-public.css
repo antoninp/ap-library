@@ -86,7 +86,7 @@ html {
   background: none;
   box-shadow: none;
   font-size: 2rem;
-  z-index: 10;
+  z-index: 21;
   cursor: pointer;
   padding: 0;
   border-radius: 0;
@@ -96,22 +96,19 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
   opacity: 0;
-  pointer-events: none;
   transition: opacity 0.4s;
-}
-.ap-fade-gallery:hover .ap-fade-arrow {
-  /* Don't show by default on hover, only when near edge */
-  opacity: 0;
-  pointer-events: none;
 }
 .ap-fade-gallery .ap-fade-arrow.edge-active {
   opacity: 1;
-  pointer-events: auto; /* <-- allow mouse events when visible */
-  transition: opacity 0.4s;
 }
-.ap-fade-gallery .ap-fade-arrow.left { left: 10px; }
-.ap-fade-gallery .ap-fade-arrow.right { right: 10px; }
+.ap-fade-gallery .ap-fade-arrow.left {
+  left: 10px;
+}
+.ap-fade-gallery .ap-fade-arrow.right {
+  right: 10px;
+}
 .ap-fade-gallery .ap-fade-arrow:hover .ap-fade-arrow-svg {
   stroke: #23282d;
 }
@@ -137,12 +134,13 @@ html {
 .ap-fade-gallery .ap-fade-edge {
   position: absolute;
   top: 0;
-  width: 75px;
+  width: 100px;
   height: 100% !important;
-  z-index: 5;
+  z-index: 20;
   cursor: pointer;
   background: transparent;
   display: block;
+  pointer-events: auto;
 }
 .ap-fade-gallery .ap-fade-edge-left {
   left: 0;
@@ -209,11 +207,11 @@ html {
     transform: translateX(-50%);
     z-index: 20;
     display: flex;
-    gap: 8px;
+    gap: 15px;
 }
 .ap-fade-dot {
-    width: 12px;
-    height: 12px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
     background: #ccc;
     cursor: pointer;

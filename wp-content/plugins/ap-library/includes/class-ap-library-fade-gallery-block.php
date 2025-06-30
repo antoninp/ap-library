@@ -64,6 +64,7 @@ class Ap_Library_Fade_Gallery_Block {
             data-loop="<?php echo $loop; ?>"
             data-show-captions="<?php echo $showCaptions; ?>"
             data-arrow-color="<?php echo $arrowColor; ?>"
+            data-caption-source="<?php echo esc_attr($attributes['captionSource'] ?? 'caption'); ?>"
         >
             <div class="ap-fade-edge ap-fade-edge-left"></div>
             <div class="ap-fade-edge ap-fade-edge-right"></div>
@@ -74,8 +75,12 @@ class Ap_Library_Fade_Gallery_Block {
             <?php foreach ( $attributes['images'] as $img ) : ?>
                 <img src="<?php echo esc_url( $img['url'] ); ?>"
                      alt="<?php echo esc_attr( $img['alt'] ?? '' ); ?>"
+                     title="<?php echo esc_attr( $img['title'] ?? '' ); ?>"
                      <?php if ($showCaptions === 'true' && !empty($img['caption'])): ?>
                          data-caption="<?php echo esc_attr($img['caption']); ?>"
+                     <?php endif; ?>
+                     <?php if ($showCaptions === 'true' && !empty($img['description'])): ?>
+                         data-description="<?php echo esc_attr($img['description']); ?>"
                      <?php endif; ?>
                 >
             <?php endforeach; ?>

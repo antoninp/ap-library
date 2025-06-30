@@ -98,6 +98,7 @@
             var loop = $gallery.data('loop') === true || $gallery.data('loop') === 'true';
             var showCaptions = $gallery.data('show-captions') === true || $gallery.data('show-captions') === 'true';
             var arrowColor = $gallery.data('arrow-color') || '#AEACA6';
+            var captionSource = $gallery.data('caption-source') || 'caption';
 
             // Apply arrow color
             $gallery.find('.ap-fade-arrow-svg path').attr('stroke', arrowColor);
@@ -121,6 +122,8 @@
 
             var lastIdx = 0;
             var direction = 'right';
+            var lastMouseX = null;
+            var hideArrowTimer = null;
 
             function show(idxNew) {
                 $imgs.removeClass('active in-out slide-left slide-right zoom-in');
@@ -143,7 +146,15 @@
                 }
                 if (showCaptions) {
                     var $captionBox = $gallery.find('.ap-fade-caption');
-                    var caption = $imgs.eq(idx).data('caption') || $imgs.eq(idx).attr('alt') || '';
+                    var $img = $imgs.eq(idx);
+                    var caption = '';
+                    if (captionSource === 'title') {
+                        caption = $img.attr('title') || '';
+                    } else if (captionSource === 'description') {
+                        caption = $img.data('description') || '';
+                    } else {
+                        caption = $img.data('caption') || $img.attr('alt') || '';
+                    }
                     $captionBox.text(caption);
                 }
                 lastIdx = idx;
@@ -158,6 +169,7 @@
             }
 
             if (showArrows) {
+                
                 $left.on('click', function(){ prev(); resetAuto(); });
                 $right.on('click', function(){ next(); resetAuto(); });
 
@@ -169,8 +181,6 @@
                 $edgeLeft.on('mouseleave', function() {
                     $left.removeClass('edge-active');
                 });
-
-                // Show right arrow when mouse is over right edge
                 $edgeRight.on('mouseenter mousemove', function() {
                     $right.addClass('edge-active');
                     $left.removeClass('edge-active');
@@ -178,28 +188,78 @@
                 $edgeRight.on('mouseleave', function() {
                     $right.removeClass('edge-active');
                 });
+                var lastMouseX = null;
+                var hideArrowTimer = null;
 
-                // Show arrow when mouse moves towards edge (not just overlay)
+                function showArrowTemp($arrow) {
+                    $arrow.addClass('edge-active');
+                    if (hideArrowTimer) clearTimeout(hideArrowTimer);
+                    hideArrowTimer = setTimeout(function() {
+                        $left.removeClass('edge-active');
+                        $right.removeClass('edge-active');
+                    }, 800); // Hide after 800ms of no movement
+                }
+
                 $gallery.on('mousemove', function(e) {
                     var offset = $gallery.offset();
                     var x = e.pageX - offset.left;
                     var width = $gallery.width();
-                    var edgeZone = 75;
+                    var edgeZone = 100;
+
+                    // Edge zone logic (always takes priority)
                     if (x < edgeZone) {
                         $left.addClass('edge-active');
                         $right.removeClass('edge-active');
+                        lastMouseX = x;
+                        if (hideArrowTimer) clearTimeout(hideArrowTimer);
+                        return;
                     } else if (x > width - edgeZone) {
                         $right.addClass('edge-active');
                         $left.removeClass('edge-active');
-                    } else {
-                        $left.removeClass('edge-active');
-                        $right.removeClass('edge-active');
+                        lastMouseX = x;
+                        if (hideArrowTimer) clearTimeout(hideArrowTimer);
+                        return;
                     }
+
+                    // Not in edge zone: show arrow based on movement direction
+                    if (lastMouseX !== null) {
+                        if (x < lastMouseX - 5) { // moved left
+                            showArrowTemp($left);
+                            $right.removeClass('edge-active');
+                        } else if (x > lastMouseX + 5) { // moved right
+                            showArrowTemp($right);
+                            $left.removeClass('edge-active');
+                        }
+                    }
+                    lastMouseX = x;
                 });
+
                 $gallery.on('mouseleave', function() {
                     $left.removeClass('edge-active');
                     $right.removeClass('edge-active');
+                    lastMouseX = null;
+                    if (hideArrowTimer) clearTimeout(hideArrowTimer);
                 });
+
+                // Edge overlays still handle their own hover/click as before
+                $edgeLeft.on('mouseenter mousemove', function() {
+                    $left.addClass('edge-active');
+                    $right.removeClass('edge-active');
+                });
+                $edgeLeft.on('mouseleave', function() {
+                    $left.removeClass('edge-active');
+                });
+                $edgeRight.on('mouseenter mousemove', function() {
+                    $right.addClass('edge-active');
+                    $left.removeClass('edge-active');
+                });
+                $edgeRight.on('mouseleave', function() {
+                    $right.removeClass('edge-active');
+                });
+                $left.on('click', function(){ prev(); resetAuto(); });
+                $right.on('click', function(){ next(); resetAuto(); });
+                $edgeLeft.on('click', function(){ prev(); resetAuto(); });
+                $edgeRight.on('click', function(){ next(); resetAuto(); });
             }
 
             function startAuto() {

@@ -25,7 +25,8 @@
             randomize: { type: 'boolean', default: false },
             loop: { type: 'boolean', default: true },
             showCaptions: { type: 'boolean', default: false },
-            arrowColor: { type: 'string', default: '#AEACA6' }
+            arrowColor: { type: 'string', default: '#AEACA6' },
+            captionSource: { type: 'string', default: 'caption' }
         },
         edit: function( props ) {
             var images = props.attributes.images || [];
@@ -39,6 +40,7 @@
             var loop = props.attributes.loop;
             var showCaptions = props.attributes.showCaptions;
             var arrowColor = props.attributes.arrowColor || '#AEACA6';
+            var captionSource = props.attributes.captionSource || 'caption';
 
             return [
                 el( InspectorControls, {},
@@ -95,6 +97,16 @@
                             label: 'Show captions',
                             checked: !!showCaptions,
                             onChange: function( val ) { props.setAttributes( { showCaptions: val } ); }
+                        } ),
+                        el( SelectControl, {
+                            label: 'Caption Source',
+                            value: captionSource,
+                            options: [
+                                { label: 'Caption', value: 'caption' },
+                                { label: 'Title', value: 'title' },
+                                { label: 'Description', value: 'description' }
+                            ],
+                            onChange: function( val ) { props.setAttributes( { captionSource: val } ); }
                         } ),
                         el( PanelRow, {},
                             el( 'span', {}, 'Arrow color:' ),
