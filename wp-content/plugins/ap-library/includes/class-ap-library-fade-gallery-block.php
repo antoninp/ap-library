@@ -27,6 +27,7 @@ class Ap_Library_Fade_Gallery_Block {
     public function render_block( $attributes ) {
         if ( empty( $attributes['images'] ) ) return '';
         $auto = !empty($attributes['auto']) ? 'true' : 'false';
+        $delay = !empty($attributes['delay']) ? intval($attributes['delay']) : 4000;
         $arrow_left_svg = '
             <svg class="ap-fade-arrow-svg" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24">
                 <path stroke="#AEACA6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -39,7 +40,7 @@ class Ap_Library_Fade_Gallery_Block {
         ';
         ob_start();
         ?>
-        <div class="ap-fade-gallery" data-auto="<?php echo esc_attr($auto); ?>">
+        <div class="ap-fade-gallery" data-auto="<?php echo esc_attr($auto); ?>" data-delay="<?php echo esc_attr($delay); ?>">
             <div class="ap-fade-edge ap-fade-edge-left"></div>
             <div class="ap-fade-edge ap-fade-edge-right"></div>
             <button class="ap-fade-arrow left" type="button"><?php echo $arrow_left_svg; ?></button>
