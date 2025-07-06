@@ -122,8 +122,7 @@ class Ap_Library {
          */
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-taxonomy.php';
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-fade-gallery-block.php';
-
+	
 		$this->loader = new Ap_Library_Loader();
 
 	}
@@ -231,8 +230,6 @@ class Ap_Library {
      */
     private function define_block_hooks() {
 
-        $fade_gallery_block = new Ap_Library_Fade_Gallery_Block();
-        $this->loader->add_action( 'init', $fade_gallery_block, 'register_block' );
     }
 
 	/**
