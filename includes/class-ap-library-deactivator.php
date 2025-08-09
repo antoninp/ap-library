@@ -39,6 +39,14 @@ class Ap_Library_Deactivator {
 		unregister_taxonomy( 'aplb_uploads_tdate' );
 		unregister_taxonomy( 'aplb_uploads_genre' );
 
+		unregister_post_type( 'uploads' );
+		unregister_post_type( 'library' );
+		unregister_post_type( 'portfolio' );
+
+		unregister_taxonomy( 'uploads_tdate' );
+		unregister_taxonomy( 'uploads_genre' );
+		unregister_taxonomy( 'library_category' );
+
 		// Flush rewrite rules to remove CPT/taxonomy permalinks
 		flush_rewrite_rules();
 	}
