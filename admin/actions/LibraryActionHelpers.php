@@ -79,12 +79,19 @@ trait LibraryActionHelpers {
     private function build_gallery_html($image_ids, $images_json) {
         $gallery_class = (count($image_ids) === 1) ? 'single-image' : '';
         $gallery_shortcode = '[gallery ids="' . implode(',', $image_ids) . '" layout="tiles"]';
-        return '<!-- wp:meow-gallery/gallery ' . json_encode([
+        $meow_gallery_html = '<!-- wp:meow-gallery/gallery ' . json_encode([
                     'images' => $images_json,
                     'layout' => 'tiles'
                 ]) . ' -->' .
                 $gallery_shortcode .
                 '<!-- /wp:meow-gallery/gallery -->';
+        
+        // Wrap the meow-gallery in a group block
+        return '<!-- wp:group -->
+            <div class="wp-block-group">
+                ' . $meow_gallery_html . '
+            </div>
+            <!-- /wp:group -->';
     }
 
     public function update_existing_library_post($library_post, $genre_uploads, $genre_id, $pdate_term_id) {

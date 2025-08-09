@@ -36,7 +36,7 @@ class UploadPostCreator {
 
         // 4. Build gallery
         $gallery_shortcode = '[gallery ids="' . $image_id . '" layout="tiles"]';
-        $gallery_html = '<!-- wp:meow-gallery/gallery {
+        $meow_gallery_html = '<!-- wp:meow-gallery/gallery {
             "images": [{
                 "alt":"",
                 "id":'. $image_id . ',
@@ -46,6 +46,13 @@ class UploadPostCreator {
             "layout":"tiles"} -->
                 '. $gallery_shortcode .'
             <!-- /wp:meow-gallery/gallery -->';
+        
+        // Wrap the meow-gallery in a group block
+        $gallery_html = '<!-- wp:group -->
+            <div class="wp-block-group">
+                ' . $meow_gallery_html . '
+            </div>
+            <!-- /wp:group -->';
 
         // 5. Create post
         $new_post = [
