@@ -47,9 +47,9 @@ class UploadPostCreator {
                 '. $gallery_shortcode .'
             <!-- /wp:meow-gallery/gallery -->';
         
-        // Wrap the meow-gallery in a group block
+        // Wrap the meow-gallery in a group block with single-image class
         $gallery_html = '<!-- wp:group -->
-            <div class="wp-block-group">
+            <div class="wp-block-group single-image">
                 ' . $meow_gallery_html . '
             </div>
             <!-- /wp:group -->';

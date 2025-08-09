@@ -87,8 +87,9 @@ trait LibraryActionHelpers {
                 '<!-- /wp:meow-gallery/gallery -->';
         
         // Wrap the meow-gallery in a group block
+        $group_class = $gallery_class ? ' ' . $gallery_class : '';
         return '<!-- wp:group -->
-            <div class="wp-block-group">
+            <div class="wp-block-group' . $group_class . '">
                 ' . $meow_gallery_html . '
             </div>
             <!-- /wp:group -->';
