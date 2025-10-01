@@ -61,18 +61,6 @@ class Ap_Library_Public {
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Ap_Library_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Ap_Library_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/ap-library-public.css', array(), $this->version, 'all' );
 
 	}
@@ -84,29 +72,20 @@ class Ap_Library_Public {
 	 */
 	public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Ap_Library_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Ap_Library_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/ap-library-public.js', array( 'jquery' ), $this->version, false );
 
 	}
-
+	
+	/**
+	 * Maybe add a "Back to Top" button to the footer.
+	 *
+	 * @since    1.0.0
+	 */
 	public function maybe_add_back_to_top_button() {
 		if ( ! get_option( 'ap_library_enable_back_to_top', false ) ) {
 			return;
 		}
 
-		$location = 'right'; // or 'left'
-		$scale = '1.5';
 		$icon = '
 				<svg class="w-[48px] h-[48px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 				<path stroke="#AEACA6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m5 15 7-7 7 7"/>

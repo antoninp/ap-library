@@ -10,6 +10,11 @@ require_once __DIR__ . '/LibraryActionHelpers.php';
 class CreateTodayLibrary implements ActionInterface {
     use LibraryActionHelpers;
 
+    /**
+     * Execute the action.
+     *
+     * @return WP_Error|true
+     */
     public function execute() {
         $today = date('Y-m-d');
         $pdate_term_id = $this->get_today_pdate_term_id($today);

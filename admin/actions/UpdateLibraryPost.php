@@ -2,9 +2,18 @@
 require_once __DIR__ . '/ActionInterface.php';
 require_once __DIR__ . '/LibraryActionHelpers.php';
 
+/**
+ * UpdateLibraryPost class that implements ActionInterface.
+ * This action processes today's uploads and updates existing library posts.
+ */
 class UpdateLibraryPost implements ActionInterface {
     use LibraryActionHelpers;
 
+    /**
+     * Execute the action.
+     *
+     * @return WP_Error|true
+     */
     public function execute() {
         $today = date('Y-m-d');
         $pdate_term_id = $this->get_today_pdate_term_id($today);

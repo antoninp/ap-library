@@ -3,7 +3,16 @@
 require_once __DIR__ . '/ActionInterface.php';
 require_once __DIR__ . '/../services/UploadPostCreator.php';
 
+/**
+ * CreateAllUploadPosts class that implements ActionInterface.
+ * This action scans all images in the media library and creates aplb_uploads posts for those without one.
+ */
 class CreateAllUploadPosts implements ActionInterface {
+    /**
+     * Execute the action.
+     *
+     * @return WP_Error|true
+     */
     public function execute() {
         // Get all image attachments
         $images = get_posts([

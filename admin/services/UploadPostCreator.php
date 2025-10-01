@@ -2,7 +2,17 @@
 require_once plugin_dir_path(__FILE__) . '../helpers/UploadDateHelper.php';
 require_once plugin_dir_path(__FILE__) . '../helpers/UploadTermHelper.php';
 
+/**
+ * Class responsible for creating posts when images are uploaded.
+ */
 class UploadPostCreator {
+
+    /**
+     * Create a new 'aplb_uploads' post when an image is uploaded.
+     *
+     * @param int  $image_id The ID of the uploaded image.
+     * @param bool $force    Whether to force post creation regardless of settings.
+     */
     public function create_post_on_image_upload($image_id, $force = false) {
         // Only check the option if not forcing
         if (!$force && !get_option('ap_library_auto_create_post_on_upload', false)) return;

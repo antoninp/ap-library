@@ -2,9 +2,18 @@
 require_once __DIR__ . '/ActionInterface.php';
 require_once __DIR__ . '/LibraryActionHelpers.php';
 
+/**
+ * UpdateAllLibraryPosts class that implements ActionInterface.
+ * This action updates all existing library posts based on their associated genres and publication dates.
+ */
 class UpdateAllLibraryPosts implements ActionInterface {
     use LibraryActionHelpers;
 
+    /**
+     * Execute the action.
+     *
+     * @return WP_Error|true
+     */
     public function execute() {
         $args = [
             'post_type'      => 'aplb_library',

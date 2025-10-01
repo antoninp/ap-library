@@ -60,6 +60,14 @@ class Ap_Library_Admin_Actions {
         $this->register_default_actions();
 	}
 
+    /**
+     * Load the required dependencies for this class.
+     *
+     * Include the files for the action classes.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
     public function load_dependencies() {
         // Load action classes
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/ActionInterface.php';
@@ -70,6 +78,12 @@ class Ap_Library_Admin_Actions {
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/CreateAllUploadPosts.php';
     }
 
+    /**
+     * Register the default actions.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
     private function register_default_actions() {
         
         $this->register_action('create_today_library', __('Create Today Galleries', 'ap-library'), [new CreateTodayLibrary(), 'execute']);
@@ -80,6 +94,14 @@ class Ap_Library_Admin_Actions {
 );
     }
 
+    /**
+     * Register a new action.
+     *
+     * @since    1.0.0
+     * @param    string    $key        The unique key for the action.
+     * @param    string    $label      The label for the action button.
+     * @param    callable  $callback   The callback to execute the action.
+     */
     public function register_action( $key, $label, $callback ) {
         $this->actions[ $key ] = array(
             'label'    => $label,
@@ -87,6 +109,11 @@ class Ap_Library_Admin_Actions {
         );
     }
 
+    /**
+     * Render the action buttons.
+     *
+     * @since    1.0.0
+     */
     public function render_buttons() {
         foreach ( $this->actions as $key => $action ) {
             ?>
@@ -98,6 +125,11 @@ class Ap_Library_Admin_Actions {
         }
     }
 
+    /**
+     * Handle the action button submissions.
+     *
+     * @since    1.0.0
+     */
     public function handle_actions() {
         foreach ( $this->actions as $key => $action ) {
             if (
@@ -129,6 +161,12 @@ class Ap_Library_Admin_Actions {
         }
     }
 
+    /**
+     * Get the last admin notice message.
+     *
+     * @since    1.0.0
+     * @return   array|null    The last admin notice message or null if none.
+     */
     public function get_last_notice() {
         return $this->last_notice;
     }

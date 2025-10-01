@@ -1,6 +1,22 @@
 <?php
 
+/**
+ * Helper class for extracting date information from image filenames or metadata.
+ *
+ * @link       https://antoninpuleo.com
+ * @since      1.0.0
+ *
+ * @package    Ap_Library
+ * @subpackage Ap_Library/admin/helpers
+ */
 class UploadDateHelper {
+    /**
+     * Extract date components from the image filename or metadata.
+     *
+     * @since    1.0.0
+     * @param    int    $image_id  The attachment ID of the image.
+     * @return   array            An array containing year, month, and day terms.
+     */
     public static function extract_date_terms($image_id) {
         $full_path = get_attached_file($image_id);
         $filename = basename($full_path, '.' . pathinfo($full_path, PATHINFO_EXTENSION));

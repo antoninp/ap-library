@@ -10,6 +10,11 @@ require_once __DIR__ . '/LibraryActionHelpers.php';
 class CreateAllLibrary implements ActionInterface {
     use LibraryActionHelpers;
 
+    /**
+     * Execute the action.
+     *
+     * @return WP_Error|true
+     */
     public function execute() {
         $uploads = get_posts([
             'post_type'      => 'aplb_uploads',

@@ -10,17 +10,44 @@
  */
 class Ap_Library_Admin_Bulk_Actions {
 
+    /**
+     * The last admin notice message.
+     *
+     * @since    1.0.0
+     * @access   public
+     * @var      array    $last_notice    The last admin notice message.
+     */
     public $last_notice = null;
 
+    /**
+     * Initialize the class and set its properties.
+     * @since    1.0.0
+     */
     public function __construct() {
 
     }
 
+    /**
+     * Register the custom bulk actions for the aplb_uploads post type.
+     *
+     * @since    1.0.0
+     * @param    array    $bulk_actions    The existing bulk actions.
+     * @return   array                     The modified bulk actions.
+     */
     public function register_uploads_bulk_actions( $bulk_actions ) {
         $bulk_actions['publish_aplb_uploads'] = __( 'Publish Uploads', 'ap-library' );
         return $bulk_actions;
     }
 
+    /**
+     * Handle the custom bulk action for publishing uploads.
+     *
+     * @since    1.0.0
+     * @param    string    $redirect_to    The redirect URL.
+     * @param    string    $doaction       The action being performed.
+     * @param    array     $post_ids      The IDs of the selected posts.
+     * @return   string                   The modified redirect URL.
+     */
     public function handle_uploads_bulk_action( $redirect_to, $doaction, $post_ids ) {
         if ( $doaction !== 'publish_aplb_uploads' ) {
             return $redirect_to;
@@ -42,6 +69,11 @@ class Ap_Library_Admin_Bulk_Actions {
         return $redirect_to;
     }
 
+    /**
+     * Maybe set an admin notice after a bulk action is performed.
+     *
+     * @since    1.0.0
+     */
     public function maybe_set_bulk_action_notice() {
         if ( ! empty( $_REQUEST['bulk_published_uploads'] ) ) {
             $count = intval( $_REQUEST['bulk_published_uploads'] );
@@ -55,6 +87,12 @@ class Ap_Library_Admin_Bulk_Actions {
         }
     }
 
+    /**
+     * Get the last admin notice message.
+     *
+     * @since    1.0.0
+     * @return   array|null    The last admin notice message or null if none.
+     */
     public function get_last_notice() {
         return $this->last_notice;
     }

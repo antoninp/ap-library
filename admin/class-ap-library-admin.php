@@ -20,17 +20,6 @@
  * @author     Antonin Puleo <a@antoninpuleo.com>
  */
 
-/**
- * The admin-specific functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    Ap_Library
- * @subpackage Ap_Library/admin
- * @author     Antonin Puleo <a@antoninpuleo.com>
- */
-
 
 class Ap_Library_Admin {
 
@@ -170,13 +159,13 @@ class Ap_Library_Admin {
 	 */
 	public function add_plugin_admin_menu() {
 		add_menu_page(
-			__( 'AP Library', 'ap-library' ), // Page title
-			__( 'AP Library', 'ap-library' ), // Menu title
-			'manage_options',                 // Capability
-			'ap-library',                     // Menu slug
-			array( $this, 'display_plugin_admin_page' ), // Callback
-			'dashicons-open-folder',          // Icon
-			25                                // Position
+			__( 'AP Library', 'ap-library' ),
+			__( 'AP Library', 'ap-library' ),
+			'manage_options',
+			'ap-library',
+			array( $this, 'display_plugin_admin_page' ),
+			'dashicons-open-folder',
+			25
 		);
 	}
 
@@ -217,10 +206,24 @@ class Ap_Library_Admin {
 		echo '</div>';
 	}
 
+	/**
+	 * Handle admin actions triggered by button clicks.
+	 *
+	 * This method checks for the presence of action buttons in the POST data,
+	 * verifies the associated nonces, and executes the corresponding action callbacks.
+	 *
+	 * @since    1.0.0
+	 */
 	public function handle_admin_actions() {
 		$this->actions_manager->handle_actions();
 	}
 
+	/**
+	 * Handle the "Auto Create Post on Upload" option.
+	 *
+	 * This method checks if the nonce is set and valid, then updates the option
+	 * to enable or disable automatic post creation on image upload based on the form submission.
+	 */
 	public function handle_auto_create_post_option() {
 		if (
 			isset( $_POST['ap_library_auto_create_post_on_upload_nonce'] ) &&
@@ -257,6 +260,9 @@ class Ap_Library_Admin {
 
 	/**
 	 * Create a post on image upload if enabled in settings.
+	 *
+	 * @since    1.0.0
+	 * @param    int      $image_id    The ID of the uploaded image.
 	 */
 	public function maybe_create_post_on_image_upload( $image_id ) {
 		require_once plugin_dir_path(__FILE__) . 'services/UploadPostCreator.php';
@@ -303,6 +309,13 @@ class Ap_Library_Admin {
 		}
 	}
 
+	/**
+	 * Add a thumbnail box to the quick edit interface for the aplb_uploads post type.
+	 *
+	 * @since    1.0.0
+	 * @param    string    $column_name    The name of the column being rendered.
+	 * @param    string    $post_type      The post type of the current screen.
+	 */
 	public function add_quick_edit_thumbnail_box($column_name, $post_type) {
 		if ($post_type !== 'aplb_uploads' || $column_name !== 'thumbnail') return;
 		?>

@@ -1,6 +1,28 @@
 <?php
 
+/**
+ * Helper class for managing taxonomy terms related to uploads.
+ *
+ * This class provides static methods to ensure the existence of specific
+ * taxonomy terms used in the plugin, such as upload date terms, genre terms,
+ * and publication date terms.
+ *
+ * @link       https://antoninpuleo.com
+ * @since      1.0.0
+ *
+ * @package    Ap_Library
+ * @subpackage Ap_Library/admin/helpers
+ */
 class UploadTermHelper {
+    /**
+     * Ensure the existence of year, month, and day terms in the 'aplb_uploads_tdate' taxonomy.
+     *
+     * @since    1.0.0
+     * @param    string    $year   The year (e.g., '2024' or 'unknown').
+     * @param    string    $month  The month (e.g., '07' for July).
+     * @param    string    $day    The day (e.g., '15').
+     * @return   array            An array containing the term IDs for year, month, and day.
+     */
     public static function ensure_tdate_terms($year, $month, $day) {
         if ($year === 'unknown') {
             $unknown_term = term_exists('unknown', 'aplb_uploads_tdate');
@@ -48,6 +70,13 @@ class UploadTermHelper {
         return [$year_term_id, $month_term_id, $day_term_id];
     }
 
+    /**
+     * Ensure the existence of a genre term in the 'aplb_uploads_genre' taxonomy.
+     *
+     * @since    1.0.0
+     * @param    string    $genre  The genre name (e.g., 'All').
+     * @return   int              The term ID of the genre.
+     */
     public static function ensure_genre_term($genre) {
         $existing_term = term_exists($genre, 'aplb_uploads_genre');
         if ($existing_term && is_array($existing_term)) {
@@ -57,6 +86,13 @@ class UploadTermHelper {
         return !is_wp_error($new_term) ? $new_term['term_id'] : 0;
     }
 
+    /**
+     * Ensure the existence of a publication date term in the 'aplb_library_pdate' taxonomy.
+     *
+     * @since    1.0.0
+     * @param    string    $date  The date in 'Y-m-d' format (e.g., '2024-07-01' or 'unknown').
+     * @return   int             The term ID of the publication date.
+     */
     public static function ensure_pdate_term($date) {
         // $date is expected to be 'Y-m-d'
         $timestamp = strtotime($date);

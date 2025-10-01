@@ -23,9 +23,7 @@
 class Ap_Library_Activator {
 
 	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
+	 * Activate the plugin.
 	 *
 	 * @since    1.0.0
 	 */

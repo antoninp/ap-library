@@ -67,7 +67,6 @@ class Ap_Library {
 		$this->define_public_hooks();
 		$this->define_custom_post_type_hooks();
 		$this->define_taxonomy_hooks();
-		$this->define_block_hooks();
 
 	}
 
@@ -80,6 +79,8 @@ class Ap_Library {
 	 * - Ap_Library_i18n. Defines internationalization functionality.
 	 * - Ap_Library_Admin. Defines all hooks for the admin area.
 	 * - Ap_Library_Public. Defines all hooks for the public side of the site.
+	 * - Ap_Library_Custom_Post_Types. Defines custom post types.
+	 * - Ap_Library_Taxonomy. Defines taxonomies.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -220,16 +221,6 @@ class Ap_Library {
         $plugin_taxonomies = new Ap_Library_Taxonomy();
 		
         $this->loader->add_action( 'init', $plugin_taxonomies, 'register_taxonomies' );
-    }
-
-	/**
-     * Register all of the hooks related to block editor functionality.
-     *
-     * @since    1.0.0
-     * @access   private
-     */
-    private function define_block_hooks() {
-
     }
 
 	/**
