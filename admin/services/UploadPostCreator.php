@@ -45,15 +45,14 @@ class UploadPostCreator {
         }
 
         // 4. Build gallery
-        $gallery_shortcode = '[gallery ids="' . $image_id . '" layout="tiles"]';
+        $gallery_shortcode = '[gallery ids="' . $image_id . '"]';
         $meow_gallery_html = '<!-- wp:meow-gallery/gallery {
             "images": [{
                 "alt":"",
                 "id":'. $image_id . ',
                 "url":"'. esc_url(wp_get_attachment_url($image_id)) .'",
                 "caption":""
-                }],
-            "layout":"tiles"} -->
+                }]} -->
                 '. $gallery_shortcode .'
             <!-- /wp:meow-gallery/gallery -->';
         

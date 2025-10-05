@@ -127,10 +127,9 @@ trait LibraryActionHelpers {
      */
     private function build_gallery_html($image_ids, $images_json) {
         $gallery_class = (count($image_ids) === 1) ? 'single-image' : '';
-        $gallery_shortcode = '[gallery ids="' . implode(',', $image_ids) . '" layout="tiles"]';
+        $gallery_shortcode = '[gallery ids="' . implode(',', $image_ids) . '"]';
         $meow_gallery_html = '<!-- wp:meow-gallery/gallery ' . json_encode([
-                    'images' => $images_json,
-                    'layout' => 'tiles'
+                    'images' => $images_json
                 ]) . ' -->' .
                 $gallery_shortcode .
                 '<!-- /wp:meow-gallery/gallery -->';
