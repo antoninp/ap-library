@@ -85,13 +85,12 @@ class Ap_Library_Admin_Actions {
      * @access   private
      */
     private function register_default_actions() {
-        
-        $this->register_action('create_today_library', __('Create Today Galleries', 'ap-library'), [new CreateTodayLibrary(), 'execute']);
-        $this->register_action('create_all_library', __('Create All Galleries', 'ap-library'), [new CreateAllLibrary(), 'execute']);
-        $this->register_action('update_today_library', __('Update Today Galleries', 'ap-library'), [new UpdateLibraryPost(), 'execute']);
-        $this->register_action('update_all_library', __('Update All Galleries', 'ap-library'), [new UpdateAllLibraryPosts(), 'execute']);
-        $this->register_action('create_all_upload_posts', __('Create Missing Upload Posts', 'ap-library'), [new CreateAllUploadPosts(), 'execute']
-);
+        // Store raw labels and translate at render time to avoid early JIT loading before 'init'
+        $this->register_action('create_today_library', 'Create Today Galleries', [new CreateTodayLibrary(), 'execute']);
+        $this->register_action('create_all_library', 'Create All Galleries', [new CreateAllLibrary(), 'execute']);
+        $this->register_action('update_today_library', 'Update Today Galleries', [new UpdateLibraryPost(), 'execute']);
+        $this->register_action('update_all_library', 'Update All Galleries', [new UpdateAllLibraryPosts(), 'execute']);
+        $this->register_action('create_all_upload_posts', 'Create Missing Upload Posts', [new CreateAllUploadPosts(), 'execute']);
     }
 
     /**
@@ -116,10 +115,11 @@ class Ap_Library_Admin_Actions {
      */
     public function render_buttons() {
         foreach ( $this->actions as $key => $action ) {
+            $label = esc_html__( $action['label'], 'ap-library' );
             ?>
             <form method="post" style="display:inline;">
                 <?php wp_nonce_field( 'ap_library_action_' . $key, 'ap_library_nonce_' . $key ); ?>
-                <input type="submit" name="ap_library_run_<?php echo esc_attr( $key ); ?>" class="button button-primary" value="<?php echo esc_attr( $action['label'] ); ?>">
+                <input type="submit" name="ap_library_run_<?php echo esc_attr( $key ); ?>" class="button button-primary" value="<?php echo esc_attr( $label ); ?>">
             </form>
             <?php
         }
@@ -143,7 +143,7 @@ class Ap_Library_Admin_Actions {
                             'type' => 'error',
                             'message' => sprintf(
                                 esc_html__('%s failed: %s', 'ap-library'),
-                                esc_html( $action['label'] ),
+                                esc_html( __( $action['label'], 'ap-library' ) ),
                                 esc_html( $result->get_error_message() )
                             ),
                         ];
@@ -151,8 +151,8 @@ class Ap_Library_Admin_Actions {
                         $this->last_notice = [
                             'type' => 'success',
                             'message' => sprintf(
-                                '%s executed successfully!',
-                                esc_html( $action['label'] )
+                                esc_html__( '%s executed successfully!', 'ap-library' ),
+                                esc_html( __( $action['label'], 'ap-library' ) )
                             ),
                         ];
                     }
