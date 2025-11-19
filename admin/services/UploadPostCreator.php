@@ -21,27 +21,36 @@ class UploadPostCreator {
         $attachment = get_post($image_id);
         $term_genre = 'All';
 
-        // 1. Extract date terms
-        list($term_year, $term_month, $term_day) = UploadDateHelper::extract_date_terms($image_id);
+        // Extract taken date from EXIF first, fallback to filename/metadata
+        require_once plugin_dir_path(dirname(__FILE__)) . '../includes/class-ap-library-exif.php';
+        $taken_date_from_exif = Ap_Library_EXIF::get_taken_date_from_post($image_id);
 
-        // 2. Ensure taxonomy terms exist
-        list($year_term_id, $month_term_id, $day_term_id) = UploadTermHelper::ensure_tdate_terms($term_year, $term_month, $term_day);
+        // If we have EXIF date, use it for both meta and term extraction
+        if ($taken_date_from_exif) {
+            $timestamp = strtotime($taken_date_from_exif);
+            $term_year = date('Y', $timestamp);
+            $term_month = date('m', $timestamp);
+            $term_day = date('d', $timestamp);
+            $taken_date = $taken_date_from_exif;
+        } else {
+            // Fallback to filename/metadata extraction
+            list($term_year, $term_month, $term_day) = UploadDateHelper::extract_date_terms($image_id);
+            if ($term_year !== 'unknown' && $term_month && $term_day) {
+                $taken_date = sprintf('%s-%s-%s', $term_year, $term_month, $term_day);
+            } else {
+                $taken_date = null;
+            }
+        }
+
         $genre_term_id = UploadTermHelper::ensure_genre_term($term_genre);
 
         $upload_date = date('Y-m-d', strtotime($attachment->post_date));
-        $pdate_term_id = UploadTermHelper::ensure_pdate_term($upload_date);
 
         // 3. Build tax_input
+        // Note: Don't set date taxonomies here - they'll be auto-synced from meta fields
         $tax_input = [];
-        $aplb_uploads_tdate_terms = array_filter([$year_term_id, $month_term_id, $day_term_id]);
-        if (!empty($aplb_uploads_tdate_terms)) {
-            $tax_input['aplb_uploads_tdate'] = $aplb_uploads_tdate_terms;
-        }
         if (!empty($genre_term_id)) {
             $tax_input['aplb_uploads_genre'] = [$genre_term_id];
-        }
-        if (!empty($pdate_term_id)) {
-            $tax_input['aplb_library_pdate'] = [$pdate_term_id];
         }
 
         // 4. Build gallery
@@ -77,6 +86,17 @@ class UploadPostCreator {
 
         set_post_thumbnail($post_id, $image_id);
 
+        // Set meta fields for date-based ordering
+        // Published date uses upload date
+        update_post_meta($post_id, APLB_META_PUBLISHED_DATE, $upload_date);
+        $this->sync_date_to_taxonomy($post_id, $upload_date, 'aplb_library_pdate');
+        
+        // Taken date from EXIF (already extracted above)
+        if ($taken_date) {
+            update_post_meta($post_id, APLB_META_TAKEN_DATE, $taken_date);
+            $this->sync_date_to_taxonomy($post_id, $taken_date, 'aplb_uploads_tdate');
+        }
+
         $attachment_args = [
             'ID'           => $image_id,
             'post_parent'  => $post_id
@@ -87,5 +107,124 @@ class UploadPostCreator {
             'ID'           => $post_id,
             'post_content' => $gallery_html
         ]);
+    }
+
+    /**
+     * Sync date meta to shadow taxonomy.
+     * Uses hierarchical structure for taken dates, flat for published dates.
+     *
+     * @param int    $post_id  Post ID.
+     * @param string $date     Date in YYYY-MM-DD format.
+     * @param string $taxonomy Taxonomy name.
+     */
+    private function sync_date_to_taxonomy($post_id, $date, $taxonomy) {
+        if (!$date || !taxonomy_exists($taxonomy)) {
+            return;
+        }
+
+        // For aplb_uploads_tdate, create hierarchical structure: Year -> Month -> Day
+        if ($taxonomy === 'aplb_uploads_tdate') {
+            $term_id = $this->sync_hierarchical_date($date, $taxonomy);
+        } else {
+            // For aplb_library_pdate, keep flat structure
+            $term_id = $this->sync_flat_date($date, $taxonomy);
+        }
+
+        if ($term_id) {
+            wp_set_object_terms($post_id, [$term_id], $taxonomy, false);
+        }
+    }
+
+    /**
+     * Sync date to flat taxonomy.
+     *
+     * @param string $date     Date in YYYY-MM-DD format.
+     * @param string $taxonomy Taxonomy name.
+     * @return int|null        Term ID or null on error.
+     */
+    private function sync_flat_date($date, $taxonomy) {
+        $term = get_term_by('slug', $date, $taxonomy);
+        
+        if (!$term) {
+            $timestamp = strtotime($date);
+            $term_name = $timestamp ? date_i18n('F j, Y', $timestamp) : $date;
+            
+            $result = wp_insert_term($term_name, $taxonomy, ['slug' => $date]);
+            
+            if (is_wp_error($result)) {
+                return null;
+            }
+            
+            return $result['term_id'];
+        }
+        
+        return $term->term_id;
+    }
+
+    /**
+     * Sync date to hierarchical taxonomy: Year -> Month -> Day.
+     *
+     * @param string $date     Date in YYYY-MM-DD format.
+     * @param string $taxonomy Taxonomy name.
+     * @return int|null        Day term ID or null on error.
+     */
+    private function sync_hierarchical_date($date, $taxonomy) {
+        $timestamp = strtotime($date);
+        if (!$timestamp) {
+            return null;
+        }
+
+        // Parse date components
+        $year  = date('Y', $timestamp);
+        $month = date('m', $timestamp);
+        $day   = date('d', $timestamp);
+        
+        $year_name  = $year;
+        $month_name = date_i18n('F', $timestamp);
+        $day_name   = date_i18n('j', $timestamp);
+
+        // Create/get year term
+        $year_term = get_term_by('slug', $year, $taxonomy);
+        if (!$year_term) {
+            $year_result = wp_insert_term($year_name, $taxonomy, ['slug' => $year]);
+            if (is_wp_error($year_result)) {
+                return null;
+            }
+            $year_term_id = $year_result['term_id'];
+        } else {
+            $year_term_id = $year_term->term_id;
+        }
+
+        // Create/get month term as child of year
+        $month_slug = $year . '-' . $month;
+        $month_term = get_term_by('slug', $month_slug, $taxonomy);
+        if (!$month_term) {
+            $month_result = wp_insert_term($month_name, $taxonomy, [
+                'slug'   => $month_slug,
+                'parent' => $year_term_id,
+            ]);
+            if (is_wp_error($month_result)) {
+                return null;
+            }
+            $month_term_id = $month_result['term_id'];
+        } else {
+            $month_term_id = $month_term->term_id;
+        }
+
+        // Create/get day term as child of month
+        $day_slug = $date;
+        $day_term = get_term_by('slug', $day_slug, $taxonomy);
+        if (!$day_term) {
+            $day_result = wp_insert_term($day_name, $taxonomy, [
+                'slug'   => $day_slug,
+                'parent' => $month_term_id,
+            ]);
+            if (is_wp_error($day_result)) {
+                return null;
+            }
+            return $day_result['term_id'];
+        }
+        
+        return $day_term->term_id;
     }
 }

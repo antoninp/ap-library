@@ -44,10 +44,10 @@ class Ap_Library_Taxonomy {
     private function register_aplb_library_pdate_taxonomy() {
 
         $args = [
-            'label'  => esc_html__( 'Published Date', 'ap-library' ),
+            'label'  => esc_html__( 'Published Date (Auto)', 'ap-library' ),
             'labels' => [
-                'menu_name'          => esc_html__( 'Published Date', 'ap-library' ),
-                'name'               => esc_html__( 'Published Date', 'ap-library' ),
+                'menu_name'          => esc_html__( 'Published Date (Auto)', 'ap-library' ),
+                'name'               => esc_html__( 'Published Date (Auto)', 'ap-library' ),
                 'singular_name'      => esc_html__( 'Published Date', 'ap-library' ),
                 'add_new_item'       => esc_html__( 'Add new Published Date', 'ap-library' ),
                 'new_item'           => esc_html__( 'New Published Date', 'ap-library' ),
@@ -60,6 +60,7 @@ class Ap_Library_Taxonomy {
             'show_ui'             => true,
             'show_in_nav_menus'   => true,
             'show_admin_column'   => true,
+            'show_in_quick_edit'  => false,
             'show_in_rest'        => true,
             'hierarchical'        => true,
             'rewrite'             => array( 'slug' => 'library-pdate' ),
@@ -78,10 +79,10 @@ class Ap_Library_Taxonomy {
     private function register_aplb_uploads_tdate_taxonomy() {
 
         $args = [
-            'label'  => esc_html__( 'Taken Date', 'ap-library' ),
+            'label'  => esc_html__( 'Taken Date (Auto)', 'ap-library' ),
             'labels' => [
-                'menu_name'          => esc_html__( 'Taken Date', 'ap-library' ),
-                'name'               => esc_html__( 'Taken Date', 'ap-library' ),
+                'menu_name'          => esc_html__( 'Taken Date (Auto)', 'ap-library' ),
+                'name'               => esc_html__( 'Taken Date (Auto)', 'ap-library' ),
                 'singular_name'      => esc_html__( 'Taken Date', 'ap-library' ),
                 'add_new_item'       => esc_html__( 'Add new Taken Date', 'ap-library' ),
                 'new_item'           => esc_html__( 'New Taken Date', 'ap-library' ),
@@ -94,6 +95,7 @@ class Ap_Library_Taxonomy {
             'show_ui'             => true,
             'show_in_nav_menus'   => true,
             'show_admin_column'   => true,
+            'show_in_quick_edit'  => false,
             'show_in_rest'        => true,
             'hierarchical'        => true,
             'rewrite'             => array( 'slug' => 'uploads-tdate' ),

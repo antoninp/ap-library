@@ -261,6 +261,8 @@ trait LibraryActionHelpers {
         }
         if ($post_id && !empty($pdate_term_id)) {
             wp_set_post_terms($post_id, [$pdate_term_id], 'aplb_library_pdate', false);
+            // Also set the published date meta for ordering
+            update_post_meta($post_id, APLB_META_PUBLISHED_DATE, $pdate);
         }
         return $post_id ? true : false;
     }

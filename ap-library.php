@@ -36,6 +36,12 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'AP_LIBRARY_VERSION', '1.0.0' );
 
 /**
+ * Meta key constants for date fields.
+ */
+define( 'APLB_META_PUBLISHED_DATE', 'aplb_published_date' );
+define( 'APLB_META_TAKEN_DATE', 'aplb_taken_date' );
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-ap-library-activator.php
  */

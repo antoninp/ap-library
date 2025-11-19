@@ -75,7 +75,8 @@ class Ap_Library_Custom_Post_Types {
                 'editor',
                 'thumbnail',
                 'author',
-                'excerpt'
+                'excerpt',
+                'custom-fields'
             ],
             'taxonomies' => [
                 'uploads_tdate',
