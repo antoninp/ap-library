@@ -28,10 +28,10 @@ class Ap_Library_Backfill {
 	public function add_backfill_submenu() {
 		add_submenu_page(
 			'edit.php?post_type=aplb_uploads',
-			__( 'Backfill Dates', 'ap-library' ),
-			__( 'Backfill Dates', 'ap-library' ),
+			__( 'Backfill', 'ap-library' ),
+			__( 'Backfill', 'ap-library' ),
 			'manage_options',
-			'aplb-backfill-dates',
+			'aplb-backfill',
 			array( $this, 'render_backfill_page' )
 		);
 	}
@@ -48,33 +48,56 @@ class Ap_Library_Backfill {
 
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Backfill Photo Dates', 'ap-library' ); ?></h1>
-			<p><?php esc_html_e( 'This tool will scan all existing uploads and extract EXIF dates, populate published dates (using post_date as fallback), and sync to date taxonomies.', 'ap-library' ); ?></p>
-			
+			<h1><?php esc_html_e( 'Backfill Upload Metadata', 'ap-library' ); ?></h1>
+			<p><?php esc_html_e( 'Use these tools to populate or regenerate date and keyword taxonomies from media metadata.', 'ap-library' ); ?></p>
 			<?php
-			// Handle form submission
-			if ( isset( $_POST['aplb_backfill_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_nonce'], 'aplb_backfill_dates' ) ) {
-				$this->process_backfill();
+			// Handle submissions independently.
+			if ( isset( $_POST['aplb_backfill_dates_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_dates_nonce'], 'aplb_backfill_dates' ) ) {
+				$this->process_dates_backfill();
+			}
+			if ( isset( $_POST['aplb_backfill_keywords_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_keywords_nonce'], 'aplb_backfill_keywords' ) ) {
+				$this->process_keywords_backfill();
 			}
 			?>
 
+			<h2><?php esc_html_e( 'Dates Backfill', 'ap-library' ); ?></h2>
+			<p><?php esc_html_e( 'Extract EXIF taken dates and ensure published/taken date meta and taxonomies are synchronized.', 'ap-library' ); ?></p>
 			<form method="post" action="">
-				<?php wp_nonce_field( 'aplb_backfill_dates', 'aplb_backfill_nonce' ); ?>
-				
+				<?php wp_nonce_field( 'aplb_backfill_dates', 'aplb_backfill_dates_nonce' ); ?>
 				<table class="form-table">
 					<tr>
 						<th scope="row"><?php esc_html_e( 'Options', 'ap-library' ); ?></th>
 						<td>
 							<label>
-								<input type="checkbox" name="overwrite_existing" value="1" />
+								<input type="checkbox" name="overwrite_existing_dates" value="1" />
 								<?php esc_html_e( 'Overwrite existing date values', 'ap-library' ); ?>
 							</label>
-							<p class="description"><?php esc_html_e( 'If unchecked, only empty dates will be filled.', 'ap-library' ); ?></p>
+							<p class="description"><?php esc_html_e( 'If unchecked, only empty date meta will be filled.', 'ap-library' ); ?></p>
 						</td>
 					</tr>
 				</table>
+				<?php submit_button( __( 'Run Dates Backfill', 'ap-library' ), 'primary', 'submit', false ); ?>
+			</form>
 
-				<?php submit_button( __( 'Start Backfill', 'ap-library' ), 'primary', 'submit', false ); ?>
+			<hr />
+
+			<h2><?php esc_html_e( 'Keywords Backfill', 'ap-library' ); ?></h2>
+			<p><?php esc_html_e( 'Extract IPTC keywords from featured images and populate the keyword taxonomy.', 'ap-library' ); ?></p>
+			<form method="post" action="">
+				<?php wp_nonce_field( 'aplb_backfill_keywords', 'aplb_backfill_keywords_nonce' ); ?>
+				<table class="form-table">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Options', 'ap-library' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="overwrite_existing_keywords" value="1" />
+								<?php esc_html_e( 'Overwrite existing keyword terms', 'ap-library' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'If unchecked, only posts without keywords will be processed.', 'ap-library' ); ?></p>
+						</td>
+					</tr>
+				</table>
+				<?php submit_button( __( 'Run Keywords Backfill', 'ap-library' ), 'secondary', 'submit', false ); ?>
 			</form>
 		</div>
 		<?php
@@ -85,11 +108,11 @@ class Ap_Library_Backfill {
 	 *
 	 * @since    1.0.0
 	 */
-	private function process_backfill() {
+	private function process_dates_backfill() {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-exif.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-meta-box.php';
 
-		$overwrite = isset( $_POST['overwrite_existing'] ) && '1' === $_POST['overwrite_existing'];
+		$overwrite = isset( $_POST['overwrite_existing_dates'] ) && '1' === $_POST['overwrite_existing_dates'];
 		
 		$args = array(
 			'post_type'      => 'aplb_uploads',
@@ -127,9 +150,67 @@ class Ap_Library_Backfill {
 			}
 		}
 
+		echo '<div class="notice notice-success is-dismissible"><p>' . sprintf(
+			esc_html__( 'Dates backfill complete! Processed %d posts, updated %d date entries.', 'ap-library' ),
+			$processed,
+			$updated
+		) . '</p></div>';
+	}
+
+	private function process_keywords_backfill() {
+		if ( ! taxonomy_exists( 'aplb_uploads_keyword' ) ) {
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'Keyword taxonomy not registered.', 'ap-library' ) . '</p></div>';
+			return;
+		}
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-exif.php';
+		$overwrite = isset( $_POST['overwrite_existing_keywords'] ) && '1' === $_POST['overwrite_existing_keywords'];
+		$args = array(
+			'post_type'      => 'aplb_uploads',
+			'posts_per_page' => -1,
+			'post_status'    => 'any',
+		);
+		$uploads = get_posts( $args );
+		$processed = 0;
+		$updated   = 0;
+		foreach ( $uploads as $post ) {
+			$post_id = $post->ID;
+			$processed++;
+			$existing_kw = wp_get_object_terms( $post_id, 'aplb_uploads_keyword', array( 'fields' => 'ids' ) );
+			if ( ! $overwrite && ! empty( $existing_kw ) ) {
+				continue;
+			}
+			$keywords = Ap_Library_EXIF::get_keywords_from_post( $post_id );
+			if ( empty( $keywords ) ) {
+				continue;
+			}
+			$term_ids = array();
+			foreach ( $keywords as $kw ) {
+				$kw = sanitize_text_field( $kw );
+				if ( $kw === '' ) { continue; }
+				// Normalize slug for case-insensitive matching
+				$slug = sanitize_title( strtolower( $kw ) );
+				// Check if term already exists by slug
+				$existing = get_term_by( 'slug', $slug, 'aplb_uploads_keyword' );
+				if ( ! $existing ) {
+					// Create new term with title-cased name derived from slug
+					$name = $this->format_keyword_name( $slug );
+					$created = wp_insert_term( $name, 'aplb_uploads_keyword', array( 'slug' => $slug ) );
+					if ( ! is_wp_error( $created ) ) {
+						$term_ids[] = (int) $created['term_id'];
+					}
+				} else {
+					// Use existing term
+					$term_ids[] = (int) $existing->term_id;
+				}
+			}
+			if ( ! empty( $term_ids ) ) {
+				wp_set_object_terms( $post_id, $term_ids, 'aplb_uploads_keyword', false );
+				$updated++;
+			}
+		}
 		echo '<div class="notice notice-success is-dismissible"><p>';
 		echo sprintf(
-			esc_html__( 'Backfill complete! Processed %d posts, updated %d dates.', 'ap-library' ),
+			esc_html__( 'Keywords backfill complete! Processed %d posts, updated %d keyword sets.', 'ap-library' ),
 			$processed,
 			$updated
 		);
@@ -255,5 +336,18 @@ class Ap_Library_Backfill {
 		}
 		
 		return $day_term->term_id;
+	}
+
+	/**
+	 * Format keyword for display with title case.
+	 *
+	 * @since Unreleased
+	 * @param string $keyword Normalized keyword slug.
+	 * @return string Title-cased keyword for display.
+	 */
+	private function format_keyword_name( $keyword ) {
+		// Replace hyphens/underscores with spaces and title case
+		$keyword = str_replace( array( '-', '_' ), ' ', $keyword );
+		return ucwords( $keyword );
 	}
 }

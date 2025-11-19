@@ -89,4 +89,56 @@ class Ap_Library_EXIF {
 
 		return self::get_taken_date( $thumbnail_id );
 	}
+
+	/**
+	 * Extract keywords from image IPTC metadata.
+	 *
+	 * @since 1.1.0
+	 * @param int $attachment_id Attachment ID.
+	 * @return array Array of sanitized keyword strings.
+	 */
+	public static function get_keywords( $attachment_id ) {
+		$file_path = get_attached_file( $attachment_id );
+		if ( ! $file_path || ! file_exists( $file_path ) ) {
+			return [];
+		}
+
+		$keywords = [];
+		// Use getimagesize with APP13 to read IPTC segment
+		$info = [];
+		@getimagesize( $file_path, $info );
+		if ( ! empty( $info['APP13'] ) && function_exists( 'iptcparse' ) ) {
+			$iptc = @iptcparse( $info['APP13'] );
+			if ( ! empty( $iptc['2#025'] ) && is_array( $iptc['2#025'] ) ) {
+				foreach ( $iptc['2#025'] as $raw_kw ) {
+					$kw = trim( $raw_kw );
+					if ( $kw !== '' ) {
+						$keywords[] = sanitize_text_field( $kw );
+					}
+				}
+			}
+		}
+
+		// Deduplicate and limit excessive keyword counts (safety)
+		$keywords = array_values( array_unique( $keywords ) );
+		if ( count( $keywords ) > 50 ) {
+			$keywords = array_slice( $keywords, 0, 50 );
+		}
+		return $keywords;
+	}
+
+	/**
+	 * Extract keywords from a post's featured image.
+	 *
+	 * @since 1.1.0
+	 * @param int $post_id Post ID.
+	 * @return array Array of keyword strings.
+	 */
+	public static function get_keywords_from_post( $post_id ) {
+		$thumbnail_id = get_post_thumbnail_id( $post_id );
+		if ( ! $thumbnail_id ) {
+			return [];
+		}
+		return self::get_keywords( $thumbnail_id );
+	}
 }

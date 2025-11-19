@@ -97,6 +97,12 @@ class UploadPostCreator {
             $this->sync_date_to_taxonomy($post_id, $taken_date, 'aplb_uploads_tdate');
         }
 
+        // Extract IPTC keywords from the image and assign taxonomy terms.
+        $keywords = Ap_Library_EXIF::get_keywords($image_id);
+        if (!empty($keywords)) {
+            $this->assign_keywords($post_id, $keywords);
+        }
+
         $attachment_args = [
             'ID'           => $image_id,
             'post_parent'  => $post_id
@@ -107,6 +113,45 @@ class UploadPostCreator {
             'ID'           => $post_id,
             'post_content' => $gallery_html
         ]);
+    }
+
+    /**
+     * Assign keyword taxonomy terms to a post.
+     *
+     * @param int   $post_id  Post ID.
+     * @param array $keywords Array of keyword strings.
+     */
+    private function assign_keywords($post_id, $keywords) {
+        $taxonomy = 'aplb_uploads_keyword';
+        if (!taxonomy_exists($taxonomy)) {
+            return;
+        }
+
+        $term_ids = [];
+        foreach ($keywords as $kw) {
+            $kw = sanitize_text_field($kw);
+            if ($kw === '') continue;
+
+            // Normalize slug for case-insensitive matching
+            $slug = sanitize_title(strtolower($kw));
+            // Check if term already exists by slug
+            $existing = get_term_by('slug', $slug, $taxonomy);
+            if (!$existing) {
+                // Create new term with title-cased name derived from slug
+                $name = $this->format_keyword_name($slug);
+                $created = wp_insert_term($name, $taxonomy, ['slug' => $slug]);
+                if (!is_wp_error($created)) {
+                    $term_ids[] = (int) $created['term_id'];
+                }
+            } else {
+                // Use existing term
+                $term_ids[] = (int) $existing->term_id;
+            }
+        }
+
+        if (!empty($term_ids)) {
+            wp_set_object_terms($post_id, $term_ids, $taxonomy, false);
+        }
     }
 
     /**
@@ -226,5 +271,17 @@ class UploadPostCreator {
         }
         
         return $day_term->term_id;
+    }
+
+    /**
+     * Format keyword for display with title case.
+     *
+     * @param string $keyword Normalized keyword slug.
+     * @return string Title-cased keyword for display.
+     */
+    private function format_keyword_name($keyword) {
+        // Replace hyphens/underscores with spaces and title case
+        $keyword = str_replace(['-', '_'], ' ', $keyword);
+        return ucwords($keyword);
     }
 }

@@ -1,7 +1,7 @@
 === AP Library ===
 Contributors: Antonin Puleo
 Donate link: https://antoninpuleo.com/
-Tags: photography, media, uploads, custom post type, taxonomy, exif, gallery, archive, dates
+Tags: photography, media, uploads, custom post type, taxonomy, exif, gallery, archive, dates, keywords
 Requires at least: 6.5
 Tested up to: 6.8.3
 Requires PHP: 7.4
@@ -20,7 +20,8 @@ AP Library provides a robust foundation to manage a photography library as first
 - Taxonomies:
     - `aplb_library_pdate` (flat) for published date groupings
     - `aplb_uploads_tdate` (hierarchical) for taken date — Year → Month → Day — enabling clean archives like `/uploads-tdate/2023/november/15/`
-- EXIF integration to extract taken date from featured images
+    - `aplb_uploads_keyword` (flat) for IPTC/EXIF photo keywords automatically extracted from the featured image
+- EXIF integration to extract taken date from featured images and IPTC keywords (creates matching taxonomy terms automatically)
 - Admin UI enhancements (meta box, quick edit integration, sortable columns)
 - Backfill tools to sync existing content
 - Query customization so archives order by `aplb_published_date` by default
@@ -29,7 +30,7 @@ AP Library provides a robust foundation to manage a photography library as first
 
 1. Upload the `ap-library` folder to `/wp-content/plugins/`.
 2. Activate “AP Library” in the Plugins screen.
-3. (Optional) Run the Backfill tool to populate taxonomy terms from existing meta values.
+3. (Optional) Run the Backfill tool to populate taxonomy terms from existing meta values and generate keywords.
 
 == Frequently Asked Questions ==
 
@@ -49,6 +50,11 @@ Yes. On save and during upload processing the plugin attempts to read DateTimeOr
 
 == Changelog ==
 
+= Unreleased - IPTC Keyword Taxonomy (pending release) =
+- Introduced non-hierarchical keyword taxonomy `aplb_uploads_keyword` (auto-populated from IPTC keywords on upload).
+- Added EXIF/IPTC keyword extraction to post creation flow.
+- Backfill screen now offers separate date and keyword operations under a single submenu.
+
 = 1.1.0 - Hierarchical taken date archives, EXIF, and sync improvements =
 - Introduced hierarchical taken date taxonomy `aplb_uploads_tdate` (Year → Month → Day) with clean archive URLs.
 - One-way synchronization from `aplb_taken_date` meta to hierarchical terms; `aplb_library_pdate` remains flat.
@@ -64,6 +70,9 @@ Yes. On save and during upload processing the plugin attempts to read DateTimeOr
 - Custom post type, date meta, base taxonomies, admin UI, and public hooks skeleton.
 
 == Upgrade Notice ==
+
+= Unreleased =
+Keyword taxonomy & extraction are available but not yet part of a tagged release. Wait for next stable version before deploying to production sites.
 
 = 1.1.0 =
 This release adds hierarchical taken date archives, EXIF-based date extraction, and improved meta→taxonomy synchronization. Run the Backfill tool to synchronize existing content.

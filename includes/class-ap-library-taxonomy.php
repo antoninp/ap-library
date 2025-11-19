@@ -32,6 +32,7 @@ class Ap_Library_Taxonomy {
         $this->register_aplb_uploads_genre_taxonomy();
         $this->register_aplb_uploads_tdate_taxonomy();
         $this->register_aplb_library_pdate_taxonomy();
+        $this->register_aplb_uploads_keyword_taxonomy();
  
     }
     
@@ -137,6 +138,40 @@ class Ap_Library_Taxonomy {
 
         register_taxonomy( 'aplb_uploads_genre', [ 'aplb_uploads', 'aplb_library' ], $args );
 
+    }
+
+    /**
+     * Register the keyword taxonomy (auto from EXIF/IPTC keywords).
+     *
+     * @since    1.1.0
+     * @access   private
+     */
+    private function register_aplb_uploads_keyword_taxonomy() {
+
+        $args = [
+            'label'  => esc_html__( 'Photo Keywords (Auto)', 'ap-library' ),
+            'labels' => [
+                'menu_name'          => esc_html__( 'Photo Keywords (Auto)', 'ap-library' ),
+                'name'               => esc_html__( 'Photo Keywords (Auto)', 'ap-library' ),
+                'singular_name'      => esc_html__( 'Keyword', 'ap-library' ),
+                'add_new_item'       => esc_html__( 'Add new Keyword', 'ap-library' ),
+                'new_item'           => esc_html__( 'New Keyword', 'ap-library' ),
+                'view_item'          => esc_html__( 'View Keyword', 'ap-library' ),
+                'not_found'          => esc_html__( 'No Keyword found', 'ap-library' ),
+                'not_found_in_trash' => esc_html__( 'No Keyword found in trash', 'ap-library' ),
+                'all_items'          => esc_html__( 'All Photo Keywords', 'ap-library' ),
+            ],
+            'public'              => true,
+            'show_ui'             => true,
+            'show_in_nav_menus'   => true,
+            'show_admin_column'   => true,
+            'show_in_quick_edit'  => true,
+            'show_in_rest'        => true,
+            'hierarchical'        => false,
+            'rewrite'             => array( 'slug' => 'uploads-keyword' ),
+        ];
+
+        register_taxonomy( 'aplb_uploads_keyword', 'aplb_uploads', $args );
     }
 
 }
