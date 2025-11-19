@@ -1,114 +1,69 @@
-=== Plugin Name ===
-Contributors: (this should be a list of wordpress.org userid's)
+=== AP Library ===
+Contributors: Antonin Puleo
 Donate link: https://antoninpuleo.com/
-Tags: comments, spam
-Requires at least: 3.0.1
-Tested up to: 3.4
-Stable tag: 4.3
+Tags: photography, media, uploads, custom post type, taxonomy, exif, gallery, archive, dates
+Requires at least: 6.5
+Tested up to: 6.8.3
+Requires PHP: 7.4
+Stable tag: 1.1.0
 License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+Photo Library system for WordPress built around a custom post type for uploads, date metadata, hierarchical taken date archives, EXIF extraction, and admin tools.
 
 == Description ==
 
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
+AP Library provides a robust foundation to manage a photography library as first-class posts. It defines:
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
-
-A few notes about the sections above:
-
-*   "Contributors" is a comma separated list of wp.org/wp-plugins.org usernames
-*   "Tags" is a comma separated list of tags that apply to the plugin
-*   "Requires at least" is the lowest version that the plugin will work on
-*   "Tested up to" is the highest version that you've *successfully used to test the plugin*. Note that it might work on
-higher versions... this is just the highest one you've verified.
-*   Stable tag should indicate the Subversion "tag" of the latest stable version, or "trunk," if you use `/trunk/` for
-stable.
-
-    Note that the `readme.txt` of the stable tag is the one that is considered the defining one for the plugin, so
-if the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used
-for displaying information about the plugin.  In this situation, the only thing considered from the trunk `readme.txt`
-is the stable tag pointer.  Thus, if you develop in trunk, you can update the trunk `readme.txt` to reflect changes in
-your in-development version, without having that information incorrectly disclosed about the current stable version
-that lacks those changes -- as long as the trunk's `readme.txt` points to the correct stable tag.
-
-    If no stable tag is provided, it is assumed that trunk is stable, but you should specify "trunk" if that's where
-you put the stable version, in order to eliminate any doubt.
+- Custom Post Type: `aplb_uploads` for uploaded photos
+- Meta fields: `aplb_published_date`, `aplb_taken_date` (ISO 8601: `YYYY-MM-DD`)
+- Taxonomies:
+    - `aplb_library_pdate` (flat) for published date groupings
+    - `aplb_uploads_tdate` (hierarchical) for taken date — Year → Month → Day — enabling clean archives like `/uploads-tdate/2023/november/15/`
+- EXIF integration to extract taken date from featured images
+- Admin UI enhancements (meta box, quick edit integration, sortable columns)
+- Backfill tools to sync existing content
+- Query customization so archives order by `aplb_published_date` by default
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
-1. Upload `ap-library.php` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `<?php do_action('plugin_name_hook'); ?>` in your templates
+1. Upload the `ap-library` folder to `/wp-content/plugins/`.
+2. Activate “AP Library” in the Plugins screen.
+3. (Optional) Run the Backfill tool to populate taxonomy terms from existing meta values.
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+= Where do taken and published dates live? =
+Two custom meta keys are used on `aplb_uploads` posts: `aplb_taken_date` and `aplb_published_date`.
 
-An answer to that question.
+= How are dates turned into taxonomy archives? =
+Dates are synchronized one-way from meta to taxonomy. Taken dates create a Year → Month → Day hierarchy in `aplb_uploads_tdate`. Published date uses a flat term in `aplb_library_pdate`.
 
-= What about foo bar? =
-
-Answer to foo bar dilemma.
+= Does it read EXIF automatically? =
+Yes. On save and during upload processing the plugin attempts to read DateTimeOriginal from the featured image. If missing, you can still set dates manually.
 
 == Screenshots ==
 
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+1. Uploads list with date columns and quick edit.
+2. Taken date taxonomy archive (Year → Month → Day).
 
 == Changelog ==
 
-= 1.0 =
-* A change since the previous version.
-* Another change.
+= 1.1.0 - Hierarchical taken date archives, EXIF, and sync improvements =
+- Introduced hierarchical taken date taxonomy `aplb_uploads_tdate` (Year → Month → Day) with clean archive URLs.
+- One-way synchronization from `aplb_taken_date` meta to hierarchical terms; `aplb_library_pdate` remains flat.
+- Backfill tool updated to generate and sync hierarchical date terms for existing uploads.
+- Admin columns and quick edit updated to edit dates and re-sync terms accordingly.
+- EXIF extraction prioritized to populate `aplb_taken_date` from featured image metadata when available.
+- Upload post creation streamlined: avoid duplicate term creation; set meta then trigger synchronization.
+- Archive query adjustments: ensure taxonomy archives use `aplb_uploads` post type and order by `aplb_published_date` (DESC).
+- UI refinement: date taxonomies hidden from Quick Edit to prevent conflicts with meta-driven sync.
+- General reliability fixes and internal logging during development (removed in release).
 
-= 0.5 =
-* List versions from most recent at top to oldest at bottom.
+= 1.0.0 - Initial Release =
+- Custom post type, date meta, base taxonomies, admin UI, and public hooks skeleton.
 
 == Upgrade Notice ==
 
-= 1.0 =
-Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
-
-= 0.5 =
-This version fixes a security related bug.  Upgrade immediately.
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.
-
-== A brief Markdown Example ==
-
-Ordered list:
-
-1. Some feature
-1. Another feature
-1. Something else about the plugin
-
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Here's a link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-Titles are optional, naturally.
-
-[markdown syntax]: http://daringfireball.net/projects/markdown/syntax
-            "Markdown is what the parser uses to process much of the readme file"
-
-Markdown uses email style notation for blockquotes and I've been told:
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-`<?php code(); // goes in backticks ?>`
+= 1.1.0 =
+This release adds hierarchical taken date archives, EXIF-based date extraction, and improved meta→taxonomy synchronization. Run the Backfill tool to synchronize existing content.
