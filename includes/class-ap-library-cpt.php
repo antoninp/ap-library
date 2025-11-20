@@ -40,19 +40,19 @@ class Ap_Library_Custom_Post_Types {
     private function register_aplb_uploads_post_type() {
         
         $args = [
-            'label'  => esc_html__( 'Uploads', 'text-domain' ),
+            'label'  => esc_html__( 'Uploads', 'ap-library' ),
             'labels' => [
-                'menu_name'          => esc_html__( 'Uploads', 'ap_uploads' ),
-                'name'               => esc_html__( 'Uploads', 'ap_uploads' ),
-                'singular_name'      => esc_html__( 'Upload', 'ap_uploads' ),
-                'add_new'            => esc_html__( 'Add Uploads', 'ap_uploads' ),
-                'add_new_item'       => esc_html__( 'Add new Uploads', 'ap_uploads' ),
-                'new_item'           => esc_html__( 'New Uploads', 'ap_uploads' ),
-                'edit_item'          => esc_html__( 'Edit Uploads', 'ap_uploads' ),
-                'view_item'          => esc_html__( 'View Uploads', 'ap_uploads' ),
-                'update_item'        => esc_html__( 'Update Uploads', 'ap_uploads' ),
-                'all_items'          => esc_html__( 'All Uploads', 'ap_uploads' ),
-                'search_items'       => esc_html__( 'Search Uploads', 'ap_uploads' ),
+                'menu_name'          => esc_html__( 'Uploads', 'ap-library' ),
+                'name'               => esc_html__( 'Uploads', 'ap-library' ),
+                'singular_name'      => esc_html__( 'Upload', 'ap-library' ),
+                'add_new'            => esc_html__( 'Add Uploads', 'ap-library' ),
+                'add_new_item'       => esc_html__( 'Add new Uploads', 'ap-library' ),
+                'new_item'           => esc_html__( 'New Uploads', 'ap-library' ),
+                'edit_item'          => esc_html__( 'Edit Uploads', 'ap-library' ),
+                'view_item'          => esc_html__( 'View Uploads', 'ap-library' ),
+                'update_item'        => esc_html__( 'Update Uploads', 'ap-library' ),
+                'all_items'          => esc_html__( 'All Uploads', 'ap-library' ),
+                'search_items'       => esc_html__( 'Search Uploads', 'ap-library' ),
             ],
             'public'              => true,
             'exclude_from_search' => false,
@@ -78,10 +78,12 @@ class Ap_Library_Custom_Post_Types {
                 'excerpt',
                 'custom-fields'
             ],
+            // Attach correct registered taxonomies (prefixed) and new keywords taxonomy
             'taxonomies' => [
-                'uploads_tdate',
-                'uploads_genre',
-                'library_pdate'
+                'aplb_uploads_tdate',
+                'aplb_uploads_genre',
+                'aplb_library_pdate',
+                'aplb_uploads_keyword'
             ],
             'rewrite' => array( 'slug' => 'lastest-uploads' ),
         ];
@@ -97,19 +99,19 @@ class Ap_Library_Custom_Post_Types {
     private function register_aplb_library_post_type() {
         
         $args = [
-            'label'  => esc_html__( 'Library', 'text-domain' ),
+            'label'  => esc_html__( 'Library', 'ap-library' ),
             'labels' => [
-                'menu_name'          => esc_html__( 'Library', 'ap_library' ),
-                'name'               => esc_html__( 'Library', 'ap_library' ),
-                'singular_name'      => esc_html__( 'Library', 'ap_library' ),
-                'add_new'            => esc_html__( 'Add Library', 'ap_library' ),
-                'add_new_item'       => esc_html__( 'Add new Library', 'ap_library' ),
-                'new_item'           => esc_html__( 'New Library', 'ap_library' ),
-                'edit_item'          => esc_html__( 'Edit Library', 'ap_library' ),
-                'view_item'          => esc_html__( 'View Library', 'ap_library' ),
-                'update_item'        => esc_html__( 'View Library', 'ap_library' ),
-                'all_items'          => esc_html__( 'All Library', 'ap_library' ),
-                'search_items'       => esc_html__( 'Search Library', 'ap_library' ),
+                'menu_name'          => esc_html__( 'Library', 'ap-library' ),
+                'name'               => esc_html__( 'Library', 'ap-library' ),
+                'singular_name'      => esc_html__( 'Library', 'ap-library' ),
+                'add_new'            => esc_html__( 'Add Library', 'ap-library' ),
+                'add_new_item'       => esc_html__( 'Add new Library', 'ap-library' ),
+                'new_item'           => esc_html__( 'New Library', 'ap-library' ),
+                'edit_item'          => esc_html__( 'Edit Library', 'ap-library' ),
+                'view_item'          => esc_html__( 'View Library', 'ap-library' ),
+                'update_item'        => esc_html__( 'View Library', 'ap-library' ),
+                'all_items'          => esc_html__( 'All Library', 'ap-library' ),
+                'search_items'       => esc_html__( 'Search Library', 'ap-library' ),
             ],
             'public'              => true,
             'exclude_from_search' => false,
@@ -133,9 +135,10 @@ class Ap_Library_Custom_Post_Types {
                 'author',
                 'thumbnail'
             ],
+            // Attach shared genre and published date taxonomies (prefixed)
             'taxonomies' => [
-                'library_category',
-                'library_pdate'
+                'aplb_library_pdate',
+                'aplb_uploads_genre'
             ],
             'rewrite' => array( 'slug' => 'library' ),
         ];

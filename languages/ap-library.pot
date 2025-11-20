@@ -12,6 +12,7 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: Manual\n"
+"X-Domain: ap-library\n"
 
 #: admin/class-ap-library-admin-columns.php:27
 msgid "Thumbnail"
