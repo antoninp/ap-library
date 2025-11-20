@@ -149,10 +149,10 @@ class Ap_Library_Taxonomy {
     private function register_aplb_uploads_keyword_taxonomy() {
 
         $args = [
-            'label'  => esc_html__( 'Photo Keywords (Auto)', 'ap-library' ),
+            'label'  => esc_html__( 'Photo Keywords', 'ap-library' ),
             'labels' => [
-                'menu_name'          => esc_html__( 'Photo Keywords (Auto)', 'ap-library' ),
-                'name'               => esc_html__( 'Photo Keywords (Auto)', 'ap-library' ),
+                'menu_name'          => esc_html__( 'Photo Keywords', 'ap-library' ),
+                'name'               => esc_html__( 'Photo Keywords', 'ap-library' ),
                 'singular_name'      => esc_html__( 'Keyword', 'ap-library' ),
                 'add_new_item'       => esc_html__( 'Add new Keyword', 'ap-library' ),
                 'new_item'           => esc_html__( 'New Keyword', 'ap-library' ),
