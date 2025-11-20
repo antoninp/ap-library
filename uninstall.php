@@ -30,8 +30,9 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
     exit;
 }
 
-// 1. Delete all custom posts
-$aplb_post_types = ['aplb_uploads', 'aplb_library', 'uploads'];
+// 1. Delete all custom posts registered by the plugin
+// Removed legacy 'uploads' slug (not a registered CPT in current version)
+$aplb_post_types = [ 'aplb_uploads', 'aplb_library' ];
 foreach ( $aplb_post_types as $post_type ) {
     $posts = get_posts([
         'post_type'      => $post_type,
@@ -44,11 +45,13 @@ foreach ( $aplb_post_types as $post_type ) {
     }
 }
 
-// 2. Delete all custom taxonomy terms
+// 2. Delete all custom taxonomy terms registered by the plugin
+// Added 'aplb_uploads_keyword' (new keyword taxonomy)
 $aplb_taxonomies = [
     'aplb_uploads_tdate',
     'aplb_uploads_genre',
-    'aplb_library_pdate'
+    'aplb_library_pdate',
+    'aplb_uploads_keyword'
 ];
 foreach ( $aplb_taxonomies as $taxonomy ) {
     $terms = get_terms( [ 'taxonomy' => $taxonomy, 'hide_empty' => false ] );
@@ -62,3 +65,8 @@ foreach ( $aplb_taxonomies as $taxonomy ) {
 // 3. Delete plugin options
 delete_option( 'ap_library_auto_create_post_on_upload' );
 delete_option( 'ap_library_enable_back_to_top' );
+
+// 4. Flush rewrite rules to remove CPT & taxonomy rewrites
+if ( function_exists( 'flush_rewrite_rules' ) ) {
+    flush_rewrite_rules();
+}
