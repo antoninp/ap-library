@@ -52,31 +52,55 @@ class Ap_Library_Backfill {
 			<p><?php esc_html_e( 'Use these tools to populate or regenerate date and keyword taxonomies from media metadata.', 'ap-library' ); ?></p>
 			<?php
 			// Handle submissions independently.
-			if ( isset( $_POST['aplb_backfill_dates_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_dates_nonce'], 'aplb_backfill_dates' ) ) {
-				$this->process_dates_backfill();
+			if ( isset( $_POST['aplb_backfill_taken_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_taken_nonce'], 'aplb_backfill_taken' ) ) {
+				$this->process_taken_date_backfill();
+			}
+			if ( isset( $_POST['aplb_backfill_published_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_published_nonce'], 'aplb_backfill_published' ) ) {
+				$this->process_published_date_backfill();
 			}
 			if ( isset( $_POST['aplb_backfill_keywords_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_keywords_nonce'], 'aplb_backfill_keywords' ) ) {
 				$this->process_keywords_backfill();
 			}
 			?>
 
-			<h2><?php esc_html_e( 'Dates Backfill', 'ap-library' ); ?></h2>
-			<p><?php esc_html_e( 'Extract EXIF taken dates and ensure published/taken date meta and taxonomies are synchronized.', 'ap-library' ); ?></p>
+			<h2><?php esc_html_e( 'Taken Date Backfill', 'ap-library' ); ?></h2>
+			<p><?php esc_html_e( 'Extract EXIF taken dates from featured images and synchronize to hierarchical taxonomy (Year → Month → Day).', 'ap-library' ); ?></p>
 			<form method="post" action="">
-				<?php wp_nonce_field( 'aplb_backfill_dates', 'aplb_backfill_dates_nonce' ); ?>
+				<?php wp_nonce_field( 'aplb_backfill_taken', 'aplb_backfill_taken_nonce' ); ?>
 				<table class="form-table">
 					<tr>
 						<th scope="row"><?php esc_html_e( 'Options', 'ap-library' ); ?></th>
 						<td>
 							<label>
-								<input type="checkbox" name="overwrite_existing_dates" value="1" />
-								<?php esc_html_e( 'Overwrite existing date values', 'ap-library' ); ?>
+								<input type="checkbox" name="overwrite_existing_taken" value="1" />
+								<?php esc_html_e( 'Overwrite existing taken dates', 'ap-library' ); ?>
 							</label>
-							<p class="description"><?php esc_html_e( 'If unchecked, only empty date meta will be filled.', 'ap-library' ); ?></p>
+							<p class="description"><?php esc_html_e( 'If unchecked, only posts without taken dates will be processed.', 'ap-library' ); ?></p>
 						</td>
 					</tr>
 				</table>
-				<?php submit_button( __( 'Run Dates Backfill', 'ap-library' ), 'primary', 'submit', false ); ?>
+				<?php submit_button( __( 'Run Taken Date Backfill', 'ap-library' ), 'primary', 'submit', false ); ?>
+			</form>
+
+			<hr />
+
+			<h2><?php esc_html_e( 'Published Date Backfill', 'ap-library' ); ?></h2>
+			<p><?php esc_html_e( 'Ensure published date meta is set (defaults to post creation date) and synchronized to flat taxonomy.', 'ap-library' ); ?></p>
+			<form method="post" action="">
+				<?php wp_nonce_field( 'aplb_backfill_published', 'aplb_backfill_published_nonce' ); ?>
+				<table class="form-table">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Options', 'ap-library' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="overwrite_existing_published" value="1" />
+								<?php esc_html_e( 'Overwrite existing published dates', 'ap-library' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'If unchecked, only posts without published dates will be processed.', 'ap-library' ); ?></p>
+						</td>
+					</tr>
+				</table>
+				<?php submit_button( __( 'Run Published Date Backfill', 'ap-library' ), 'primary', 'submit', false ); ?>
 			</form>
 
 			<hr />
@@ -104,15 +128,14 @@ class Ap_Library_Backfill {
 	}
 
 	/**
-	 * Process the backfill operation.
+	 * Process taken date backfill.
 	 *
-	 * @since    1.0.0
+	 * @since Unreleased
 	 */
-	private function process_dates_backfill() {
+	private function process_taken_date_backfill() {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-exif.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-meta-box.php';
 
-		$overwrite = isset( $_POST['overwrite_existing_dates'] ) && '1' === $_POST['overwrite_existing_dates'];
+		$overwrite = isset( $_POST['overwrite_existing_taken'] ) && '1' === $_POST['overwrite_existing_taken'];
 		
 		$args = array(
 			'post_type'      => 'aplb_uploads',
@@ -128,7 +151,6 @@ class Ap_Library_Backfill {
 			$post_id = $post->ID;
 			$processed++;
 
-			// Process taken date
 			$existing_taken = get_post_meta( $post_id, APLB_META_TAKEN_DATE, true );
 			if ( $overwrite || ! $existing_taken ) {
 				$taken_date = Ap_Library_EXIF::get_taken_date_from_post( $post_id );
@@ -138,11 +160,39 @@ class Ap_Library_Backfill {
 					$updated++;
 				}
 			}
+		}
 
-			// Process published date (use post_date as fallback)
+		echo '<div class="notice notice-success is-dismissible"><p>' . sprintf(
+			esc_html__( 'Taken date backfill complete! Processed %d posts, updated %d taken dates.', 'ap-library' ),
+			$processed,
+			$updated
+		) . '</p></div>';
+	}
+
+	/**
+	 * Process published date backfill.
+	 *
+	 * @since Unreleased
+	 */
+	private function process_published_date_backfill() {
+		$overwrite = isset( $_POST['overwrite_existing_published'] ) && '1' === $_POST['overwrite_existing_published'];
+		
+		$args = array(
+			'post_type'      => 'aplb_uploads',
+			'posts_per_page' => -1,
+			'post_status'    => 'any',
+		);
+
+		$uploads = get_posts( $args );
+		$processed = 0;
+		$updated = 0;
+
+		foreach ( $uploads as $post ) {
+			$post_id = $post->ID;
+			$processed++;
+
 			$existing_published = get_post_meta( $post_id, APLB_META_PUBLISHED_DATE, true );
 			if ( $overwrite || ! $existing_published ) {
-				// Default to post creation date
 				$published_date = gmdate( 'Y-m-d', strtotime( $post->post_date ) );
 				update_post_meta( $post_id, APLB_META_PUBLISHED_DATE, $published_date );
 				$this->sync_date_to_taxonomy( $post_id, $published_date, 'aplb_library_pdate' );
@@ -151,7 +201,7 @@ class Ap_Library_Backfill {
 		}
 
 		echo '<div class="notice notice-success is-dismissible"><p>' . sprintf(
-			esc_html__( 'Dates backfill complete! Processed %d posts, updated %d date entries.', 'ap-library' ),
+			esc_html__( 'Published date backfill complete! Processed %d posts, updated %d published dates.', 'ap-library' ),
 			$processed,
 			$updated
 		) . '</p></div>';
@@ -290,8 +340,8 @@ class Ap_Library_Backfill {
 		$day   = date( 'd', $timestamp );
 		
 		$year_name  = $year;
-		$month_name = date_i18n( 'F', $timestamp );
-		$day_name   = date_i18n( 'j', $timestamp );
+		$month_name = date_i18n( 'F Y', $timestamp ); // e.g., "May 2023"
+		$day_name   = date_i18n( 'F j, Y', $timestamp ); // e.g., "May 15, 2023"
 
 		// Create/get year term
 		$year_term = get_term_by( 'slug', $year, $taxonomy );

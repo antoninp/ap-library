@@ -225,8 +225,8 @@ class UploadPostCreator {
         $day   = date('d', $timestamp);
         
         $year_name  = $year;
-        $month_name = date_i18n('F', $timestamp);
-        $day_name   = date_i18n('j', $timestamp);
+        $month_name = date_i18n('F Y', $timestamp); // e.g., "May 2023"
+        $day_name   = date_i18n('F j, Y', $timestamp); // e.g., "May 15, 2023"
 
         // Create/get year term
         $year_term = get_term_by('slug', $year, $taxonomy);
