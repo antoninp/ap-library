@@ -118,6 +118,7 @@ class UploadPostCreator {
     /**
      * Assign keyword taxonomy terms to a post.
      *
+     * @since 1.2.0
      * @param int   $post_id  Post ID.
      * @param array $keywords Array of keyword strings.
      */
@@ -276,6 +277,7 @@ class UploadPostCreator {
     /**
      * Format keyword for display with title case.
      *
+     * @since 1.2.0
      * @param string $keyword Normalized keyword slug.
      * @return string Title-cased keyword for display.
      */

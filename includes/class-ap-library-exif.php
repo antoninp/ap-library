@@ -93,7 +93,7 @@ class Ap_Library_EXIF {
 	/**
 	 * Extract keywords from image IPTC metadata.
 	 *
-	 * @since 1.1.0
+	 * @since 1.2.0
 	 * @param int $attachment_id Attachment ID.
 	 * @return array Array of sanitized keyword strings.
 	 */
@@ -130,7 +130,7 @@ class Ap_Library_EXIF {
 	/**
 	 * Extract keywords from a post's featured image.
 	 *
-	 * @since 1.1.0
+	 * @since 1.2.0
 	 * @param int $post_id Post ID.
 	 * @return array Array of keyword strings.
 	 */

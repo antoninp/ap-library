@@ -143,7 +143,7 @@ class Ap_Library_Taxonomy {
     /**
      * Register the keyword taxonomy (auto from EXIF/IPTC keywords).
      *
-     * @since    1.1.0
+     * @since    1.2.0
      * @access   private
      */
     private function register_aplb_uploads_keyword_taxonomy() {

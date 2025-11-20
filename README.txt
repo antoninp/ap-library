@@ -5,7 +5,7 @@ Tags: photography, media, uploads, custom post type, taxonomy, exif, gallery, ar
 Requires at least: 6.5
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,8 +20,8 @@ AP Library provides a robust foundation to manage a photography library as first
 - Taxonomies:
     - `aplb_library_pdate` (flat) for published date groupings
     - `aplb_uploads_tdate` (hierarchical) for taken date — Year → Month → Day — enabling clean archives like `/uploads-tdate/2023/november/15/`
-    - `aplb_uploads_keyword` (flat) for IPTC/EXIF photo keywords automatically extracted from the featured image
-- EXIF integration to extract taken date from featured images and IPTC keywords (creates matching taxonomy terms automatically)
+    - `aplb_uploads_keyword` (flat) for IPTC/EXIF photo keywords automatically extracted from featured images
+- EXIF integration to extract taken dates and IPTC keywords from featured images (creates matching taxonomy terms automatically)
 - Admin UI enhancements (meta box, quick edit integration, sortable columns)
 - Backfill tools to sync existing content
 - Query customization so archives order by `aplb_published_date` by default
@@ -43,6 +43,9 @@ Dates are synchronized one-way from meta to taxonomy. Taken dates create a Year 
 = Does it read EXIF automatically? =
 Yes. On save and during upload processing the plugin attempts to read DateTimeOriginal from the featured image. If missing, you can still set dates manually.
 
+= How are keywords extracted and assigned? =
+Keywords are automatically extracted from IPTC metadata (field 2#025) embedded in featured images. The plugin uses case-insensitive matching, so "Australia" and "australia" map to the same term with a consistent title-case display name. Keywords are assigned during upload and can be backfilled for existing content.
+
 == Screenshots ==
 
 1. Uploads list with date columns and quick edit.
@@ -50,10 +53,16 @@ Yes. On save and during upload processing the plugin attempts to read DateTimeOr
 
 == Changelog ==
 
-= Unreleased - IPTC Keyword Taxonomy (pending release) =
-- Introduced non-hierarchical keyword taxonomy `aplb_uploads_keyword` (auto-populated from IPTC keywords on upload).
-- Added EXIF/IPTC keyword extraction to post creation flow.
-- Backfill screen now offers separate date and keyword operations under a single submenu.
+= 1.2.0 - Photo Keywords & Enhanced Date Backfill =
+- Added `aplb_uploads_keyword` taxonomy with automatic IPTC keyword extraction from featured images
+- Keywords are now automatically extracted and assigned during upload post creation
+- Implemented case-insensitive keyword matching with normalized slugs and title-case display names
+- Enhanced backfill UI: unified submenu with three separate operations (Taken Date, Published Date, Keywords)
+- Split date backfill into independent operations for taken dates and published dates
+- Improved hierarchical date term names for better human readability (e.g., "May 2023" instead of "May", "May 15, 2023" instead of "15")
+- Added EXIF keyword extraction methods: `get_keywords()` and `get_keywords_from_post()`
+- Keyword taxonomy hidden from Quick Edit to maintain consistency
+- All keyword operations respect case-insensitive matching ("Australia" and "australia" map to the same term)
 
 = 1.1.0 - Hierarchical taken date archives, EXIF, and sync improvements =
 - Introduced hierarchical taken date taxonomy `aplb_uploads_tdate` (Year → Month → Day) with clean archive URLs.
@@ -71,8 +80,8 @@ Yes. On save and during upload processing the plugin attempts to read DateTimeOr
 
 == Upgrade Notice ==
 
-= Unreleased =
-Keyword taxonomy & extraction are available but not yet part of a tagged release. Wait for next stable version before deploying to production sites.
+= 1.2.0 =
+This release adds automatic keyword extraction from IPTC metadata and separate backfill operations for taken/published dates. Run the backfill tools (Taken Date, Published Date, and Keywords) to populate taxonomy terms for existing content.
 
 = 1.1.0 =
 This release adds hierarchical taken date archives, EXIF-based date extraction, and improved meta→taxonomy synchronization. Run the Backfill tool to synchronize existing content.

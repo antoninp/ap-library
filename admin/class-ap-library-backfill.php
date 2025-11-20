@@ -130,7 +130,7 @@ class Ap_Library_Backfill {
 	/**
 	 * Process taken date backfill.
 	 *
-	 * @since Unreleased
+	 * @since 1.2.0
 	 */
 	private function process_taken_date_backfill() {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-exif.php';
@@ -172,7 +172,7 @@ class Ap_Library_Backfill {
 	/**
 	 * Process published date backfill.
 	 *
-	 * @since Unreleased
+	 * @since 1.2.0
 	 */
 	private function process_published_date_backfill() {
 		$overwrite = isset( $_POST['overwrite_existing_published'] ) && '1' === $_POST['overwrite_existing_published'];
@@ -207,6 +207,11 @@ class Ap_Library_Backfill {
 		) . '</p></div>';
 	}
 
+	/**
+	 * Process keywords backfill from IPTC metadata.
+	 *
+	 * @since 1.2.0
+	 */
 	private function process_keywords_backfill() {
 		if ( ! taxonomy_exists( 'aplb_uploads_keyword' ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Keyword taxonomy not registered.', 'ap-library' ) . '</p></div>';
@@ -391,7 +396,7 @@ class Ap_Library_Backfill {
 	/**
 	 * Format keyword for display with title case.
 	 *
-	 * @since Unreleased
+	 * @since 1.2.0
 	 * @param string $keyword Normalized keyword slug.
 	 * @return string Title-cased keyword for display.
 	 */
