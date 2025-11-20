@@ -5,7 +5,7 @@ Tags: photography, media, uploads, custom post type, taxonomy, exif, gallery, ar
 Requires at least: 6.5
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,14 @@ Keywords are automatically extracted from IPTC metadata (field 2#025) embedded i
 
 == Changelog ==
 
+= 1.2.1 - i18n and cleanup =
+- Updated: Normalized translation text domain to `ap-library` across the plugin for consistent i18n.
+- Updated: Regenerated POT file and added `X-Domain: ap-library` header.
+- Fixed: CPT labels to use the unified `ap-library` text domain.
+- Fixed: Corrected CPT ↔ taxonomy associations to use actual registered slugs.
+- Fixed: Uninstall routine now removes posts and terms for all AP Library CPTs/taxonomies and flushes rewrite rules.
+- Misc: Minor label consistency and internal cleanup.
+
 = 1.2.0 - Photo Keywords & Enhanced Date Backfill =
 - Added `aplb_uploads_keyword` taxonomy with automatic IPTC keyword extraction from featured images
 - Keywords are now automatically extracted and assigned during upload post creation
@@ -79,6 +87,9 @@ Keywords are automatically extracted from IPTC metadata (field 2#025) embedded i
 - Custom post type, date meta, base taxonomies, admin UI, and public hooks skeleton.
 
 == Upgrade Notice ==
+
+= 1.2.1 =
+No action required. This release improves internationalization and uninstall cleanup. Uninstall now fully removes AP Library posts and taxonomy terms and flushes rewrites.
 
 = 1.2.0 =
 This release adds automatic keyword extraction from IPTC metadata and separate backfill operations for taken/published dates. Run the backfill tools (Taken Date, Published Date, and Keywords) to populate taxonomy terms for existing content.
