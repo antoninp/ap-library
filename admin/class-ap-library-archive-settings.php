@@ -39,7 +39,6 @@ class Ap_Library_Archive_Settings {
 			'tax:aplb_library_pdate'   => [ 'enabled' => true, 'post_types' => [ 'aplb_uploads' ], 'orderby' => 'meta_value', 'meta_key' => APLB_META_PUBLISHED_DATE, 'order' => 'DESC', 'posts_per_page' => '' ],
 			'tax:aplb_uploads_keyword' => [ 'enabled' => true, 'post_types' => [ 'aplb_uploads' ], 'orderby' => 'meta_value', 'meta_key' => APLB_META_PUBLISHED_DATE, 'order' => 'DESC', 'posts_per_page' => '' ],
 			'post_type:aplb_uploads'   => [ 'enabled' => true, 'post_types' => [ 'aplb_uploads' ], 'orderby' => 'meta_value', 'meta_key' => APLB_META_PUBLISHED_DATE, 'order' => 'DESC', 'posts_per_page' => '' ],
-			'post_type:aplb_library'   => [ 'enabled' => true, 'post_types' => [ 'aplb_library' ], 'orderby' => 'meta_value', 'meta_key' => APLB_META_PUBLISHED_DATE, 'order' => 'DESC', 'posts_per_page' => '' ],
 			'author'                   => [ 'enabled' => true, 'post_types' => [ 'aplb_uploads' ], 'orderby' => 'meta_value', 'meta_key' => APLB_META_PUBLISHED_DATE, 'order' => 'DESC', 'posts_per_page' => '' ],
 			'date'                     => [ 'enabled' => true, 'post_types' => [ 'aplb_uploads' ], 'orderby' => 'meta_value', 'meta_key' => APLB_META_PUBLISHED_DATE, 'order' => 'DESC', 'posts_per_page' => '' ],
 			'search'                   => [ 'enabled' => false, 'post_types' => [ 'aplb_uploads' ], 'orderby' => 'meta_value', 'meta_key' => APLB_META_PUBLISHED_DATE, 'order' => 'DESC', 'posts_per_page' => '' ],
@@ -57,14 +56,13 @@ class Ap_Library_Archive_Settings {
 
 		$rules   = get_option( self::OPTION_NAME, [] );
 		$defaults = $this->get_default_rules();
-		$all_post_types = [ 'aplb_uploads', 'aplb_library' ];
+		$all_post_types = [ 'aplb_uploads' ];
 		$contexts = [
 			'tax:aplb_uploads_genre' => __( 'Genre Taxonomy Archive', 'ap-library' ),
 			'tax:aplb_uploads_tdate' => __( 'Taken Date Taxonomy Archive', 'ap-library' ),
 			'tax:aplb_library_pdate' => __( 'Published Date Taxonomy Archive', 'ap-library' ),
 			'tax:aplb_uploads_keyword' => __( 'Keyword Taxonomy Archive', 'ap-library' ),
 			'post_type:aplb_uploads' => __( 'Uploads Post Type Archive', 'ap-library' ),
-			'post_type:aplb_library' => __( 'Library Post Type Archive', 'ap-library' ),
 			'author'                 => __( 'Author Archives', 'ap-library' ),
 			'date'                   => __( 'Date Archives (year/month/day)', 'ap-library' ),
 			'search'                 => __( 'Search Results', 'ap-library' ),

@@ -95,9 +95,6 @@ class Ap_Library_Query {
 		if ( $query->is_post_type_archive( 'aplb_uploads' ) ) {
 			return 'post_type:aplb_uploads';
 		}
-		if ( $query->is_post_type_archive( 'aplb_library' ) ) {
-			return 'post_type:aplb_library';
-		}
 		if ( $query->is_author() ) {
 			return 'author';
 		}

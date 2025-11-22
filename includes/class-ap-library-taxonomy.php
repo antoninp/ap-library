@@ -67,7 +67,8 @@ class Ap_Library_Taxonomy {
             'rewrite'             => array( 'slug' => 'library-pdate' ),
         ];
 
-        register_taxonomy( 'aplb_library_pdate', array( 'aplb_library' , 'aplb_uploads' ), $args );
+        // Library CPT removed; taxonomy now only attached to uploads.
+        register_taxonomy( 'aplb_library_pdate', array( 'aplb_uploads' ), $args );
 
     }
 
@@ -136,7 +137,8 @@ class Ap_Library_Taxonomy {
             'rewrite'             => array( 'slug' => 'uploads-genre' ),
         ];
 
-        register_taxonomy( 'aplb_uploads_genre', [ 'aplb_uploads', 'aplb_library' ], $args );
+        // Library CPT removed; taxonomy now only attached to uploads.
+        register_taxonomy( 'aplb_uploads_genre', [ 'aplb_uploads' ], $args );
 
     }
 

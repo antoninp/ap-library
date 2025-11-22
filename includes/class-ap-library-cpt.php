@@ -26,9 +26,8 @@ class Ap_Library_Custom_Post_Types {
      * @since    1.0.0
      */
     public function register_post_types() {
-
+        // Only register uploads post type (library CPT removed)
         $this->register_aplb_uploads_post_type();
-        $this->register_aplb_library_post_type();
 
     }
 
@@ -96,54 +95,5 @@ class Ap_Library_Custom_Post_Types {
      *
      * @since    1.0.0
      */
-    private function register_aplb_library_post_type() {
-        
-        $args = [
-            'label'  => esc_html__( 'Library', 'ap-library' ),
-            'labels' => [
-                'menu_name'          => esc_html__( 'Library', 'ap-library' ),
-                'name'               => esc_html__( 'Library', 'ap-library' ),
-                'singular_name'      => esc_html__( 'Library', 'ap-library' ),
-                'add_new'            => esc_html__( 'Add Library', 'ap-library' ),
-                'add_new_item'       => esc_html__( 'Add new Library', 'ap-library' ),
-                'new_item'           => esc_html__( 'New Library', 'ap-library' ),
-                'edit_item'          => esc_html__( 'Edit Library', 'ap-library' ),
-                'view_item'          => esc_html__( 'View Library', 'ap-library' ),
-                'update_item'        => esc_html__( 'View Library', 'ap-library' ),
-                'all_items'          => esc_html__( 'All Library', 'ap-library' ),
-                'search_items'       => esc_html__( 'Search Library', 'ap-library' ),
-            ],
-            'public'              => true,
-            'exclude_from_search' => false,
-            'publicly_queryable'  => true,
-            'show_ui'             => true,
-            'show_in_nav_menus'   => true,
-            'show_in_admin_bar'   => true,
-            'show_in_rest'        => true,
-            'capability_type'     => 'post',
-            'hierarchical'        => true,
-            'has_archive'         => 'library',
-            'query_var'           => true,
-            'can_export'          => true,
-            'rewrite_no_front'    => false,
-            'show_in_menu'        => true,
-            'menu_position'         => 5,
-            'menu_icon'           => 'dashicons-images-alt2',
-            'supports' => [
-                'title',
-                'editor',
-                'author',
-                'thumbnail'
-            ],
-            // Attach shared genre and published date taxonomies (prefixed)
-            'taxonomies' => [
-                'aplb_library_pdate',
-                'aplb_uploads_genre'
-            ],
-            'rewrite' => array( 'slug' => 'library' ),
-        ];
-
-
-        register_post_type( 'aplb_library', $args );
-    }
+    // Removed library post type registration; legacy posts are no longer used.
 }

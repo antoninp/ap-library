@@ -9,13 +9,13 @@ Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Photo Library system for WordPress built around a custom post type for uploads, date metadata, hierarchical taken date archives, EXIF extraction, and admin tools.
+Photo Library system for WordPress built around a custom post type for uploads, date metadata, hierarchical taken date archives, EXIF extraction, keyword extraction, and admin tools.
 
 == Description ==
 
 AP Library provides a robust foundation to manage a photography library as first-class posts. It defines:
 
-- Custom Post Type: `aplb_uploads` for uploaded photos
+- Custom Post Type: `aplb_uploads` for uploaded photos (the former `aplb_library` CPT has been removed and consolidated here)
 - Meta fields: `aplb_published_date`, `aplb_taken_date` (ISO 8601: `YYYY-MM-DD`)
 - Taxonomies:
     - `aplb_library_pdate` (flat) for published date groupings
@@ -34,7 +34,7 @@ Navigate to: Uploads → Archive Settings.
 
 For each archive context you can:
 * Enable or disable the rule (when disabled, WordPress default behavior applies)
-* Set Post Types included (choose one or both of `aplb_uploads`, `aplb_library`)
+* Set Post Types included (currently only `aplb_uploads`)
 * Choose Order By: Meta Value, Post Date, Title, or Menu Order
 * Specify Meta Key (used only when ordering by Meta Value; defaults to `aplb_published_date`)
 * Set Order direction (ASC / DESC)
@@ -46,7 +46,6 @@ Managed contexts:
 * Published date taxonomy: `aplb_library_pdate`
 * Keyword taxonomy: `aplb_uploads_keyword`
 * Uploads post type archive
-* Library post type archive
 * Author archives
 * Date archives (year / month / day)
 * Search results
@@ -82,6 +81,14 @@ Keywords are automatically extracted from IPTC metadata (field 2#025) embedded i
 2. Taken date taxonomy archive (Year → Month → Day).
 
 == Changelog ==
+
+= Unreleased - Consolidated to Single Uploads CPT =
+- Removed legacy `aplb_library` custom post type; all functionality now centers on `aplb_uploads`.
+- Detached taxonomies `aplb_library_pdate` and `aplb_uploads_genre` from the old CPT; they now only attach to `aplb_uploads`.
+- Removed admin actions and helper classes related to creating/updating library posts.
+- Updated archive query settings UI to eliminate library post type contexts.
+- Simplified uninstall routine (only removes `aplb_uploads` posts plus related taxonomies).
+- Documentation updated to reflect single CPT architecture.
 
 = 1.2.1 - i18n and cleanup =
 - Updated: Normalized translation text domain to `ap-library` across the plugin for consistent i18n.

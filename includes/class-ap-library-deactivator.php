@@ -31,13 +31,14 @@ class Ap_Library_Deactivator {
 	 */
 	public static function deactivate() {
 		
-		// Unregister custom post types
+		// Unregister custom post types (library CPT removed)
 		unregister_post_type( 'aplb_uploads' );
-		unregister_post_type( 'aplb_library' );
 
 		// Unregister taxonomies if needed
 		unregister_taxonomy( 'aplb_uploads_tdate' );
 		unregister_taxonomy( 'aplb_uploads_genre' );
+		unregister_taxonomy( 'aplb_library_pdate' );
+		unregister_taxonomy( 'aplb_uploads_keyword' );
 
 		// Flush rewrite rules to remove CPT/taxonomy permalinks
 		flush_rewrite_rules();

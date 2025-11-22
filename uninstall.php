@@ -32,7 +32,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 // 1. Delete all custom posts registered by the plugin
 // Removed legacy 'uploads' slug (not a registered CPT in current version)
-$aplb_post_types = [ 'aplb_uploads', 'aplb_library' ];
+$aplb_post_types = [ 'aplb_uploads' ];
 foreach ( $aplb_post_types as $post_type ) {
     $posts = get_posts([
         'post_type'      => $post_type,
