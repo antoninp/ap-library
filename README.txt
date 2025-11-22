@@ -26,6 +26,36 @@ AP Library provides a robust foundation to manage a photography library as first
 - Backfill tools to sync existing content
 - Query customization so archives order by `aplb_published_date` by default
 
+== Archive Query Settings ==
+
+Since 1.2.x you can configure how taxonomy / post type / author / date archives build their main query instead of relying on hard‑coded logic.
+
+Navigate to: Uploads → Archive Settings.
+
+For each archive context you can:
+* Enable or disable the rule (when disabled, WordPress default behavior applies)
+* Set Post Types included (choose one or both of `aplb_uploads`, `aplb_library`)
+* Choose Order By: Meta Value, Post Date, Title, or Menu Order
+* Specify Meta Key (used only when ordering by Meta Value; defaults to `aplb_published_date`)
+* Set Order direction (ASC / DESC)
+* Configure Posts Per Page (leave empty for WP default, use -1 for all posts)
+
+Managed contexts:
+* Genre taxonomy: `aplb_uploads_genre`
+* Taken date taxonomy: `aplb_uploads_tdate`
+* Published date taxonomy: `aplb_library_pdate`
+* Keyword taxonomy: `aplb_uploads_keyword`
+* Uploads post type archive
+* Library post type archive
+* Author archives
+* Date archives (year / month / day)
+* Search results
+* Front page (when set to show posts)
+
+The rules are applied via `pre_get_posts` to the main query. Any Query Loop block set to inherit the URL query will automatically reflect updates. Leaving Meta Key empty while using Meta Value ordering falls back to the default published date meta key.
+
+Changing included post types may hide posts not assigned to the selected types within a taxonomy term—ensure term assignments are consistent if you expect mixed results.
+
 == Installation ==
 
 1. Upload the `ap-library` folder to `/wp-content/plugins/`.
