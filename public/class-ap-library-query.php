@@ -36,8 +36,8 @@ class Ap_Library_Query {
 			return; // Not a context we manage.
 		}
 
-		$rules     = get_option( Ap_Library_Archive_Settings::OPTION_NAME );
-		$defaults  = ( new Ap_Library_Archive_Settings() )->get_default_rules();
+		$rules     = get_option( Ap_Library_Archive_Rules::OPTION_NAME );
+		$defaults  = ( new Ap_Library_Archive_Rules() )->get_default_rules();
 		$rule      = isset( $rules[ $context_key ] ) ? $rules[ $context_key ] : ( $defaults[ $context_key ] ?? null );
 
 		if ( ! $rule || empty( $rule['post_types'] ) ) {

@@ -2,28 +2,28 @@
 /**
  * Admin settings for configurable archive query rules.
  */
-class Ap_Library_Archive_Settings {
+class Ap_Library_Archive_Rules {
 
 	const OPTION_NAME = 'ap_library_archive_rules';
 
 	/**
 	 * Add submenu page under Library CPT.
 	 */
-	public function add_settings_submenu() {
+	public function add_rules_submenu() {
 		add_submenu_page(
 			'edit.php?post_type=aplb_photo',
-			__( 'Archive Settings', 'ap-library' ),
-			__( 'Archive Settings', 'ap-library' ),
+			__( 'Archive Rules', 'ap-library' ),
+			__( 'Archive Rules', 'ap-library' ),
 			'manage_options',
-			'aplb-archive-settings',
-			[ $this, 'render_settings_page' ]
+			'aplb-archive-rules',
+			[ $this, 'render_rules_page' ]
 		);
 	}
 
 	/**
 	 * Register option on admin init.
 	 */
-	public function register_settings() {
+	public function register_rules() {
 		if ( ! get_option( self::OPTION_NAME ) ) {
 			add_option( self::OPTION_NAME, $this->get_default_rules() );
 		}
@@ -47,9 +47,9 @@ class Ap_Library_Archive_Settings {
 	}
 
 	/**
-	 * Render settings page UI.
+	 * Render rules page UI.
 	 */
-	public function render_settings_page() {
+	public function render_rules_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Insufficient permissions.', 'ap-library' ) );
 		}
@@ -76,7 +76,7 @@ class Ap_Library_Archive_Settings {
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Archive rules reset to defaults.', 'ap-library' ) . '</p></div>';
 		}
 
-		if ( isset( $_POST['aplb_archive_settings_nonce'] ) && wp_verify_nonce( $_POST['aplb_archive_settings_nonce'], 'aplb_archive_settings' ) ) {
+		if ( isset( $_POST['aplb_archive_rules_nonce'] ) && wp_verify_nonce( $_POST['aplb_archive_rules_nonce'], 'aplb_archive_rules' ) ) {
 			$sanitized = [];
 			foreach ( $contexts as $key => $label ) {
 				$enabled_key      = 'enabled_' . $key;
@@ -123,11 +123,11 @@ class Ap_Library_Archive_Settings {
 
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Archive Query Settings', 'ap-library' ); ?></h1>
+			<h1><?php esc_html_e( 'Archive Rules', 'ap-library' ); ?></h1>
 			<p><?php esc_html_e( 'Configure which post types and ordering each archive context should use.', 'ap-library' ); ?></p>
 			<p class="description"><?php esc_html_e( 'These rules are applied to the main query via pre_get_posts. Query Loop blocks using "Inherit query from URL" will reflect changes automatically. Leaving meta key empty (with meta_value orderby) falls back to default published date meta. Leave Posts Per Page empty to use WordPress default setting.', 'ap-library' ); ?></p>
 			<form method="post" action="">
-				<?php wp_nonce_field( 'aplb_archive_settings', 'aplb_archive_settings_nonce' ); ?>
+				<?php wp_nonce_field( 'aplb_archive_rules', 'aplb_archive_rules_nonce' ); ?>
 				<table class="widefat striped">
 					<thead>
 						<tr>
@@ -185,7 +185,7 @@ class Ap_Library_Archive_Settings {
 
 			<hr style="margin: 2em 0;" />
 
-			<h2><?php esc_html_e( 'Reset Settings', 'ap-library' ); ?></h2>
+			<h2><?php esc_html_e( 'Reset Rules', 'ap-library' ); ?></h2>
 			<p><?php esc_html_e( 'Reset all archive rules to plugin defaults. This action cannot be undone.', 'ap-library' ); ?></p>
 			<form method="post" action="" onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure you want to reset all archive rules to defaults? This cannot be undone.', 'ap-library' ) ); ?>');">
 				<?php wp_nonce_field( 'aplb_archive_reset', 'aplb_archive_reset_nonce' ); ?>

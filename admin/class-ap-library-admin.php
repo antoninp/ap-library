@@ -140,7 +140,7 @@ class Ap_Library_Admin {
 			'aplb_photo',             // single edit/add screen
 			'aplb_photo_page_aplb-overview',
 			'aplb_photo_page_aplb-backfill',
-			'aplb_photo_page_aplb-archive-settings',
+			'aplb_photo_page_aplb-archive-rules',
 		];
 		if ( in_array( $screen->id, $allowed_ids, true ) ) {
 			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/ap-library-admin.css', [], $this->version, 'all' );
@@ -221,7 +221,7 @@ class Ap_Library_Admin {
 			<h2><?php esc_html_e( 'Related Tools', 'ap-library' ); ?></h2>
 			<ul>
 				<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=aplb_photo&page=aplb-backfill' ) ); ?>"><?php esc_html_e( 'Backfill Tools', 'ap-library' ); ?></a> — <?php esc_html_e( 'Regenerate metadata and taxonomy terms from existing photos', 'ap-library' ); ?></li>
-				<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=aplb_photo&page=aplb-archive-settings' ) ); ?>"><?php esc_html_e( 'Archive Settings', 'ap-library' ); ?></a> — <?php esc_html_e( 'Configure ordering and post types for archive pages', 'ap-library' ); ?></li>
+				<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=aplb_photo&page=aplb-archive-rules' ) ); ?>"><?php esc_html_e( 'Archive Rules', 'ap-library' ); ?></a> — <?php esc_html_e( 'Configure ordering and post types for archive pages', 'ap-library' ); ?></li>
 				<li><a href="https://wordpress.org/support/plugin/ap-library" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Documentation & Support', 'ap-library' ); ?></a></li>
 			</ul>
 		</div>

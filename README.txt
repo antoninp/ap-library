@@ -27,11 +27,11 @@ AP Library provides a robust foundation to manage a photography library as first
 - Backfill tools to sync existing content
 - Query customization so archives order by `aplb_published_date` by default
 
-== Archive Query Settings ==
+== Archive Rules ==
 
 Since 1.2.x you can configure how taxonomy / post type / author / date archives build their main query instead of relying on hard‑coded logic.
 
-Navigate to: Photos → Archive Settings.
+Navigate to: Photos → Archive Rules.
 
 For each archive context you can:
 * Enable or disable the rule (when disabled, WordPress default behavior applies)
@@ -86,7 +86,7 @@ Keywords are automatically extracted from IPTC metadata (field 2#025) embedded i
 After activation you will find plugin tools under the Photos post type menu:
 - Photos → Library Overview (quick actions, status, general settings)
 - Photos → Backfill (regenerate taken/published dates and keywords)
-- Photos → Archive Settings (configure ordering & enable/disable archive contexts)
+- Photos → Archive Rules (configure ordering & enable/disable archive contexts)
 
 == Changelog ==
 
@@ -94,14 +94,14 @@ After activation you will find plugin tools under the Photos post type menu:
 - Removed legacy `aplb_library` custom post type; all functionality now centers on the `aplb_photo` post type.
 - Detached legacy taxonomies from the old CPT; all taxonomy associations now target `aplb_photo` only.
 - Removed admin actions and helper classes related to creating/updating library posts.
-- Updated archive query settings UI to eliminate library post type contexts.
+- Updated archive query rules UI to eliminate library post type contexts.
 - Simplified uninstall routine (only removes `aplb_photo` posts plus related taxonomies).
 - Renamed CPT from `aplb_uploads` → `aplb_photo` with archive base `photos`.
 - Renamed taxonomies to `aplb_taken_date`, `aplb_published_date`, `aplb_genre`, and `aplb_keyword` with updated rewrite bases.
 - Updated admin UI (menus, columns, bulk actions, meta box) and public query logic to the new slugs.
 - Replaced "AP Library" submenu with "Library Overview" (slug: `aplb-overview`; central hub for actions, status, and unified settings).
-- Normalized submenu slugs for consistency: `aplb-overview`, `aplb-backfill`, `aplb-archive-settings`.
-- Archive Settings: added Reset to Defaults button, reorganized layout with explanatory text above table.
+- Normalized submenu slugs for consistency: `aplb-overview`, `aplb-backfill`, `aplb-archive-rules`.
+- Archive Rules: added Reset to Defaults button, reorganized layout with explanatory text above table.
 - Backfill page: added prominent warning about irreversible overwrite operations.
 - Overview page: enhanced Related Tools links with descriptions, combined settings into single Save button.
 - Uninstall/deactivation updated to clean up the new CPT/taxonomies.

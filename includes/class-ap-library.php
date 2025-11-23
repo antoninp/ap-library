@@ -139,9 +139,9 @@ class Ap_Library {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-backfill.php';
 
 		/**
-		 * The class responsible for archive settings (configurable query rules).
+		 * The class responsible for archive rules (configurable query rules).
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-archive-settings.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-archive-rules.php';
 
 		/**
 		 * The class responsible for query modifications.
@@ -218,10 +218,10 @@ class Ap_Library {
 		$backfill = new Ap_Library_Backfill();
 		$this->loader->add_action( 'admin_menu', $backfill, 'add_backfill_submenu' );
 
-		// Archive settings hooks
-		$archive_settings = new Ap_Library_Archive_Settings();
-		$this->loader->add_action( 'admin_menu', $archive_settings, 'add_settings_submenu' );
-		$this->loader->add_action( 'admin_init', $archive_settings, 'register_settings' );
+		// Archive rules hooks
+		$archive_rules = new Ap_Library_Archive_Rules();
+		$this->loader->add_action( 'admin_menu', $archive_rules, 'add_rules_submenu' );
+		$this->loader->add_action( 'admin_init', $archive_rules, 'register_rules' );
 
 		// Overview menu at bottom for better UX (after task-specific tools)
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu', 99 );
