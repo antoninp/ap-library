@@ -184,7 +184,6 @@ class Ap_Library {
 		// Main admin hooks
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_admin_actions' );
 		// Unified settings handler replaces legacy individual handlers.
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_overview_settings' );
@@ -223,6 +222,9 @@ class Ap_Library {
 		$archive_settings = new Ap_Library_Archive_Settings();
 		$this->loader->add_action( 'admin_menu', $archive_settings, 'add_settings_submenu' );
 		$this->loader->add_action( 'admin_init', $archive_settings, 'register_settings' );
+
+		// Overview menu at bottom for better UX (after task-specific tools)
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu', 99 );
 		
 	}
 
