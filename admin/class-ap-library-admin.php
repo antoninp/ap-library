@@ -132,7 +132,19 @@ class Ap_Library_Admin {
 	 */
 	public function enqueue_styles() {
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/ap-library-admin.css', array(), $this->version, 'all' );
+		// Only load on our post type list/edit screens and plugin subpages.
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen ) { return; }
+		$allowed_ids = [
+			'edit-aplb_photo',        // list table
+			'aplb_photo',             // single edit/add screen
+			'aplb_photo_page_ap-library-overview',
+			'aplb_photo_page_aplb-backfill',
+			'aplb_photo_page_aplb-archive-settings',
+		];
+		if ( in_array( $screen->id, $allowed_ids, true ) ) {
+			wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/ap-library-admin.css', [], $this->version, 'all' );
+		}
 
 	}
 
@@ -143,13 +155,18 @@ class Ap_Library_Admin {
 	 */
 	public function enqueue_scripts() {
 
-		wp_enqueue_script(
-			$this->plugin_name,
-			plugin_dir_url(__FILE__) . 'js/ap-library-admin.js',
-			array('jquery'),
-			$this->version,
-			false
-		);
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen ) { return; }
+		// Only needed for Quick Edit thumbnail injection on photo list screen.
+		if ( $screen->id === 'edit-aplb_photo' ) {
+			wp_enqueue_script(
+				$this->plugin_name,
+				plugin_dir_url(__FILE__) . 'js/ap-library-admin.js',
+				['jquery'],
+				$this->version,
+				false
+			);
+		}
 	}
 
 	/**
@@ -158,14 +175,14 @@ class Ap_Library_Admin {
 	 * @since    1.0.0
 	 */
 	public function add_plugin_admin_menu() {
-		add_menu_page(
-			__( 'AP Library', 'ap-library' ),
-			__( 'AP Library', 'ap-library' ),
+		// Overview hub for actions, settings, and status.
+		add_submenu_page(
+			'edit.php?post_type=aplb_photo',
+			__( 'Library Overview', 'ap-library' ),
+			__( 'Library Overview', 'ap-library' ),
 			'manage_options',
-			'ap-library',
-			array( $this, 'display_plugin_admin_page' ),
-			'dashicons-open-folder',
-			25
+			'ap-library-overview',
+			[ $this, 'display_plugin_admin_page' ]
 		);
 	}
 
@@ -173,37 +190,94 @@ class Ap_Library_Admin {
 	 * Display the plugin admin page content.
 	 */
 	public function display_plugin_admin_page() {
-		echo '<div class="ap-library-admin-wrap">';
-		echo '<h1 class="ap-library-admin-title">' . esc_html__( 'AP Library Admin', 'ap-library' ) . '</h1>';
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'ap-library' ) );
+		}
+		$status = $this->get_status_snapshot();
+		?>
+		<div class="wrap">
+			<h1><?php esc_html_e( 'Photo Library Overview', 'ap-library' ); ?></h1>
+			<p><?php esc_html_e( 'This overview provides quick actions, status, and general settings for your photo library.', 'ap-library' ); ?></p>
 
-		echo '<div class="ap-library-admin-actions">';
-		$this->actions_manager->render_buttons();
-		echo '</div>';
+			<h2><?php esc_html_e( 'Quick Actions', 'ap-library' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Run maintenance or creation tasks. These operations are safe and won’t modify existing posts unless noted.', 'ap-library' ); ?></p>
+			<?php $this->actions_manager->render_buttons(); ?>
 
+			<h2><?php esc_html_e( 'Library Status', 'ap-library' ); ?></h2>
+			<table class="widefat striped" style="max-width:680px;">
+				<tbody>
+					<tr><td><?php esc_html_e( 'Total Photos (published)', 'ap-library' ); ?></td><td><strong><?php echo esc_html( $status['total'] ); ?></strong></td></tr>
+					<tr><td><?php esc_html_e( 'With Taken Date', 'ap-library' ); ?></td><td><strong><?php echo esc_html( $status['with_taken'] ); ?></strong></td></tr>
+					<tr><td><?php esc_html_e( 'With Published Date Meta', 'ap-library' ); ?></td><td><strong><?php echo esc_html( $status['with_published'] ); ?></strong></td></tr>
+					<tr><td><?php esc_html_e( 'With Keywords', 'ap-library' ); ?></td><td><strong><?php echo esc_html( $status['with_keywords'] ); ?></strong></td></tr>
+				</tbody>
+			</table>
+
+			<h2><?php esc_html_e( 'General Settings', 'ap-library' ); ?></h2>
+			<div style="max-width:680px;">
+				<?php $this->render_setting_auto_create(); ?>
+				<?php $this->render_setting_back_to_top(); ?>
+			</div>
+
+			<h2><?php esc_html_e( 'Tools & Settings Links', 'ap-library' ); ?></h2>
+			<ul>
+				<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=aplb_photo&page=aplb-backfill' ) ); ?>"><?php esc_html_e( 'Backfill Tools', 'ap-library' ); ?></a></li>
+				<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=aplb_photo&page=aplb-archive-settings' ) ); ?>"><?php esc_html_e( 'Archive Query Settings', 'ap-library' ); ?></a></li>
+				<li><a href="https://wordpress.org/support/plugin/ap-library" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Documentation & Support', 'ap-library' ); ?></a></li>
+			</ul>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Render auto-create setting form.
+	 */
+	private function render_setting_auto_create() {
 		$enabled = get_option( 'ap_library_auto_create_post_on_upload', false );
 		?>
-		<form method="post" class="ap-library-checkbox-row">
-		    <?php wp_nonce_field( 'ap_library_auto_create_post_on_upload_action', 'ap_library_auto_create_post_on_upload_nonce' ); ?>
-		    <input type="checkbox" id="ap_library_auto_create_post_on_upload" name="ap_library_auto_create_post_on_upload" value="1" <?php checked( $enabled, true ); ?> />
-		    <label for="ap_library_auto_create_post_on_upload">
-		        <?php esc_html_e( 'Automatically create a post when an image is uploaded', 'ap-library' ); ?>
-		    </label>
-		    <input type="submit" class="ap-library-admin-save-btn" value="<?php esc_attr_e( 'Save', 'ap-library' ); ?>">
+		<form method="post" style="margin-bottom:1em;">
+			<?php wp_nonce_field( 'ap_library_auto_create_post_on_upload_action', 'ap_library_auto_create_post_on_upload_nonce' ); ?>
+			<label for="ap_library_auto_create_post_on_upload">
+				<input type="checkbox" id="ap_library_auto_create_post_on_upload" name="ap_library_auto_create_post_on_upload" value="1" <?php checked( $enabled, true ); ?> />
+				<?php esc_html_e( 'Automatically create a photo post when an image is uploaded', 'ap-library' ); ?>
+			</label>
+			<p><input type="submit" value="<?php esc_attr_e( 'Save', 'ap-library' ); ?>" class="button button-primary" /></p>
 		</form>
 		<?php
+	}
 
-		$back_to_top_enabled = get_option( 'ap_library_enable_back_to_top', false );
+	/**
+	 * Render back-to-top setting form.
+	 */
+	private function render_setting_back_to_top() {
+		$enabled = get_option( 'ap_library_enable_back_to_top', false );
 		?>
-		<form method="post" class="ap-library-checkbox-row">
-		    <?php wp_nonce_field( 'ap_library_enable_back_to_top_action', 'ap_library_enable_back_to_top_nonce' ); ?>
-		    <input type="checkbox" id="ap_library_enable_back_to_top" name="ap_library_enable_back_to_top" value="1" <?php checked( $back_to_top_enabled, true ); ?> />
-		    <label for="ap_library_enable_back_to_top">
-		        <?php esc_html_e( 'Enable "Back to Top" button on public pages', 'ap-library' ); ?>
-		    </label>
-		    <input type="submit" class="ap-library-admin-save-btn" value="<?php esc_attr_e( 'Save', 'ap-library' ); ?>">
+		<form method="post" style="margin-bottom:1em;">
+			<?php wp_nonce_field( 'ap_library_enable_back_to_top_action', 'ap_library_enable_back_to_top_nonce' ); ?>
+			<label for="ap_library_enable_back_to_top">
+				<input type="checkbox" id="ap_library_enable_back_to_top" name="ap_library_enable_back_to_top" value="1" <?php checked( $enabled, true ); ?> />
+				<?php esc_html_e( 'Enable "Back to Top" button on public photo pages', 'ap-library' ); ?>
+			</label>
+			<p><input type="submit" value="<?php esc_attr_e( 'Save', 'ap-library' ); ?>" class="button button-primary" /></p>
 		</form>
 		<?php
-		echo '</div>';
+	}
+
+	/**
+	 * Build a status snapshot with simple counts.
+	 */
+	private function get_status_snapshot() {
+		global $wpdb;
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type='aplb_photo' AND post_status='publish'" );
+		$with_taken = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} m ON p.ID=m.post_id WHERE p.post_type='aplb_photo' AND p.post_status='publish' AND m.meta_key=%s AND m.meta_value<>''", APLB_META_TAKEN_DATE ) );
+		$with_published = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} m ON p.ID=m.post_id WHERE p.post_type='aplb_photo' AND p.post_status='publish' AND m.meta_key=%s AND m.meta_value<>''", APLB_META_PUBLISHED_DATE ) );
+		$with_keywords = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p INNER JOIN {$wpdb->term_relationships} tr ON p.ID=tr.object_id INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id=tt.term_taxonomy_id WHERE p.post_type='aplb_photo' AND p.post_status='publish' AND tt.taxonomy=%s", 'aplb_keyword' ) );
+		return [
+			'total' => $total,
+			'with_taken' => $with_taken,
+			'with_published' => $with_published,
+			'with_keywords' => $with_keywords,
+		];
 	}
 
 	/**
@@ -282,15 +356,21 @@ class Ap_Library_Admin {
 		$notices = [];
 
 		// Collect notice from actions manager
-		if ($this->actions_manager && $this->actions_manager->get_last_notice()) {
-			$notices[] = $this->actions_manager->get_last_notice();
-			$this->actions_manager->last_notice = null;
+		if ( is_object( $this->actions_manager ) && method_exists( $this->actions_manager, 'get_last_notice' ) ) {
+			$action_notice = $this->actions_manager->get_last_notice();
+			if ( $action_notice ) {
+				$notices[] = $action_notice;
+				// (Notice already consumed; skip direct property reset for compatibility.)
+			}
 		}
 
 		// Collect notice from bulk actions manager
-		if ($this->bulk_actions_manager && $this->bulk_actions_manager->get_last_notice()) {
-			$notices[] = $this->bulk_actions_manager->get_last_notice();
-			$this->bulk_actions_manager->last_notice = null;
+		if ( is_object( $this->bulk_actions_manager ) && method_exists( $this->bulk_actions_manager, 'get_last_notice' ) ) {
+			$bulk_notice = $this->bulk_actions_manager->get_last_notice();
+			if ( $bulk_notice ) {
+				$notices[] = $bulk_notice;
+				// (Notice already consumed; skip direct property reset for compatibility.)
+			}
 		}
 
 		// Collect notice from admin class itself

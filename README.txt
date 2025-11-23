@@ -81,19 +81,28 @@ Keywords are automatically extracted from IPTC metadata (field 2#025) embedded i
 1. Photos list with date columns and quick edit.
 2. Taken date taxonomy archive (Year → Month → Day).
 
+== Navigation ==
+
+After activation you will find plugin tools under the Photos post type menu:
+- Photos → Library Overview (quick actions, status, general settings)
+- Photos → Backfill (regenerate taken/published dates and keywords)
+- Photos → Archive Settings (configure ordering & enable/disable archive contexts)
+
 == Changelog ==
 
 = Unreleased - Consolidated to Single Photo CPT (breaking) =
-- Removed legacy `aplb_library` custom post type; all functionality now centers on `aplb_uploads`.
-- Detached taxonomies `aplb_library_pdate` and `aplb_uploads_genre` from the old CPT; they now only attach to `aplb_uploads`.
+- Removed legacy `aplb_library` custom post type; all functionality now centers on the `aplb_photo` post type.
+- Detached legacy taxonomies from the old CPT; all taxonomy associations now target `aplb_photo` only.
 - Removed admin actions and helper classes related to creating/updating library posts.
 - Updated archive query settings UI to eliminate library post type contexts.
-- Simplified uninstall routine (only removes `aplb_uploads` posts plus related taxonomies).
-- Renamed CPT from `aplb_uploads` to `aplb_photo` with archive base `photos`.
+- Simplified uninstall routine (only removes `aplb_photo` posts plus related taxonomies).
+- Renamed CPT from `aplb_uploads` → `aplb_photo` with archive base `photos`.
 - Renamed taxonomies to `aplb_taken_date`, `aplb_published_date`, `aplb_genre`, and `aplb_keyword` with updated rewrite bases.
 - Updated admin UI (menus, columns, bulk actions, meta box) and public query logic to the new slugs.
+- Replaced "AP Library" submenu with "Library Overview" (central hub for actions, status, and settings).
 - Uninstall/deactivation updated to clean up the new CPT/taxonomies.
 - Documentation updated to reflect single CPT architecture.
+- Removed deprecated Upload* stub classes/files after migration.
 - Breaking change: existing content under the old `aplb_uploads` CPT and taxonomies will not appear until migrated. Use the Backfill tools to re-sync date/keyword terms from meta, and consider migrating post_type from `aplb_uploads` to `aplb_photo` if you have existing data. After upgrading, visit Settings → Permalinks and click Save to flush rewrite rules.
 
 = 1.2.1 - i18n and cleanup =
