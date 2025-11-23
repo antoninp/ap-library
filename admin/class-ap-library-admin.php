@@ -256,6 +256,10 @@ class Ap_Library_Admin {
 	private function render_overview_settings_form() {
 		$auto_create = get_option( 'ap_library_auto_create_post_on_upload', false );
 		$back_to_top = get_option( 'ap_library_enable_back_to_top', false );
+		$exclude_keywords = get_option( 'ap_library_exclude_keywords', 'logo,banner,icon,avatar,profile,thumbnail,thumb,background,header,footer,placeholder,default,button,badge,sprite,ui,favicon,symbol,graphic,decoration' );
+		$min_width = get_option( 'ap_library_min_photo_width', 400 );
+		$min_height = get_option( 'ap_library_min_photo_height', 400 );
+		$min_filesize = get_option( 'ap_library_min_photo_filesize', 50 );
 		?>
 		<form method="post">
 			<?php wp_nonce_field( 'ap_library_overview_settings_action', 'ap_library_overview_settings_nonce' ); ?>
@@ -271,6 +275,37 @@ class Ap_Library_Admin {
 					<?php esc_html_e( 'Enable "Back to Top" button on public photo pages', 'ap-library' ); ?>
 				</label>
 			</p>
+			
+			<h3><?php esc_html_e( 'Photo Post Creation Filters', 'ap-library' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'These filters exclude non-photograph images (logos, icons, banners) when creating photo posts.', 'ap-library' ); ?></p>
+			
+			<p>
+				<label for="ap_library_exclude_keywords">
+					<?php esc_html_e( 'Exclude filenames containing (comma-separated):', 'ap-library' ); ?><br>
+					<input type="text" id="ap_library_exclude_keywords" name="ap_library_exclude_keywords" value="<?php echo esc_attr( $exclude_keywords ); ?>" class="regular-text" />
+				</label>
+			</p>
+			
+			<p>
+				<label for="ap_library_min_photo_width">
+					<?php esc_html_e( 'Minimum width (pixels):', 'ap-library' ); ?>
+					<input type="number" id="ap_library_min_photo_width" name="ap_library_min_photo_width" value="<?php echo esc_attr( $min_width ); ?>" min="0" step="1" style="width:80px;" />
+				</label>
+				<label for="ap_library_min_photo_height" style="margin-left:20px;">
+					<?php esc_html_e( 'Minimum height (pixels):', 'ap-library' ); ?>
+					<input type="number" id="ap_library_min_photo_height" name="ap_library_min_photo_height" value="<?php echo esc_attr( $min_height ); ?>" min="0" step="1" style="width:80px;" />
+				</label>
+				<br><small class="description"><?php esc_html_e( 'Images smaller than these dimensions will be excluded (set to 0 to disable).', 'ap-library' ); ?></small>
+			</p>
+			
+			<p>
+				<label for="ap_library_min_photo_filesize">
+					<?php esc_html_e( 'Minimum file size (KB):', 'ap-library' ); ?>
+					<input type="number" id="ap_library_min_photo_filesize" name="ap_library_min_photo_filesize" value="<?php echo esc_attr( $min_filesize ); ?>" min="0" step="1" style="width:80px;" />
+				</label>
+				<br><small class="description"><?php esc_html_e( 'Images smaller than this file size will be excluded (set to 0 to disable).', 'ap-library' ); ?></small>
+			</p>
+			
 			<p><input type="submit" class="button button-primary" value="<?php esc_attr_e( 'Save Settings', 'ap-library' ); ?>" /></p>
 		</form>
 		<?php
@@ -289,6 +324,21 @@ class Ap_Library_Admin {
 			$back_to_top = isset( $_POST['ap_library_enable_back_to_top'] );
 			update_option( 'ap_library_auto_create_post_on_upload', $auto_create );
 			update_option( 'ap_library_enable_back_to_top', $back_to_top );
+			
+			// Save filter settings
+			if ( isset( $_POST['ap_library_exclude_keywords'] ) ) {
+				update_option( 'ap_library_exclude_keywords', sanitize_text_field( $_POST['ap_library_exclude_keywords'] ) );
+			}
+			if ( isset( $_POST['ap_library_min_photo_width'] ) ) {
+				update_option( 'ap_library_min_photo_width', absint( $_POST['ap_library_min_photo_width'] ) );
+			}
+			if ( isset( $_POST['ap_library_min_photo_height'] ) ) {
+				update_option( 'ap_library_min_photo_height', absint( $_POST['ap_library_min_photo_height'] ) );
+			}
+			if ( isset( $_POST['ap_library_min_photo_filesize'] ) ) {
+				update_option( 'ap_library_min_photo_filesize', absint( $_POST['ap_library_min_photo_filesize'] ) );
+			}
+			
 			$this->last_notice = [ 'type' => 'success', 'message' => __( 'Settings saved.', 'ap-library' ) ];
 		}
 	}

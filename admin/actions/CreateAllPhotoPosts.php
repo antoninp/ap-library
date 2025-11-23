@@ -40,19 +40,44 @@ class CreateAllPhotoPosts implements ActionInterface {
 
         $created            = 0;
         $creator            = new PhotoPostCreator();
-        $exclude_keywords   = [ 'logo', 'banner', 'icon', 'avatar', 'profile', 'thumbnail', 'thumb', 'background', 'header', 'footer', 'placeholder', 'default' ];
-        $exclude_extensions = [ 'svg', 'gif' ];
+        
+        // Get filter settings from options
+        $exclude_keywords_str = get_option( 'ap_library_exclude_keywords', 'logo,banner,icon,avatar,profile,thumbnail,thumb,background,header,footer,placeholder,default,button,badge,sprite,ui,favicon,symbol,graphic,decoration' );
+        $exclude_keywords     = array_filter( array_map( 'trim', explode( ',', $exclude_keywords_str ) ) );
+        $min_width            = (int) get_option( 'ap_library_min_photo_width', 400 );
+        $min_height           = (int) get_option( 'ap_library_min_photo_height', 400 );
+        $min_filesize_kb      = (int) get_option( 'ap_library_min_photo_filesize', 50 );
+        $exclude_extensions   = [ 'svg', 'gif' ];
+        
         foreach ( $images as $image_id ) {
             $file     = get_attached_file( $image_id );
             $filename = strtolower( basename( $file ) );
             $ext      = strtolower( pathinfo( $filename, PATHINFO_EXTENSION ) );
 
+            // Check filename against exclusion keywords
             foreach ( $exclude_keywords as $word ) {
-                if ( strpos( $filename, $word ) !== false ) {
+                if ( ! empty( $word ) && strpos( $filename, strtolower( $word ) ) !== false ) {
                     continue 2; // Skip this image entirely
                 }
             }
+            
+            // Check extension exclusions
             if ( in_array( $ext, $exclude_extensions, true ) ) continue;
+
+            // Check dimensions
+            if ( $min_width > 0 || $min_height > 0 ) {
+                $metadata = wp_get_attachment_metadata( $image_id );
+                if ( isset( $metadata['width'], $metadata['height'] ) ) {
+                    if ( $min_width > 0 && $metadata['width'] < $min_width ) continue;
+                    if ( $min_height > 0 && $metadata['height'] < $min_height ) continue;
+                }
+            }
+            
+            // Check file size
+            if ( $min_filesize_kb > 0 && file_exists( $file ) ) {
+                $filesize_kb = filesize( $file ) / 1024;
+                if ( $filesize_kb < $min_filesize_kb ) continue;
+            }
 
             if ( ! in_array( $image_id, $existing_image_ids, true ) ) {
                 $creator->create_post_on_image_upload( $image_id, true );
