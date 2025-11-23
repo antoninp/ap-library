@@ -50,6 +50,7 @@ class Ap_Library_Backfill {
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Backfill Photo Metadata', 'ap-library' ); ?></h1>
 			<p><?php esc_html_e( 'Use these tools to populate or regenerate date and keyword taxonomies from media metadata.', 'ap-library' ); ?></p>
+			<div class="notice notice-warning inline"><p><strong><?php esc_html_e( 'Warning:', 'ap-library' ); ?></strong> <?php esc_html_e( 'Backfill operations with "overwrite existing" enabled will replace current data. These changes are permanent and cannot be undone automatically. Consider backing up your database before running overwrite operations.', 'ap-library' ); ?></p></div>
 			<?php
 			// Handle submissions independently.
 			if ( isset( $_POST['aplb_backfill_taken_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_taken_nonce'], 'aplb_backfill_taken' ) ) {
