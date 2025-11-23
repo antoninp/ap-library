@@ -28,19 +28,19 @@ class Ap_Library_Admin_Bulk_Actions {
     }
 
     /**
-     * Register the custom bulk actions for the aplb_uploads post type.
+     * Register the custom bulk actions for the aplb_photo post type.
      *
      * @since    1.0.0
      * @param    array    $bulk_actions    The existing bulk actions.
      * @return   array                     The modified bulk actions.
      */
-    public function register_uploads_bulk_actions( $bulk_actions ) {
-        $bulk_actions['publish_aplb_uploads'] = __( 'Publish Uploads', 'ap-library' );
+    public function register_photo_bulk_actions( $bulk_actions ) {
+        $bulk_actions['publish_aplb_photo'] = __( 'Publish Photos', 'ap-library' );
         return $bulk_actions;
     }
 
     /**
-     * Handle the custom bulk action for publishing uploads.
+     * Handle the custom bulk action for publishing photos.
      *
      * @since    1.0.0
      * @param    string    $redirect_to    The redirect URL.
@@ -48,15 +48,15 @@ class Ap_Library_Admin_Bulk_Actions {
      * @param    array     $post_ids      The IDs of the selected posts.
      * @return   string                   The modified redirect URL.
      */
-    public function handle_uploads_bulk_action( $redirect_to, $doaction, $post_ids ) {
-        if ( $doaction !== 'publish_aplb_uploads' ) {
+    public function handle_photo_bulk_action( $redirect_to, $doaction, $post_ids ) {
+        if ( $doaction !== 'publish_aplb_photo' ) {
             return $redirect_to;
         }
 
         $published = 0;
         foreach ( $post_ids as $post_id ) {
             $post = get_post( $post_id );
-            if ( $post && $post->post_type === 'aplb_uploads' && $post->post_status !== 'publish' ) {
+            if ( $post && $post->post_type === 'aplb_photo' && $post->post_status !== 'publish' ) {
                 wp_update_post( array(
                     'ID' => $post_id,
                     'post_status' => 'publish'
@@ -65,7 +65,7 @@ class Ap_Library_Admin_Bulk_Actions {
             }
         }
 
-        $redirect_to = add_query_arg( 'bulk_published_uploads', $published, $redirect_to );
+        $redirect_to = add_query_arg( 'bulk_published_photos', $published, $redirect_to );
         return $redirect_to;
     }
 
@@ -75,12 +75,12 @@ class Ap_Library_Admin_Bulk_Actions {
      * @since    1.0.0
      */
     public function maybe_set_bulk_action_notice() {
-        if ( ! empty( $_REQUEST['bulk_published_uploads'] ) ) {
-            $count = intval( $_REQUEST['bulk_published_uploads'] );
+        if ( ! empty( $_REQUEST['bulk_published_photos'] ) ) {
+            $count = intval( $_REQUEST['bulk_published_photos'] );
             $this->last_notice = [
                 'type' => 'success',
                 'message' => sprintf(
-                    esc_html__( 'Published %d uploads.', 'ap-library' ),
+                    esc_html__( 'Published %d photos.', 'ap-library' ),
                     $count
                 ),
             ];

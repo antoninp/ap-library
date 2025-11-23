@@ -265,8 +265,8 @@ class Ap_Library_Admin {
 	 * @param    int      $image_id    The ID of the uploaded image.
 	 */
 	public function maybe_create_post_on_image_upload( $image_id ) {
-		require_once plugin_dir_path(__FILE__) . 'services/UploadPostCreator.php';
-		$creator = new UploadPostCreator();
+		require_once plugin_dir_path(__FILE__) 	. 'services/PhotoPostCreator.php';
+		$creator = new PhotoPostCreator();
 		$creator->create_post_on_image_upload($image_id);
 	}
 
@@ -310,14 +310,14 @@ class Ap_Library_Admin {
 	}
 
 	/**
-	 * Add a thumbnail box to the quick edit interface for the aplb_uploads post type.
+	 * Add a thumbnail box to the quick edit interface for the aplb_photo post type.
 	 *
 	 * @since    1.0.0
 	 * @param    string    $column_name    The name of the column being rendered.
 	 * @param    string    $post_type      The post type of the current screen.
 	 */
 	public function add_quick_edit_thumbnail_box($column_name, $post_type) {
-		if ($post_type !== 'aplb_uploads' || $column_name !== 'thumbnail') return;
+		if ($post_type !== 'aplb_photo' || $column_name !== 'thumbnail') return;
 		?>
 		<fieldset class="inline-edit-col-right">
 			<div class="inline-edit-col">

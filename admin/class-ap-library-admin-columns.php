@@ -13,13 +13,13 @@
 class Ap_Library_Admin_Columns {
 
     /**
-     * Add thumbnail and date columns to the aplb_uploads post type list table.
+    * Add thumbnail and date columns to the aplb_photo post type list table.
      *
      * @since    1.0.0
      * @param    array    $columns    The existing columns.
      * @return   array                The modified columns.
      */
-    public function add_aplb_uploads_thumbnail_column( $columns ) {
+    public function add_aplb_photo_thumbnail_column( $columns ) {
         $new = array();
         foreach ( $columns as $key => $value ) {
             $new[ $key ] = $value;
@@ -42,7 +42,7 @@ class Ap_Library_Admin_Columns {
      * @param    string    $column    The name of the column being rendered.
      * @param    int       $post_id   The ID of the current post.
      */
-    public function render_aplb_uploads_thumbnail_column( $column, $post_id ) {
+    public function render_aplb_photo_thumbnail_column( $column, $post_id ) {
         if ( $column === 'thumbnail' ) {
             if ( has_post_thumbnail( $post_id ) ) {
                 echo get_the_post_thumbnail( $post_id, array( 60, 60 ) );
@@ -115,7 +115,7 @@ class Ap_Library_Admin_Columns {
      * @param    string    $post_type      The post type.
      */
     public function add_quick_edit_date_fields( $column_name, $post_type ) {
-        if ( 'aplb_uploads' !== $post_type ) {
+        if ( 'aplb_photo' !== $post_type ) {
             return;
         }
 
@@ -157,7 +157,7 @@ class Ap_Library_Admin_Columns {
             return;
         }
 
-        if ( get_post_type( $post_id ) !== 'aplb_uploads' ) {
+        if ( get_post_type( $post_id ) !== 'aplb_photo' ) {
             return;
         }
 
@@ -166,7 +166,7 @@ class Ap_Library_Admin_Columns {
             $published_date = sanitize_text_field( $_POST['aplb_published_date'] );
             if ( $published_date ) {
                 update_post_meta( $post_id, APLB_META_PUBLISHED_DATE, $published_date );
-                $this->sync_date_to_taxonomy( $post_id, $published_date, 'aplb_library_pdate' );
+                $this->sync_date_to_taxonomy( $post_id, $published_date, 'aplb_published_date' );
             }
         }
 
@@ -175,7 +175,7 @@ class Ap_Library_Admin_Columns {
             $taken_date = sanitize_text_field( $_POST['aplb_taken_date'] );
             if ( $taken_date ) {
                 update_post_meta( $post_id, APLB_META_TAKEN_DATE, $taken_date );
-                $this->sync_date_to_taxonomy( $post_id, $taken_date, 'aplb_uploads_tdate' );
+                $this->sync_date_to_taxonomy( $post_id, $taken_date, 'aplb_taken_date' );
             }
         }
     }
@@ -193,11 +193,11 @@ class Ap_Library_Admin_Columns {
             return;
         }
 
-        // For aplb_uploads_tdate, create hierarchical structure: Year -> Month -> Day
-        if ( $taxonomy === 'aplb_uploads_tdate' ) {
+        // For aplb_taken_date, create hierarchical structure: Year -> Month -> Day
+        if ( $taxonomy === 'aplb_taken_date' ) {
             $term_id = $this->sync_hierarchical_date( $date, $taxonomy );
         } else {
-            // For aplb_library_pdate, keep flat structure
+            // For aplb_published_date, keep flat structure
             $term_id = $this->sync_flat_date( $date, $taxonomy );
         }
 
@@ -309,7 +309,7 @@ class Ap_Library_Admin_Columns {
     public function enqueue_quick_edit_script() {
         global $pagenow, $typenow;
         
-        if ( 'edit.php' === $pagenow && 'aplb_uploads' === $typenow ) {
+        if ( 'edit.php' === $pagenow && 'aplb_photo' === $typenow ) {
             ?>
             <script type="text/javascript">
             jQuery(document).ready(function($) {

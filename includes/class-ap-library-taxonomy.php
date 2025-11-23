@@ -29,10 +29,10 @@ class Ap_Library_Taxonomy {
      */
     public function register_taxonomies() {
 
-        $this->register_aplb_uploads_genre_taxonomy();
-        $this->register_aplb_uploads_tdate_taxonomy();
-        $this->register_aplb_library_pdate_taxonomy();
-        $this->register_aplb_uploads_keyword_taxonomy();
+        $this->register_aplb_genre_taxonomy();
+        $this->register_aplb_taken_date_taxonomy();
+        $this->register_aplb_published_date_taxonomy();
+        $this->register_aplb_keyword_taxonomy();
  
     }
     
@@ -42,7 +42,7 @@ class Ap_Library_Taxonomy {
      * @since    1.0.0
      * @access   private
      */
-    private function register_aplb_library_pdate_taxonomy() {
+    private function register_aplb_published_date_taxonomy() {
 
         $args = [
             'label'  => esc_html__( 'Published Date (Auto)', 'ap-library' ),
@@ -64,11 +64,10 @@ class Ap_Library_Taxonomy {
             'show_in_quick_edit'  => false,
             'show_in_rest'        => true,
             'hierarchical'        => true,
-            'rewrite'             => array( 'slug' => 'library-pdate' ),
+            'rewrite'             => array( 'slug' => 'photo-published' ),
         ];
 
-        // Library CPT removed; taxonomy now only attached to uploads.
-        register_taxonomy( 'aplb_library_pdate', array( 'aplb_uploads' ), $args );
+        register_taxonomy( 'aplb_published_date', array( 'aplb_photo' ), $args );
 
     }
 
@@ -78,7 +77,7 @@ class Ap_Library_Taxonomy {
      * @since    1.0.0
      * @access   private
      */
-    private function register_aplb_uploads_tdate_taxonomy() {
+    private function register_aplb_taken_date_taxonomy() {
 
         $args = [
             'label'  => esc_html__( 'Taken Date (Auto)', 'ap-library' ),
@@ -100,10 +99,9 @@ class Ap_Library_Taxonomy {
             'show_in_quick_edit'  => false,
             'show_in_rest'        => true,
             'hierarchical'        => true,
-            'rewrite'             => array( 'slug' => 'uploads-tdate' ),
+            'rewrite'             => array( 'slug' => 'photo-taken' ),
         ];
-
-        register_taxonomy( 'aplb_uploads_tdate', 'aplb_uploads', $args );
+        register_taxonomy( 'aplb_taken_date', 'aplb_photo', $args );
         
     }
 
@@ -113,7 +111,7 @@ class Ap_Library_Taxonomy {
      * @since    1.0.0
      * @access   private
      */
-    private function register_aplb_uploads_genre_taxonomy() {
+    private function register_aplb_genre_taxonomy() {
         
         $args = [
             'label'  => esc_html__( 'Photo Genre', 'ap-library' ),
@@ -134,11 +132,9 @@ class Ap_Library_Taxonomy {
             'show_admin_column'   => true,
             'show_in_rest'        => true,
             'hierarchical'        => true,
-            'rewrite'             => array( 'slug' => 'uploads-genre' ),
+            'rewrite'             => array( 'slug' => 'photo-genre' ),
         ];
-
-        // Library CPT removed; taxonomy now only attached to uploads.
-        register_taxonomy( 'aplb_uploads_genre', [ 'aplb_uploads' ], $args );
+        register_taxonomy( 'aplb_genre', [ 'aplb_photo' ], $args );
 
     }
 
@@ -148,7 +144,7 @@ class Ap_Library_Taxonomy {
      * @since    1.2.0
      * @access   private
      */
-    private function register_aplb_uploads_keyword_taxonomy() {
+    private function register_aplb_keyword_taxonomy() {
 
         $args = [
             'label'  => esc_html__( 'Photo Keywords', 'ap-library' ),
@@ -170,10 +166,9 @@ class Ap_Library_Taxonomy {
             'show_in_quick_edit'  => true,
             'show_in_rest'        => true,
             'hierarchical'        => false,
-            'rewrite'             => array( 'slug' => 'uploads-keyword' ),
+            'rewrite'             => array( 'slug' => 'photo-keyword' ),
         ];
-
-        register_taxonomy( 'aplb_uploads_keyword', 'aplb_uploads', $args );
+        register_taxonomy( 'aplb_keyword', 'aplb_photo', $args );
     }
 
 }

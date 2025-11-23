@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AP Library 1.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ap-library\n"
-"POT-Creation-Date: 2025-11-20 00:00:00+00:00\n"
+"POT-Creation-Date: 2025-11-23 00:00:00+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -36,7 +36,7 @@ msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #: admin/class-ap-library-backfill.php:51
-msgid "Backfill Upload Metadata"
+msgid "Backfill Photo Metadata"
 msgstr ""
 
 #: admin/class-ap-library-backfill.php:52
@@ -164,8 +164,51 @@ msgstr ""
 msgid "No EXIF date found"
 msgstr ""
 
-#: admin/helpers/UploadTermHelper.php:103
+#: admin/helpers/PhotoTermHelper.php:74
 msgid "Unknown"
+msgstr ""
+
+# Added new/renamed admin action strings
+#: admin/class-ap-library-admin-actions.php
+msgid "Create Missing Photo Posts"
+msgstr ""
+
+#: admin/class-ap-library-admin-actions.php
+msgid "%s failed: %s"
+msgstr ""
+
+#: admin/class-ap-library-admin-actions.php
+msgid "%s executed successfully!"
+msgstr ""
+
+# Bulk actions updated label & notice
+#: admin/class-ap-library-admin-bulk-actions.php
+msgid "Publish Photos"
+msgstr ""
+
+#: admin/class-ap-library-admin-bulk-actions.php
+msgid "Published %d photos."
+msgstr ""
+
+# Admin settings strings
+#: admin/class-ap-library-admin.php
+msgid "AP Library Admin"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Automatically create a post when an image is uploaded"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Enable \"Back to Top\" button on public pages"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Save"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Settings saved."
 msgstr ""
 
 #: includes/class-ap-library-taxonomy.php:48

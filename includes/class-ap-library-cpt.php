@@ -26,32 +26,32 @@ class Ap_Library_Custom_Post_Types {
      * @since    1.0.0
      */
     public function register_post_types() {
-        // Only register uploads post type (library CPT removed)
-        $this->register_aplb_uploads_post_type();
+        // Register photo post type (renamed from uploads)
+        $this->register_aplb_photo_post_type();
 
     }
 
     /**
-     * Register the uploads custom post types.
+     * Register the photo custom post types.
      *
      * @since    1.0.0
      */
-    private function register_aplb_uploads_post_type() {
+    private function register_aplb_photo_post_type() {
         
         $args = [
-            'label'  => esc_html__( 'Uploads', 'ap-library' ),
+            'label'  => esc_html__( 'Photos', 'ap-library' ),
             'labels' => [
-                'menu_name'          => esc_html__( 'Uploads', 'ap-library' ),
-                'name'               => esc_html__( 'Uploads', 'ap-library' ),
-                'singular_name'      => esc_html__( 'Upload', 'ap-library' ),
-                'add_new'            => esc_html__( 'Add Uploads', 'ap-library' ),
-                'add_new_item'       => esc_html__( 'Add new Uploads', 'ap-library' ),
-                'new_item'           => esc_html__( 'New Uploads', 'ap-library' ),
-                'edit_item'          => esc_html__( 'Edit Uploads', 'ap-library' ),
-                'view_item'          => esc_html__( 'View Uploads', 'ap-library' ),
-                'update_item'        => esc_html__( 'Update Uploads', 'ap-library' ),
-                'all_items'          => esc_html__( 'All Uploads', 'ap-library' ),
-                'search_items'       => esc_html__( 'Search Uploads', 'ap-library' ),
+                'menu_name'          => esc_html__( 'Photos', 'ap-library' ),
+                'name'               => esc_html__( 'Photos', 'ap-library' ),
+                'singular_name'      => esc_html__( 'Photo', 'ap-library' ),
+                'add_new'            => esc_html__( 'Add Photo', 'ap-library' ),
+                'add_new_item'       => esc_html__( 'Add New Photo', 'ap-library' ),
+                'new_item'           => esc_html__( 'New Photo', 'ap-library' ),
+                'edit_item'          => esc_html__( 'Edit Photo', 'ap-library' ),
+                'view_item'          => esc_html__( 'View Photo', 'ap-library' ),
+                'update_item'        => esc_html__( 'Update Photo', 'ap-library' ),
+                'all_items'          => esc_html__( 'All Photos', 'ap-library' ),
+                'search_items'       => esc_html__( 'Search Photos', 'ap-library' ),
             ],
             'public'              => true,
             'exclude_from_search' => false,
@@ -62,13 +62,13 @@ class Ap_Library_Custom_Post_Types {
             'show_in_rest'        => true,
             'capability_type'     => 'post',
             'hierarchical'        => true,
-            'has_archive'         => 'uploads',
+            'has_archive'         => 'photos',
             'query_var'           => true,
             'can_export'          => true,
             'rewrite_no_front'    => false,
             'show_in_menu'        => true,
             'menu_position'         => 4,
-            'menu_icon'           => 'dashicons-upload',
+            'menu_icon'           => 'dashicons-format-image',
             'supports' => [
                 'title',
                 'editor',
@@ -79,15 +79,15 @@ class Ap_Library_Custom_Post_Types {
             ],
             // Attach correct registered taxonomies (prefixed) and new keywords taxonomy
             'taxonomies' => [
-                'aplb_uploads_tdate',
-                'aplb_uploads_genre',
-                'aplb_library_pdate',
-                'aplb_uploads_keyword'
+                'aplb_taken_date',
+                'aplb_genre',
+                'aplb_published_date',
+                'aplb_keyword'
             ],
-            'rewrite' => array( 'slug' => 'lastest-uploads' ),
+            'rewrite' => array( 'slug' => 'photos' ),
         ];
 
-        register_post_type( 'aplb_uploads', $args );
+        register_post_type( 'aplb_photo', $args );
     }
 
     /**

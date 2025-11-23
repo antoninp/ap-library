@@ -71,7 +71,7 @@ class Ap_Library_Admin_Actions {
     public function load_dependencies() {
         // Load action classes
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/ActionInterface.php';
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/CreateAllUploadPosts.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/actions/CreateAllPhotoPosts.php';
     }
 
     /**
@@ -82,7 +82,7 @@ class Ap_Library_Admin_Actions {
      */
     private function register_default_actions() {
         // Store raw labels and translate at render time to avoid early JIT loading before 'init'
-        $this->register_action('create_all_upload_posts', 'Create Missing Upload Posts', [new CreateAllUploadPosts(), 'execute']);
+        $this->register_action('create_all_photo_posts', 'Create Missing Photo Posts', [new CreateAllPhotoPosts(), 'execute']);
     }
 
     /**

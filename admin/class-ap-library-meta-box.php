@@ -11,7 +11,7 @@
  */
 
 /**
- * Handles meta boxes for uploads post type.
+* Handles meta boxes for photo post type.
  *
  * @since      1.0.0
  * @package    Ap_Library
@@ -30,7 +30,7 @@ class Ap_Library_Meta_Box {
 			'aplb_dates_meta_box',
 			__( 'Photo Dates', 'ap-library' ),
 			array( $this, 'render_dates_meta_box' ),
-			'aplb_uploads',
+			'aplb_photo',
 			'side',
 			'high'
 		);
@@ -141,10 +141,10 @@ class Ap_Library_Meta_Box {
 			$published_date = sanitize_text_field( $_POST['aplb_published_date'] );
 			if ( $published_date ) {
 				update_post_meta( $post_id, APLB_META_PUBLISHED_DATE, $published_date );
-				$this->sync_date_to_taxonomy( $post_id, $published_date, 'aplb_library_pdate' );
+				$this->sync_date_to_taxonomy( $post_id, $published_date, 'aplb_published_date' );
 			} else {
 				delete_post_meta( $post_id, APLB_META_PUBLISHED_DATE );
-				wp_set_object_terms( $post_id, array(), 'aplb_library_pdate' );
+				wp_set_object_terms( $post_id, array(), 'aplb_published_date' );
 			}
 		}
 
@@ -153,10 +153,10 @@ class Ap_Library_Meta_Box {
 			$taken_date = sanitize_text_field( $_POST['aplb_taken_date'] );
 			if ( $taken_date ) {
 				update_post_meta( $post_id, APLB_META_TAKEN_DATE, $taken_date );
-				$this->sync_date_to_taxonomy( $post_id, $taken_date, 'aplb_uploads_tdate' );
+				$this->sync_date_to_taxonomy( $post_id, $taken_date, 'aplb_taken_date' );
 			} else {
 				delete_post_meta( $post_id, APLB_META_TAKEN_DATE );
-				wp_set_object_terms( $post_id, array(), 'aplb_uploads_tdate' );
+				wp_set_object_terms( $post_id, array(), 'aplb_taken_date' );
 			}
 		}
 	}
@@ -174,11 +174,11 @@ class Ap_Library_Meta_Box {
 			return;
 		}
 
-		// For aplb_uploads_tdate, create hierarchical structure: Year -> Month -> Day
-		if ( $taxonomy === 'aplb_uploads_tdate' ) {
+		// For aplb_taken_date, create hierarchical structure: Year -> Month -> Day
+		if ( $taxonomy === 'aplb_taken_date' ) {
 			$term_id = $this->sync_hierarchical_date( $date, $taxonomy );
 		} else {
-			// For aplb_library_pdate, keep flat structure
+			// For aplb_published_date, keep flat structure
 			$term_id = $this->sync_flat_date( $date, $taxonomy );
 		}
 

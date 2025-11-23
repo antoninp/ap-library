@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Backfill tool for existing uploads.
+ * Backfill tool for existing photo posts.
  *
  * @link       https://antoninpuleo.com/
  * @since      1.0.0
@@ -27,7 +27,7 @@ class Ap_Library_Backfill {
 	 */
 	public function add_backfill_submenu() {
 		add_submenu_page(
-			'edit.php?post_type=aplb_uploads',
+			'edit.php?post_type=aplb_photo',
 			__( 'Backfill', 'ap-library' ),
 			__( 'Backfill', 'ap-library' ),
 			'manage_options',
@@ -48,7 +48,7 @@ class Ap_Library_Backfill {
 
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Backfill Upload Metadata', 'ap-library' ); ?></h1>
+			<h1><?php esc_html_e( 'Backfill Photo Metadata', 'ap-library' ); ?></h1>
 			<p><?php esc_html_e( 'Use these tools to populate or regenerate date and keyword taxonomies from media metadata.', 'ap-library' ); ?></p>
 			<?php
 			// Handle submissions independently.
@@ -138,16 +138,16 @@ class Ap_Library_Backfill {
 		$overwrite = isset( $_POST['overwrite_existing_taken'] ) && '1' === $_POST['overwrite_existing_taken'];
 		
 		$args = array(
-			'post_type'      => 'aplb_uploads',
+			'post_type'      => 'aplb_photo',
 			'posts_per_page' => -1,
 			'post_status'    => 'any',
 		);
 
-		$uploads = get_posts( $args );
+		$photos = get_posts( $args );
 		$processed = 0;
 		$updated = 0;
 
-		foreach ( $uploads as $post ) {
+		foreach ( $photos as $post ) {
 			$post_id = $post->ID;
 			$processed++;
 
@@ -156,7 +156,7 @@ class Ap_Library_Backfill {
 				$taken_date = Ap_Library_EXIF::get_taken_date_from_post( $post_id );
 				if ( $taken_date ) {
 					update_post_meta( $post_id, APLB_META_TAKEN_DATE, $taken_date );
-					$this->sync_date_to_taxonomy( $post_id, $taken_date, 'aplb_uploads_tdate' );
+					$this->sync_date_to_taxonomy( $post_id, $taken_date, 'aplb_taken_date' );
 					$updated++;
 				}
 			}
@@ -178,16 +178,16 @@ class Ap_Library_Backfill {
 		$overwrite = isset( $_POST['overwrite_existing_published'] ) && '1' === $_POST['overwrite_existing_published'];
 		
 		$args = array(
-			'post_type'      => 'aplb_uploads',
+			'post_type'      => 'aplb_photo',
 			'posts_per_page' => -1,
 			'post_status'    => 'any',
 		);
 
-		$uploads = get_posts( $args );
+		$photos = get_posts( $args );
 		$processed = 0;
 		$updated = 0;
 
-		foreach ( $uploads as $post ) {
+		foreach ( $photos as $post ) {
 			$post_id = $post->ID;
 			$processed++;
 
@@ -195,7 +195,7 @@ class Ap_Library_Backfill {
 			if ( $overwrite || ! $existing_published ) {
 				$published_date = gmdate( 'Y-m-d', strtotime( $post->post_date ) );
 				update_post_meta( $post_id, APLB_META_PUBLISHED_DATE, $published_date );
-				$this->sync_date_to_taxonomy( $post_id, $published_date, 'aplb_library_pdate' );
+				$this->sync_date_to_taxonomy( $post_id, $published_date, 'aplb_published_date' );
 				$updated++;
 			}
 		}
@@ -213,24 +213,24 @@ class Ap_Library_Backfill {
 	 * @since 1.2.0
 	 */
 	private function process_keywords_backfill() {
-		if ( ! taxonomy_exists( 'aplb_uploads_keyword' ) ) {
+		if ( ! taxonomy_exists( 'aplb_keyword' ) ) {
 			echo '<div class="notice notice-error"><p>' . esc_html__( 'Keyword taxonomy not registered.', 'ap-library' ) . '</p></div>';
 			return;
 		}
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-exif.php';
 		$overwrite = isset( $_POST['overwrite_existing_keywords'] ) && '1' === $_POST['overwrite_existing_keywords'];
 		$args = array(
-			'post_type'      => 'aplb_uploads',
+			'post_type'      => 'aplb_photo',
 			'posts_per_page' => -1,
 			'post_status'    => 'any',
 		);
-		$uploads = get_posts( $args );
+		$photos = get_posts( $args );
 		$processed = 0;
 		$updated   = 0;
-		foreach ( $uploads as $post ) {
+		foreach ( $photos as $post ) {
 			$post_id = $post->ID;
 			$processed++;
-			$existing_kw = wp_get_object_terms( $post_id, 'aplb_uploads_keyword', array( 'fields' => 'ids' ) );
+			$existing_kw = wp_get_object_terms( $post_id, 'aplb_keyword', array( 'fields' => 'ids' ) );
 			if ( ! $overwrite && ! empty( $existing_kw ) ) {
 				continue;
 			}
@@ -245,11 +245,11 @@ class Ap_Library_Backfill {
 				// Normalize slug for case-insensitive matching
 				$slug = sanitize_title( strtolower( $kw ) );
 				// Check if term already exists by slug
-				$existing = get_term_by( 'slug', $slug, 'aplb_uploads_keyword' );
+				$existing = get_term_by( 'slug', $slug, 'aplb_keyword' );
 				if ( ! $existing ) {
 					// Create new term with title-cased name derived from slug
 					$name = $this->format_keyword_name( $slug );
-					$created = wp_insert_term( $name, 'aplb_uploads_keyword', array( 'slug' => $slug ) );
+					$created = wp_insert_term( $name, 'aplb_keyword', array( 'slug' => $slug ) );
 					if ( ! is_wp_error( $created ) ) {
 						$term_ids[] = (int) $created['term_id'];
 					}
@@ -259,7 +259,7 @@ class Ap_Library_Backfill {
 				}
 			}
 			if ( ! empty( $term_ids ) ) {
-				wp_set_object_terms( $post_id, $term_ids, 'aplb_uploads_keyword', false );
+				wp_set_object_terms( $post_id, $term_ids, 'aplb_keyword', false );
 				$updated++;
 			}
 		}
@@ -285,11 +285,11 @@ class Ap_Library_Backfill {
 			return;
 		}
 
-		// For aplb_uploads_tdate, create hierarchical structure: Year -> Month -> Day
-		if ( $taxonomy === 'aplb_uploads_tdate' ) {
+		// For aplb_taken_date, create hierarchical structure: Year -> Month -> Day
+		if ( $taxonomy === 'aplb_taken_date' ) {
 			$term_id = $this->sync_hierarchical_date( $date, $taxonomy );
 		} else {
-			// For aplb_library_pdate, keep flat structure
+			// For aplb_published_date, keep flat structure
 			$term_id = $this->sync_flat_date( $date, $taxonomy );
 		}
 

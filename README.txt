@@ -9,18 +9,19 @@ Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Photo Library system for WordPress built around a custom post type for uploads, date metadata, hierarchical taken date archives, EXIF extraction, keyword extraction, and admin tools.
+Photo Library system for WordPress built around a custom post type for photos, date metadata, hierarchical taken date archives, EXIF extraction, keyword extraction, and admin tools.
 
 == Description ==
 
 AP Library provides a robust foundation to manage a photography library as first-class posts. It defines:
 
-- Custom Post Type: `aplb_uploads` for uploaded photos (the former `aplb_library` CPT has been removed and consolidated here)
+- Custom Post Type: `aplb_photo` for photos
 - Meta fields: `aplb_published_date`, `aplb_taken_date` (ISO 8601: `YYYY-MM-DD`)
 - Taxonomies:
-    - `aplb_library_pdate` (flat) for published date groupings
-    - `aplb_uploads_tdate` (hierarchical) for taken date — Year → Month → Day — enabling clean archives like `/uploads-tdate/2023/november/15/`
-    - `aplb_uploads_keyword` (flat) for IPTC/EXIF photo keywords automatically extracted from featured images
+    - `aplb_published_date` (flat) for published date groupings
+    - `aplb_taken_date` (hierarchical) for taken date — Year → Month → Day — enabling clean archives like `/photo-taken/2023/november/15/`
+    - `aplb_genre` (hierarchical) for your own logical groupings (optional)
+    - `aplb_keyword` (flat) for IPTC/EXIF photo keywords automatically extracted from featured images
 - EXIF integration to extract taken dates and IPTC keywords from featured images (creates matching taxonomy terms automatically)
 - Admin UI enhancements (meta box, quick edit integration, sortable columns)
 - Backfill tools to sync existing content
@@ -30,22 +31,22 @@ AP Library provides a robust foundation to manage a photography library as first
 
 Since 1.2.x you can configure how taxonomy / post type / author / date archives build their main query instead of relying on hard‑coded logic.
 
-Navigate to: Uploads → Archive Settings.
+Navigate to: Photos → Archive Settings.
 
 For each archive context you can:
 * Enable or disable the rule (when disabled, WordPress default behavior applies)
-* Set Post Types included (currently only `aplb_uploads`)
+* Set Post Types included (currently only `aplb_photo`)
 * Choose Order By: Meta Value, Post Date, Title, or Menu Order
 * Specify Meta Key (used only when ordering by Meta Value; defaults to `aplb_published_date`)
 * Set Order direction (ASC / DESC)
 * Configure Posts Per Page (leave empty for WP default, use -1 for all posts)
 
 Managed contexts:
-* Genre taxonomy: `aplb_uploads_genre`
-* Taken date taxonomy: `aplb_uploads_tdate`
-* Published date taxonomy: `aplb_library_pdate`
-* Keyword taxonomy: `aplb_uploads_keyword`
-* Uploads post type archive
+* Genre taxonomy: `aplb_genre`
+* Taken date taxonomy: `aplb_taken_date`
+* Published date taxonomy: `aplb_published_date`
+* Keyword taxonomy: `aplb_keyword`
+* Photos post type archive
 * Author archives
 * Date archives (year / month / day)
 * Search results
@@ -64,10 +65,10 @@ Changing included post types may hide posts not assigned to the selected types w
 == Frequently Asked Questions ==
 
 = Where do taken and published dates live? =
-Two custom meta keys are used on `aplb_uploads` posts: `aplb_taken_date` and `aplb_published_date`.
+Two custom meta keys are used on `aplb_photo` posts: `aplb_taken_date` and `aplb_published_date`.
 
 = How are dates turned into taxonomy archives? =
-Dates are synchronized one-way from meta to taxonomy. Taken dates create a Year → Month → Day hierarchy in `aplb_uploads_tdate`. Published date uses a flat term in `aplb_library_pdate`.
+Dates are synchronized one-way from meta to taxonomy. Taken dates create a Year → Month → Day hierarchy in `aplb_taken_date`. Published date uses a flat term in `aplb_published_date`.
 
 = Does it read EXIF automatically? =
 Yes. On save and during upload processing the plugin attempts to read DateTimeOriginal from the featured image. If missing, you can still set dates manually.
@@ -77,18 +78,23 @@ Keywords are automatically extracted from IPTC metadata (field 2#025) embedded i
 
 == Screenshots ==
 
-1. Uploads list with date columns and quick edit.
+1. Photos list with date columns and quick edit.
 2. Taken date taxonomy archive (Year → Month → Day).
 
 == Changelog ==
 
-= Unreleased - Consolidated to Single Uploads CPT =
+= Unreleased - Consolidated to Single Photo CPT (breaking) =
 - Removed legacy `aplb_library` custom post type; all functionality now centers on `aplb_uploads`.
 - Detached taxonomies `aplb_library_pdate` and `aplb_uploads_genre` from the old CPT; they now only attach to `aplb_uploads`.
 - Removed admin actions and helper classes related to creating/updating library posts.
 - Updated archive query settings UI to eliminate library post type contexts.
 - Simplified uninstall routine (only removes `aplb_uploads` posts plus related taxonomies).
+- Renamed CPT from `aplb_uploads` to `aplb_photo` with archive base `photos`.
+- Renamed taxonomies to `aplb_taken_date`, `aplb_published_date`, `aplb_genre`, and `aplb_keyword` with updated rewrite bases.
+- Updated admin UI (menus, columns, bulk actions, meta box) and public query logic to the new slugs.
+- Uninstall/deactivation updated to clean up the new CPT/taxonomies.
 - Documentation updated to reflect single CPT architecture.
+- Breaking change: existing content under the old `aplb_uploads` CPT and taxonomies will not appear until migrated. Use the Backfill tools to re-sync date/keyword terms from meta, and consider migrating post_type from `aplb_uploads` to `aplb_photo` if you have existing data. After upgrading, visit Settings → Permalinks and click Save to flush rewrite rules.
 
 = 1.2.1 - i18n and cleanup =
 - Updated: Normalized translation text domain to `ap-library` across the plugin for consistent i18n.
