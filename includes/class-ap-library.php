@@ -194,9 +194,9 @@ class Ap_Library {
 
 		// Columns hooks
 		$columns_manager = $plugin_admin->get_columns_manager();
-		$this->loader->add_filter( 'manage_aplb_uploads_posts_columns', $columns_manager, 'add_aplb_uploads_thumbnail_column' );
-		$this->loader->add_action( 'manage_aplb_uploads_posts_custom_column', $columns_manager, 'render_aplb_uploads_thumbnail_column', 10, 2 );
-		$this->loader->add_filter( 'manage_edit-aplb_uploads_sortable_columns', $columns_manager, 'make_date_columns_sortable' );
+		$this->loader->add_filter( 'manage_aplb_photo_posts_columns', $columns_manager, 'add_aplb_photo_thumbnail_column' );
+		$this->loader->add_action( 'manage_aplb_photo_posts_custom_column', $columns_manager, 'render_aplb_photo_thumbnail_column', 10, 2 );
+		$this->loader->add_filter( 'manage_edit-aplb_photo_sortable_columns', $columns_manager, 'make_date_columns_sortable' );
 		$this->loader->add_action( 'pre_get_posts', $columns_manager, 'handle_date_column_sorting' );
 		$this->loader->add_action( 'quick_edit_custom_box', $columns_manager, 'add_quick_edit_date_fields', 10, 2 );
 		$this->loader->add_action( 'save_post', $columns_manager, 'save_quick_edit_data' );
@@ -204,8 +204,8 @@ class Ap_Library {
 		
 		// Bulk actions hooks
 		$bulk_actions_manager = $plugin_admin->get_bulk_actions_manager();
-		$this->loader->add_filter( 'bulk_actions-edit-aplb_uploads', $bulk_actions_manager, 'register_uploads_bulk_actions' );
-		$this->loader->add_filter( 'handle_bulk_actions-edit-aplb_uploads', $bulk_actions_manager, 'handle_uploads_bulk_action', 10, 3 );
+		$this->loader->add_filter( 'bulk_actions-edit-aplb_photo', $bulk_actions_manager, 'register_photo_bulk_actions' );
+		$this->loader->add_filter( 'handle_bulk_actions-edit-aplb_photo', $bulk_actions_manager, 'handle_photo_bulk_action', 10, 3 );
 		$this->loader->add_action( 'admin_init', $bulk_actions_manager, 'maybe_set_bulk_action_notice' );
 
 		// Meta box hooks

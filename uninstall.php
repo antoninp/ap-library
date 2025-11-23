@@ -32,7 +32,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 // 1. Delete all custom posts registered by the plugin
 // Removed legacy 'uploads' slug (not a registered CPT in current version)
-$aplb_post_types = [ 'aplb_uploads', 'aplb_library' ];
+$aplb_post_types = [ 'aplb_photo' ];
 foreach ( $aplb_post_types as $post_type ) {
     $posts = get_posts([
         'post_type'      => $post_type,
@@ -46,12 +46,11 @@ foreach ( $aplb_post_types as $post_type ) {
 }
 
 // 2. Delete all custom taxonomy terms registered by the plugin
-// Added 'aplb_uploads_keyword' (new keyword taxonomy)
 $aplb_taxonomies = [
-    'aplb_uploads_tdate',
-    'aplb_uploads_genre',
-    'aplb_library_pdate',
-    'aplb_uploads_keyword'
+    'aplb_taken_date',
+    'aplb_genre',
+    'aplb_published_date',
+    'aplb_keyword'
 ];
 foreach ( $aplb_taxonomies as $taxonomy ) {
     $terms = get_terms( [ 'taxonomy' => $taxonomy, 'hide_empty' => false ] );

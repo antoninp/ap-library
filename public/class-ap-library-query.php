@@ -80,23 +80,20 @@ class Ap_Library_Query {
 	 * @return string|null Context key or null if unmanaged.
 	 */
 	private function determine_context_key( $query ) {
-		if ( $query->is_tax( 'aplb_uploads_genre' ) ) {
-			return 'tax:aplb_uploads_genre';
+		if ( $query->is_tax( 'aplb_genre' ) ) {
+			return 'tax:aplb_genre';
 		}
-		if ( $query->is_tax( 'aplb_uploads_tdate' ) ) {
-			return 'tax:aplb_uploads_tdate';
+		if ( $query->is_tax( 'aplb_taken_date' ) ) {
+			return 'tax:aplb_taken_date';
 		}
-		if ( $query->is_tax( 'aplb_library_pdate' ) ) {
-			return 'tax:aplb_library_pdate';
+		if ( $query->is_tax( 'aplb_published_date' ) ) {
+			return 'tax:aplb_published_date';
 		}
-		if ( $query->is_tax( 'aplb_uploads_keyword' ) ) {
-			return 'tax:aplb_uploads_keyword';
+		if ( $query->is_tax( 'aplb_keyword' ) ) {
+			return 'tax:aplb_keyword';
 		}
-		if ( $query->is_post_type_archive( 'aplb_uploads' ) ) {
-			return 'post_type:aplb_uploads';
-		}
-		if ( $query->is_post_type_archive( 'aplb_library' ) ) {
-			return 'post_type:aplb_library';
+		if ( $query->is_post_type_archive( 'aplb_photo' ) ) {
+			return 'post_type:aplb_photo';
 		}
 		if ( $query->is_author() ) {
 			return 'author';
