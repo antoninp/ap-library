@@ -138,7 +138,7 @@ class Ap_Library_Admin {
 		$allowed_ids = [
 			'edit-aplb_photo',        // list table
 			'aplb_photo',             // single edit/add screen
-			'aplb_photo_page_ap-library-overview',
+			'aplb_photo_page_aplb-overview',
 			'aplb_photo_page_aplb-backfill',
 			'aplb_photo_page_aplb-archive-settings',
 		];
@@ -181,7 +181,7 @@ class Ap_Library_Admin {
 			__( 'Library Overview', 'ap-library' ),
 			__( 'Library Overview', 'ap-library' ),
 			'manage_options',
-			'ap-library-overview',
+			'aplb-overview',
 			[ $this, 'display_plugin_admin_page' ]
 		);
 	}
@@ -215,14 +215,13 @@ class Ap_Library_Admin {
 
 			<h2><?php esc_html_e( 'General Settings', 'ap-library' ); ?></h2>
 			<div style="max-width:680px;">
-				<?php $this->render_setting_auto_create(); ?>
-				<?php $this->render_setting_back_to_top(); ?>
+				<?php $this->render_overview_settings_form(); ?>
 			</div>
 
-			<h2><?php esc_html_e( 'Tools & Settings Links', 'ap-library' ); ?></h2>
+			<h2><?php esc_html_e( 'Related Tools', 'ap-library' ); ?></h2>
 			<ul>
-				<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=aplb_photo&page=aplb-backfill' ) ); ?>"><?php esc_html_e( 'Backfill Tools', 'ap-library' ); ?></a></li>
-				<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=aplb_photo&page=aplb-archive-settings' ) ); ?>"><?php esc_html_e( 'Archive Query Settings', 'ap-library' ); ?></a></li>
+				<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=aplb_photo&page=aplb-backfill' ) ); ?>"><?php esc_html_e( 'Backfill Tools', 'ap-library' ); ?></a> — <?php esc_html_e( 'Regenerate metadata and taxonomy terms from existing photos', 'ap-library' ); ?></li>
+				<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=aplb_photo&page=aplb-archive-settings' ) ); ?>"><?php esc_html_e( 'Archive Settings', 'ap-library' ); ?></a> — <?php esc_html_e( 'Configure ordering and post types for archive pages', 'ap-library' ); ?></li>
 				<li><a href="https://wordpress.org/support/plugin/ap-library" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Documentation & Support', 'ap-library' ); ?></a></li>
 			</ul>
 		</div>
@@ -232,35 +231,44 @@ class Ap_Library_Admin {
 	/**
 	 * Render auto-create setting form.
 	 */
-	private function render_setting_auto_create() {
-		$enabled = get_option( 'ap_library_auto_create_post_on_upload', false );
+	private function render_overview_settings_form() {
+		$auto_create = get_option( 'ap_library_auto_create_post_on_upload', false );
+		$back_to_top = get_option( 'ap_library_enable_back_to_top', false );
 		?>
-		<form method="post" style="margin-bottom:1em;">
-			<?php wp_nonce_field( 'ap_library_auto_create_post_on_upload_action', 'ap_library_auto_create_post_on_upload_nonce' ); ?>
-			<label for="ap_library_auto_create_post_on_upload">
-				<input type="checkbox" id="ap_library_auto_create_post_on_upload" name="ap_library_auto_create_post_on_upload" value="1" <?php checked( $enabled, true ); ?> />
-				<?php esc_html_e( 'Automatically create a photo post when an image is uploaded', 'ap-library' ); ?>
-			</label>
-			<p><input type="submit" value="<?php esc_attr_e( 'Save', 'ap-library' ); ?>" class="button button-primary" /></p>
+		<form method="post">
+			<?php wp_nonce_field( 'ap_library_overview_settings_action', 'ap_library_overview_settings_nonce' ); ?>
+			<p>
+				<label for="ap_library_auto_create_post_on_upload">
+					<input type="checkbox" id="ap_library_auto_create_post_on_upload" name="ap_library_auto_create_post_on_upload" value="1" <?php checked( $auto_create, true ); ?> />
+					<?php esc_html_e( 'Automatically create a photo post when an image is uploaded', 'ap-library' ); ?>
+				</label>
+			</p>
+			<p>
+				<label for="ap_library_enable_back_to_top">
+					<input type="checkbox" id="ap_library_enable_back_to_top" name="ap_library_enable_back_to_top" value="1" <?php checked( $back_to_top, true ); ?> />
+					<?php esc_html_e( 'Enable "Back to Top" button on public photo pages', 'ap-library' ); ?>
+				</label>
+			</p>
+			<p><input type="submit" class="button button-primary" value="<?php esc_attr_e( 'Save Settings', 'ap-library' ); ?>" /></p>
 		</form>
 		<?php
 	}
 
 	/**
-	 * Render back-to-top setting form.
+	 * Unified settings handler for overview page.
 	 */
-	private function render_setting_back_to_top() {
-		$enabled = get_option( 'ap_library_enable_back_to_top', false );
-		?>
-		<form method="post" style="margin-bottom:1em;">
-			<?php wp_nonce_field( 'ap_library_enable_back_to_top_action', 'ap_library_enable_back_to_top_nonce' ); ?>
-			<label for="ap_library_enable_back_to_top">
-				<input type="checkbox" id="ap_library_enable_back_to_top" name="ap_library_enable_back_to_top" value="1" <?php checked( $enabled, true ); ?> />
-				<?php esc_html_e( 'Enable "Back to Top" button on public photo pages', 'ap-library' ); ?>
-			</label>
-			<p><input type="submit" value="<?php esc_attr_e( 'Save', 'ap-library' ); ?>" class="button button-primary" /></p>
-		</form>
-		<?php
+	public function handle_overview_settings() {
+		if (
+			isset( $_POST['ap_library_overview_settings_nonce'] ) &&
+			wp_verify_nonce( $_POST['ap_library_overview_settings_nonce'], 'ap_library_overview_settings_action' ) &&
+			current_user_can( 'manage_options' )
+		) {
+			$auto_create = isset( $_POST['ap_library_auto_create_post_on_upload'] );
+			$back_to_top = isset( $_POST['ap_library_enable_back_to_top'] );
+			update_option( 'ap_library_auto_create_post_on_upload', $auto_create );
+			update_option( 'ap_library_enable_back_to_top', $back_to_top );
+			$this->last_notice = [ 'type' => 'success', 'message' => __( 'Settings saved.', 'ap-library' ) ];
+		}
 	}
 
 	/**
@@ -293,44 +301,8 @@ class Ap_Library_Admin {
 	}
 
 	/**
-	 * Handle the "Auto Create Post on Upload" option.
-	 *
-	 * This method checks if the nonce is set and valid, then updates the option
-	 * to enable or disable automatic post creation on image upload based on the form submission.
+	 * (Deprecated handlers removed: auto-create and back-to-top now processed via handle_overview_settings.)
 	 */
-	public function handle_auto_create_post_option() {
-		if (
-			isset( $_POST['ap_library_auto_create_post_on_upload_nonce'] ) &&
-			wp_verify_nonce( $_POST['ap_library_auto_create_post_on_upload_nonce'], 'ap_library_auto_create_post_on_upload_action' )
-		) {
-			$enabled = isset( $_POST['ap_library_auto_create_post_on_upload'] ) ? true : false;
-			update_option( 'ap_library_auto_create_post_on_upload', $enabled );
-			$this->last_notice = [
-				'type' => 'success',
-				'message' => __( 'Settings saved.', 'ap-library' )
-			];
-		}
-	}
-
-	/**
-	 * Handle the "Back to Top" button option.
-	 *
-	 * This method checks if the nonce is set and valid, then updates the option
-	 * to enable or disable the "Back to Top" button based on the form submission.
-	 */
-	public function handle_back_to_top_option() {
-		if (
-			isset( $_POST['ap_library_enable_back_to_top_nonce'] ) &&
-			wp_verify_nonce( $_POST['ap_library_enable_back_to_top_nonce'], 'ap_library_enable_back_to_top_action' )
-		) {
-			$enabled = isset( $_POST['ap_library_enable_back_to_top'] ) ? true : false;
-			update_option( 'ap_library_enable_back_to_top', $enabled );
-			$this->last_notice = [
-				'type' => 'success',
-				'message' => __( 'Settings saved.', 'ap-library' )
-			];
-		}
-	}
 
 	/**
 	 * Create a post on image upload if enabled in settings.
