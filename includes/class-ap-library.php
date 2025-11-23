@@ -186,9 +186,10 @@ class Ap_Library {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_admin_actions' );
-		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_auto_create_post_option' );
+		// Unified settings handler replaces legacy individual handlers.
+		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_overview_settings' );
 		$this->loader->add_action( 'add_attachment', $plugin_admin, 'maybe_create_post_on_image_upload' );
-		$this->loader->add_action( 'admin_init', $plugin_admin, 'handle_back_to_top_option' );
+		// (Deprecated handlers kept for backward compatibility but no longer hooked.)
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'show_admin_notices' );
 		$this->loader->add_action('quick_edit_custom_box', $plugin_admin, 'add_quick_edit_thumbnail_box', 10, 2);
 

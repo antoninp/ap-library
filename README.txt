@@ -99,7 +99,11 @@ After activation you will find plugin tools under the Photos post type menu:
 - Renamed CPT from `aplb_uploads` → `aplb_photo` with archive base `photos`.
 - Renamed taxonomies to `aplb_taken_date`, `aplb_published_date`, `aplb_genre`, and `aplb_keyword` with updated rewrite bases.
 - Updated admin UI (menus, columns, bulk actions, meta box) and public query logic to the new slugs.
-- Replaced "AP Library" submenu with "Library Overview" (central hub for actions, status, and settings).
+- Replaced "AP Library" submenu with "Library Overview" (slug: `aplb-overview`; central hub for actions, status, and unified settings).
+- Normalized submenu slugs for consistency: `aplb-overview`, `aplb-backfill`, `aplb-archive-settings`.
+- Archive Settings: added Reset to Defaults button, reorganized layout with explanatory text above table.
+- Backfill page: added prominent warning about irreversible overwrite operations.
+- Overview page: enhanced Related Tools links with descriptions, combined settings into single Save button.
 - Uninstall/deactivation updated to clean up the new CPT/taxonomies.
 - Documentation updated to reflect single CPT architecture.
 - Removed deprecated Upload* stub classes/files after migration.
