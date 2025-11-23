@@ -1,6 +1,12 @@
 /**
- * AP Library admin styles trimmed after UI simplification.
- * Intentionally minimal; keep file for potential future enhancements.
+ * AP Library admin styles.
  */
 
-/* (No rules currently needed) */
+/* Bulk Genre Toolbar Layout */
+/* Inline bulk genres minimal styles */
+#aplb-inline-bulk-genres { font-size:13px; }
+#aplb-inline-bulk-genres select { font-size:12px; }
+#aplb-inline-bulk-genres .aplb-term-badge { background:#f0f0f1; border-radius:3px; padding:2px 6px; font-size:11px; display:inline-block; margin:2px 4px 2px 0; }
+
+/* Status coloring applied inline from JS; ensure badges look consistent */
+.aplb-term-badge { background:#f0f0f1; border-radius:3px; padding:2px 6px; font-size:11px; display:inline-block; margin:2px 4px 2px 0; }

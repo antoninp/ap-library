@@ -88,6 +88,30 @@ After activation you will find plugin tools under the Photos post type menu:
 - Photos → Backfill (regenerate taken/published dates and keywords)
 - Photos → Archive Rules (configure ordering & enable/disable archive contexts)
 
+== Bulk Genre Assignment ==
+
+On the Photos list screen (`edit.php?post_type=aplb_photo`) a "Bulk Genres" toolbar lets you assign one or more Genre taxonomy terms (`aplb_genre`) to multiple photo posts without page reloads.
+
+Workflow:
+1. Tick the checkboxes of the photos you want to update (thumbnails are visible in the list for visual confirmation).
+2. Select one or more genres in the multi‑select box.
+3. (Optional) Toggle "Replace existing genres" if you want to overwrite instead of add.
+4. Click "Apply Genres to Selected".
+
+Modes:
+* Add (default): Selected genres are merged with any existing genres on each photo (duplicates suppressed).
+* Replace: Existing genres for each selected photo are discarded and replaced with only the selected genres.
+
+The update runs through an internal REST endpoint (`/wp-json/ap-library/v1/assign-genres`). A success message appears and each affected row's Genre column is updated immediately—no full page refresh required.
+
+Notes:
+* You must have capability to edit the selected posts (standard `edit_post`).
+* The toolbar only appears on the `aplb_photo` list screen.
+* At least one post and one genre must be selected for the Apply button to enable.
+* If a request fails, an inline error message is shown; retry after checking connectivity or nonce validity.
+
+This feature significantly reduces repetitive Quick Edit steps when tagging batches of newly created photo posts prior to publishing.
+
 == Changelog ==
 
 = Unreleased - Consolidated to Single Photo CPT (breaking) =

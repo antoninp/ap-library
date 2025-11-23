@@ -191,6 +191,9 @@ class Ap_Library {
 		// (Deprecated handlers kept for backward compatibility but no longer hooked.)
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'show_admin_notices' );
 		$this->loader->add_action('quick_edit_custom_box', $plugin_admin, 'add_quick_edit_thumbnail_box', 10, 2);
+		// Bulk genre assignment toolbar (list table) & REST routes
+		$this->loader->add_action( 'restrict_manage_posts', $plugin_admin, 'render_bulk_genre_toolbar' );
+		$this->loader->add_action( 'rest_api_init', $plugin_admin, 'register_rest_routes' );
 
 		// Columns hooks
 		$columns_manager = $plugin_admin->get_columns_manager();
