@@ -253,8 +253,8 @@ class Ap_Library_Admin_Columns {
         $day   = date( 'd', $timestamp );
         
         $year_name  = $year;
-        $month_name = date_i18n( 'F', $timestamp );
-        $day_name   = date_i18n( 'j', $timestamp );
+        $month_name = date_i18n( 'F Y', $timestamp );
+        $day_name   = date_i18n( 'F j, Y', $timestamp );
 
         // Create/get year term
         $year_term = get_term_by( 'slug', $year, $taxonomy );
