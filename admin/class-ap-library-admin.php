@@ -251,7 +251,13 @@ class Ap_Library_Admin {
 	}
 
 	/**
-	 * Render auto-create setting form.
+	 * Render auto-create setting form and photo post creation filters.
+	 *
+	 * Displays settings for auto-creating posts on upload, back-to-top button,
+	 * and photo filtering options (keywords, dimensions, file size).
+	 *
+	 * @since    1.0.0
+	 * @modified 1.3.0 Added photo post creation filter settings.
 	 */
 	private function render_overview_settings_form() {
 		$auto_create = get_option( 'ap_library_auto_create_post_on_upload', false );
@@ -313,6 +319,12 @@ class Ap_Library_Admin {
 
 	/**
 	 * Unified settings handler for overview page.
+	 *
+	 * Processes and saves all overview page settings including auto-create,
+	 * back-to-top, and photo post creation filters.
+	 *
+	 * @since    1.0.0
+	 * @modified 1.3.0 Added handling for photo post creation filter settings.
 	 */
 	public function handle_overview_settings() {
 		if (
@@ -458,6 +470,10 @@ class Ap_Library_Admin {
 
 	/**
 	 * Register REST API routes for admin bulk operations.
+	 *
+	 * Registers the /ap-library/v1/assign-genres endpoint for bulk genre assignment.
+	 *
+	 * @since    1.3.0
 	 */
 	public function register_rest_routes() {
 		register_rest_route(
@@ -472,8 +488,14 @@ class Ap_Library_Admin {
 	}
 
 	/**
-	 * REST callback to assign (add) selected genre terms to multiple photo posts.
-	 * Expects JSON: { postIds:[], termIds:[] }
+	 * REST callback to assign selected genre terms to multiple photo posts.
+	 *
+	 * Supports two modes: 'add' (merge with existing genres) and 'replace' (overwrite existing genres).
+	 * Expects JSON payload: { postIds: [], termIds: [], mode: 'add'|'replace' }
+	 *
+	 * @since    1.3.0
+	 * @param    WP_REST_Request $request The REST request object containing postIds, termIds, and mode.
+	 * @return   WP_REST_Response Response object with success status and list of updated post IDs.
 	 */
 	public function rest_assign_genres( WP_REST_Request $request ) {
 		$post_ids = (array) $request->get_param( 'postIds' );
@@ -506,6 +528,11 @@ class Ap_Library_Admin {
 
 	/**
 	 * Output the bulk genre toolbar on the photo list screen.
+	 *
+	 * Renders an inline toolbar with genre selection, add/replace mode toggle,
+	 * and apply button for bulk genre assignment to selected photos.
+	 *
+	 * @since    1.3.0
 	 */
 	public function render_bulk_genre_toolbar() {
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;

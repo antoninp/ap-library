@@ -5,12 +5,24 @@ require_once __DIR__ . '/../services/PhotoPostCreator.php';
 
 /**
  * Action that scans all images and creates aplb_photo posts for any missing.
+ *
+ * Applies configurable filters to exclude non-photograph images (logos, icons, banners)
+ * based on filename keywords, dimensions, and file size.
+ *
+ * @since      1.3.0
  */
 class CreateAllPhotoPosts implements ActionInterface {
     /**
-     * Execute the action.
+     * Execute the action to create missing photo posts with filtering.
      *
-     * @return WP_Error|true
+     * Reads filter settings from options:
+     * - ap_library_exclude_keywords: Comma-separated keywords to exclude
+     * - ap_library_min_photo_width: Minimum width in pixels (default 400)
+     * - ap_library_min_photo_height: Minimum height in pixels (default 400)
+     * - ap_library_min_photo_filesize: Minimum file size in KB (default 50)
+     *
+     * @since  1.3.0
+     * @return WP_Error|true True on success, WP_Error on failure.
      */
     public function execute() {
         $images = get_posts([

@@ -7,7 +7,7 @@
  * taxonomy terms used in the plugin (taken date hierarchy, genre, published date).
  *
  * @link       https://antoninpuleo.com
- * @since      1.0.0
+ * @since      1.3.0
  *
  * @package    Ap_Library
  * @subpackage Ap_Library/admin/helpers
@@ -16,11 +16,11 @@ class PhotoTermHelper {
     /**
      * Ensure the existence of year, month, and day terms in the 'aplb_taken_date' taxonomy.
      *
-     * @since 1.0.0
-     * @param string $year  The year (e.g., '2024' or 'unknown').
-     * @param string $month The month (e.g., '07' for July).
-     * @param string $day   The day (e.g., '15').
-     * @return array        Term IDs for year, month, and day (month/day may be null for unknown year).
+     * @since  1.3.0
+     * @param  string $year  The year (e.g., '2024' or 'unknown').
+     * @param  string $month The month (e.g., '07' for July).
+     * @param  string $day   The day (e.g., '15').
+     * @return array  Term IDs for year, month, and day (month/day may be null for unknown year).
      */
     public static function ensure_tdate_terms( $year, $month, $day ) {
         if ( $year === 'unknown' ) {
@@ -71,9 +71,9 @@ class PhotoTermHelper {
     /**
      * Ensure the existence of a genre term in the 'aplb_genre' taxonomy.
      *
-     * @since 1.0.0
-     * @param string $genre The genre name (e.g., 'All').
-     * @return int          Term ID of the genre or 0 on failure.
+     * @since  1.3.0
+     * @param  string $genre The genre name (e.g., 'All').
+     * @return int    Term ID of the genre or 0 on failure.
      */
     public static function ensure_genre_term( $genre ) {
         $existing_term = term_exists( $genre, 'aplb_genre' );
@@ -87,9 +87,9 @@ class PhotoTermHelper {
     /**
      * Ensure the existence of a published date term in the 'aplb_published_date' taxonomy.
      *
-     * @since 1.0.0
-     * @param string $date Date in 'Y-m-d' format or 'unknown'.
-     * @return int         Term ID for the date term or 0 on failure.
+     * @since  1.3.0
+     * @param  string $date Date in 'Y-m-d' format or 'unknown'.
+     * @return int    Term ID for the date term or 0 on failure.
      */
     public static function ensure_pdate_term( $date ) {
         $timestamp = strtotime( $date );

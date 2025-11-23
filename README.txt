@@ -5,7 +5,7 @@ Tags: photography, media, uploads, custom post type, taxonomy, exif, gallery, ar
 Requires at least: 6.5
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,26 +112,51 @@ Notes:
 
 This feature significantly reduces repetitive Quick Edit steps when tagging batches of newly created photo posts prior to publishing.
 
+== Photo Post Creation Filters ==
+
+To prevent non-photograph images (logos, icons, banners, UI graphics) from being converted to photo posts, the "Create Missing Photo Posts" action applies intelligent filtering.
+
+Configurable filters (Photos → Library Overview → Photo Post Creation Filters):
+
+**Filename Exclusions**: Images with these keywords in their filename are skipped. Default keywords include: `logo`, `banner`, `icon`, `avatar`, `profile`, `thumbnail`, `thumb`, `background`, `header`, `footer`, `placeholder`, `default`, `button`, `badge`, `sprite`, `ui`, `favicon`, `symbol`, `graphic`, `decoration`.
+
+**Minimum Dimensions**: Images smaller than the specified width or height (in pixels) are excluded. Default: 400×400px. Set to 0 to disable.
+
+**Minimum File Size**: Images smaller than the specified file size (in KB) are excluded. Default: 50KB. Set to 0 to disable. Small file sizes often indicate logos or icons rather than photographs.
+
+**Extension Exclusions**: SVG and GIF files are always excluded regardless of other settings.
+
+All filters are applied when running the "Create Missing Photo Posts" quick action. Filters do not affect manual photo post creation or auto-creation on upload. You can customize all thresholds and keywords through the settings interface.
+
+Typical exclusion scenarios:
+* Logo files: Caught by filename keyword "logo"
+* Small icons: Caught by dimension filter (< 400px)
+* Tiny graphics: Caught by file size filter (< 50KB)
+* UI elements: Caught by keywords like "button", "badge", "ui"
+* Social media graphics: Often caught by dimension ratios or keywords like "banner", "header"
+
 == Changelog ==
 
-= Unreleased - Consolidated to Single Photo CPT (breaking) =
-- Removed legacy `aplb_library` custom post type; all functionality now centers on the `aplb_photo` post type.
-- Detached legacy taxonomies from the old CPT; all taxonomy associations now target `aplb_photo` only.
-- Removed admin actions and helper classes related to creating/updating library posts.
-- Updated archive query rules UI to eliminate library post type contexts.
-- Simplified uninstall routine (only removes `aplb_photo` posts plus related taxonomies).
-- Renamed CPT from `aplb_uploads` → `aplb_photo` with archive base `photos`.
-- Renamed taxonomies to `aplb_taken_date`, `aplb_published_date`, `aplb_genre`, and `aplb_keyword` with updated rewrite bases.
-- Updated admin UI (menus, columns, bulk actions, meta box) and public query logic to the new slugs.
-- Replaced "AP Library" submenu with "Library Overview" (slug: `aplb-overview`; central hub for actions, status, and unified settings).
-- Normalized submenu slugs for consistency: `aplb-overview`, `aplb-backfill`, `aplb-archive-rules`.
-- Archive Rules: added Reset to Defaults button, reorganized layout with explanatory text above table.
-- Backfill page: added prominent warning about irreversible overwrite operations.
-- Overview page: enhanced Related Tools links with descriptions, combined settings into single Save button.
-- Uninstall/deactivation updated to clean up the new CPT/taxonomies.
-- Documentation updated to reflect single CPT architecture.
-- Removed deprecated Upload* stub classes/files after migration.
-- Breaking change: existing content under the old `aplb_uploads` CPT and taxonomies will not appear until migrated. Use the Backfill tools to re-sync date/keyword terms from meta, and consider migrating post_type from `aplb_uploads` to `aplb_photo` if you have existing data. After upgrading, visit Settings → Permalinks and click Save to flush rewrite rules.
+= 1.3.0 - Consolidated to Single Photo CPT (breaking changes) =
+- Added: Bulk genre assignment toolbar on Photos list screen with Add/Replace modes and REST API endpoint `/ap-library/v1/assign-genres`.
+- Added: Configurable photo post creation filters to exclude non-photographs (logos, icons, banners) based on filename keywords, dimensions (min width/height, default 400px), and file size (min KB, default 50KB).
+- Added: Smart filtering in "Create Missing Photo Posts" action for logos and UI graphics.
+- Added: Reset to Defaults button on Archive Rules page.
+- Added: Prominent warning on Backfill page about irreversible overwrite operations.
+- Updated: Renamed CPT from `aplb_uploads` → `aplb_photo` with archive base `photos`.
+- Updated: Renamed taxonomies to `aplb_taken_date`, `aplb_published_date`, `aplb_genre`, and `aplb_keyword` with updated rewrite bases.
+- Updated: Replaced "AP Library" submenu with "Library Overview" (slug: `aplb-overview`) as central hub for actions, status, and unified settings.
+- Updated: Normalized submenu slugs for consistency: `aplb-overview`, `aplb-backfill`, `aplb-archive-rules`.
+- Updated: Archive Rules UI reorganized with explanatory text above table.
+- Updated: Overview page settings combined into single Save button with enhanced Related Tools links.
+- Updated: Admin UI (menus, columns, bulk actions, meta box) and public query logic to new slugs.
+- Updated: All taxonomy associations now target `aplb_photo` only.
+- Updated: Simplified uninstall routine (only removes `aplb_photo` posts plus related taxonomies).
+- Updated: Documentation updated to reflect single CPT architecture.
+- Removed: Legacy `aplb_library` custom post type; all functionality now centers on the `aplb_photo` post type.
+- Removed: Admin actions and helper classes related to creating/updating library posts.
+- Removed: Deprecated Upload* stub classes/files after migration.
+- Breaking change: Existing content under the old `aplb_uploads` CPT and taxonomies will not appear until migrated. Use the Backfill tools to re-sync date/keyword terms from meta, and consider migrating post_type from `aplb_uploads` to `aplb_photo` if you have existing data. After upgrading, visit Settings → Permalinks and click Save to flush rewrite rules.
 
 = 1.2.1 - i18n and cleanup =
 - Updated: Normalized translation text domain to `ap-library` across the plugin for consistent i18n.
@@ -167,6 +192,9 @@ This feature significantly reduces repetitive Quick Edit steps when tagging batc
 - Custom post type, date meta, base taxonomies, admin UI, and public hooks skeleton.
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+**BREAKING CHANGES:** This release consolidates to a single photo CPT (`aplb_photo`) and renames post types/taxonomies. Existing content will not appear until migrated. After upgrading, visit Settings → Permalinks and click Save. Use Backfill tools to re-sync content. Review the changelog for full migration details.
 
 = 1.2.1 =
 No action required. This release improves internationalization and uninstall cleanup. Uninstall now fully removes AP Library posts and taxonomy terms and flushes rewrites.

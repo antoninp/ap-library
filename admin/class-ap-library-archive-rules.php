@@ -1,6 +1,8 @@
 <?php
 /**
  * Admin settings for configurable archive query rules.
+ *
+ * @since      1.3.0
  */
 class Ap_Library_Archive_Rules {
 
@@ -8,6 +10,8 @@ class Ap_Library_Archive_Rules {
 
 	/**
 	 * Add submenu page under Library CPT.
+	 *
+	 * @since 1.3.0
 	 */
 	public function add_rules_submenu() {
 		add_submenu_page(
@@ -22,6 +26,8 @@ class Ap_Library_Archive_Rules {
 
 	/**
 	 * Register option on admin init.
+	 *
+	 * @since 1.3.0
 	 */
 	public function register_rules() {
 		if ( ! get_option( self::OPTION_NAME ) ) {
@@ -31,6 +37,9 @@ class Ap_Library_Archive_Rules {
 
 	/**
 	 * Default archive rules.
+	 *
+	 * @since  1.3.0
+	 * @return array Default archive query rules configuration.
 	 */
 	public function get_default_rules() {
 		return [
@@ -48,6 +57,8 @@ class Ap_Library_Archive_Rules {
 
 	/**
 	 * Render rules page UI.
+	 *
+	 * @since 1.3.0
 	 */
 	public function render_rules_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {

@@ -16,7 +16,7 @@
  * Plugin Name:       AP Library
  * Plugin URI:        https://antoninpuleo.com
  * Description:       Photo Library System based on post for photography website.
- * Version:           1.2.1
+ * Version:           1.3.0
  * Author:            Antonin Puleo
  * Author URI:        https://antoninpuleo.com/
  * License:           GPL-2.0+
@@ -33,7 +33,7 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Currently plugin version.
  */
-define( 'AP_LIBRARY_VERSION', '1.2.1' );
+define( 'AP_LIBRARY_VERSION', '1.3.0' );
 
 /**
  * Meta key constants for date fields.

@@ -3,7 +3,7 @@
  * Helper class for extracting date information from image filenames or metadata for photos.
  *
  * @link       https://antoninpuleo.com
- * @since      1.0.0
+ * @since      1.3.0
  *
  * @package    Ap_Library
  * @subpackage Ap_Library/admin/helpers
@@ -14,9 +14,9 @@ class PhotoDateHelper {
      * Expected filename pattern: YYYYMMDD-... (first 8 chars form date)
      * Falls back to image metadata created timestamp; otherwise returns unknown.
      *
-     * @since 1.0.0
-     * @param int $image_id Attachment ID of the image.
-     * @return array        [year, month, day] or ['unknown', null, null].
+     * @since  1.3.0
+     * @param  int   $image_id Attachment ID of the image.
+     * @return array [year, month, day] or ['unknown', null, null].
      */
     public static function extract_date_terms( $image_id ) {
         $full_path = get_attached_file( $image_id );
