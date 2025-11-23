@@ -69,6 +69,13 @@ class Ap_Library_Archive_Settings {
 			'front-page'             => __( 'Front Page (if shows posts)', 'ap-library' ),
 		];
 
+		// Handle reset to defaults
+		if ( isset( $_POST['aplb_archive_reset_nonce'] ) && wp_verify_nonce( $_POST['aplb_archive_reset_nonce'], 'aplb_archive_reset' ) ) {
+			update_option( self::OPTION_NAME, $this->get_default_rules() );
+			$rules = $this->get_default_rules();
+			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Archive rules reset to defaults.', 'ap-library' ) . '</p></div>';
+		}
+
 		if ( isset( $_POST['aplb_archive_settings_nonce'] ) && wp_verify_nonce( $_POST['aplb_archive_settings_nonce'], 'aplb_archive_settings' ) ) {
 			$sanitized = [];
 			foreach ( $contexts as $key => $label ) {
@@ -117,7 +124,8 @@ class Ap_Library_Archive_Settings {
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Archive Query Settings', 'ap-library' ); ?></h1>
-			<p><?php esc_html_e( 'Configure which post types and ordering each archive context should use. Leaving meta key empty (with meta_value orderby) falls back to default published date meta.', 'ap-library' ); ?></p>
+			<p><?php esc_html_e( 'Configure which post types and ordering each archive context should use.', 'ap-library' ); ?></p>
+			<p class="description"><?php esc_html_e( 'These rules are applied to the main query via pre_get_posts. Query Loop blocks using "Inherit query from URL" will reflect changes automatically. Leaving meta key empty (with meta_value orderby) falls back to default published date meta. Leave Posts Per Page empty to use WordPress default setting.', 'ap-library' ); ?></p>
 			<form method="post" action="">
 				<?php wp_nonce_field( 'aplb_archive_settings', 'aplb_archive_settings_nonce' ); ?>
 				<table class="widefat striped">
@@ -174,7 +182,15 @@ class Ap_Library_Archive_Settings {
 				</table>
 				<?php submit_button( __( 'Save Archive Rules', 'ap-library' ) ); ?>
 			</form>
-			<p class="description"><?php esc_html_e( 'These rules are applied to the main query via pre_get_posts. Query Loop blocks using "Inherit query from URL" will reflect changes automatically. Leave Posts Per Page empty to use WordPress default setting.', 'ap-library' ); ?></p>
+
+			<hr style="margin: 2em 0;" />
+
+			<h2><?php esc_html_e( 'Reset Settings', 'ap-library' ); ?></h2>
+			<p><?php esc_html_e( 'Reset all archive rules to plugin defaults. This action cannot be undone.', 'ap-library' ); ?></p>
+			<form method="post" action="" onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure you want to reset all archive rules to defaults? This cannot be undone.', 'ap-library' ) ); ?>');">
+				<?php wp_nonce_field( 'aplb_archive_reset', 'aplb_archive_reset_nonce' ); ?>
+				<?php submit_button( __( 'Reset to Defaults', 'ap-library' ), 'secondary', 'submit', false ); ?>
+			</form>
 		</div>
 		<?php
 	}
