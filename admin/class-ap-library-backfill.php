@@ -312,7 +312,8 @@ class Ap_Library_Backfill {
 		
 		if ( ! $term ) {
 			$timestamp = strtotime( $date );
-			$term_name = $timestamp ? date_i18n( 'F j, Y', $timestamp ) : $date;
+			$format = get_option( 'ap_library_date_format', 'M j, Y' );
+			$term_name = $timestamp ? date_i18n( $format, $timestamp ) : $date;
 			
 			$result = wp_insert_term( $term_name, $taxonomy, array( 'slug' => $date ) );
 			
@@ -345,9 +346,10 @@ class Ap_Library_Backfill {
 		$month = date( 'm', $timestamp );
 		$day   = date( 'd', $timestamp );
 		
+		$format = get_option( 'ap_library_date_format', 'M j, Y' );
 		$year_name  = $year;
 		$month_name = date_i18n( 'F Y', $timestamp ); // e.g., "May 2023"
-		$day_name   = date_i18n( 'F j, Y', $timestamp ); // e.g., "May 15, 2023"
+		$day_name   = date_i18n( $format, $timestamp );
 
 		// Create/get year term
 		$year_term = get_term_by( 'slug', $year, $taxonomy );

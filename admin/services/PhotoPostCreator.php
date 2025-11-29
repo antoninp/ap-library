@@ -139,7 +139,8 @@ class PhotoPostCreator {
         $term = get_term_by( 'slug', $date, $taxonomy );
         if ( ! $term ) {
             $timestamp = strtotime( $date );
-            $term_name = $timestamp ? date_i18n( 'F j, Y', $timestamp ) : $date;
+            $format = get_option( 'ap_library_date_format', 'M j, Y' );
+            $term_name = $timestamp ? date_i18n( $format, $timestamp ) : $date;
             $result    = wp_insert_term( $term_name, $taxonomy, [ 'slug' => $date ] );
             if ( is_wp_error( $result ) ) return null;
             return $result['term_id'];
@@ -158,6 +159,8 @@ class PhotoPostCreator {
         $month = date( 'm', $timestamp );
         $day   = date( 'd', $timestamp );
 
+        $format = get_option( 'ap_library_date_format', 'M j, Y' );
+        
         $year_term = get_term_by( 'slug', $year, $taxonomy );
         if ( ! $year_term ) {
             $year_result = wp_insert_term( $year, $taxonomy, [ 'slug' => $year ] );
@@ -176,7 +179,7 @@ class PhotoPostCreator {
         $day_slug = $date;
         $day_term = get_term_by( 'slug', $day_slug, $taxonomy );
         if ( ! $day_term ) {
-            $day_result = wp_insert_term( date_i18n( 'F j, Y', $timestamp ), $taxonomy, [ 'slug' => $day_slug, 'parent' => $month_term_id ] );
+            $day_result = wp_insert_term( date_i18n( $format, $timestamp ), $taxonomy, [ 'slug' => $day_slug, 'parent' => $month_term_id ] );
             if ( is_wp_error( $day_result ) ) return null;
             return $day_result['term_id'];
         }

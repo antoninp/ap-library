@@ -276,6 +276,7 @@ class Ap_Library_Admin {
 	private function render_overview_settings_form() {
 		$auto_create = get_option( 'ap_library_auto_create_post_on_upload', false );
 		$back_to_top = get_option( 'ap_library_enable_back_to_top', false );
+		$date_format = get_option( 'ap_library_date_format', 'M j, Y' );
 		$exclude_keywords = get_option( 'ap_library_exclude_keywords', 'logo,banner,icon,avatar,profile,thumbnail,thumb,background,header,footer,placeholder,default,button,badge,sprite,ui,favicon,symbol,graphic,decoration' );
 		$min_width = get_option( 'ap_library_min_photo_width', 400 );
 		$min_height = get_option( 'ap_library_min_photo_height', 400 );
@@ -294,6 +295,20 @@ class Ap_Library_Admin {
 					<input type="checkbox" id="ap_library_enable_back_to_top" name="ap_library_enable_back_to_top" value="1" <?php checked( $back_to_top, true ); ?> />
 					<?php esc_html_e( 'Enable "Back to Top" button on public photo pages', 'ap-library' ); ?>
 				</label>
+			</p>
+			
+			<p>
+				<label for="ap_library_date_format">
+					<?php esc_html_e( 'Date format:', 'ap-library' ); ?><br>
+					<select id="ap_library_date_format" name="ap_library_date_format">
+						<option value="M j, Y" <?php selected( $date_format, 'M j, Y' ); ?>><?php echo esc_html( date_i18n( 'M j, Y', current_time( 'timestamp' ) ) ); ?> (<?php esc_html_e( 'Short', 'ap-library' ); ?>)</option>
+						<option value="F j, Y" <?php selected( $date_format, 'F j, Y' ); ?>><?php echo esc_html( date_i18n( 'F j, Y', current_time( 'timestamp' ) ) ); ?> (<?php esc_html_e( 'Full', 'ap-library' ); ?>)</option>
+						<option value="Y-m-d" <?php selected( $date_format, 'Y-m-d' ); ?>><?php echo esc_html( date_i18n( 'Y-m-d', current_time( 'timestamp' ) ) ); ?> (<?php esc_html_e( 'ISO', 'ap-library' ); ?>)</option>
+						<option value="m/d/Y" <?php selected( $date_format, 'm/d/Y' ); ?>><?php echo esc_html( date_i18n( 'm/d/Y', current_time( 'timestamp' ) ) ); ?> (<?php esc_html_e( 'US', 'ap-library' ); ?>)</option>
+						<option value="d/m/Y" <?php selected( $date_format, 'd/m/Y' ); ?>><?php echo esc_html( date_i18n( 'd/m/Y', current_time( 'timestamp' ) ) ); ?> (<?php esc_html_e( 'EU', 'ap-library' ); ?>)</option>
+					</select>
+				</label>
+				<br><small class="description"><?php esc_html_e( 'Format for displaying dates in photo list columns and taxonomy terms. Applies to newly created dates.', 'ap-library' ); ?></small>
 			</p>
 			
 			<h3><?php esc_html_e( 'Photo Post Creation Filters', 'ap-library' ); ?></h3>
@@ -350,6 +365,15 @@ class Ap_Library_Admin {
 			$back_to_top = isset( $_POST['ap_library_enable_back_to_top'] );
 			update_option( 'ap_library_auto_create_post_on_upload', $auto_create );
 			update_option( 'ap_library_enable_back_to_top', $back_to_top );
+			
+			// Save date format
+			if ( isset( $_POST['ap_library_date_format'] ) ) {
+				$allowed_formats = [ 'M j, Y', 'F j, Y', 'Y-m-d', 'm/d/Y', 'd/m/Y' ];
+				$format = sanitize_text_field( $_POST['ap_library_date_format'] );
+				if ( in_array( $format, $allowed_formats, true ) ) {
+					update_option( 'ap_library_date_format', $format );
+				}
+			}
 			
 			// Save filter settings
 			if ( isset( $_POST['ap_library_exclude_keywords'] ) ) {

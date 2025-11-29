@@ -201,7 +201,8 @@ class Ap_Library_Meta_Box {
 		
 		if ( ! $term ) {
 			$timestamp = strtotime( $date );
-			$term_name = $timestamp ? date_i18n( 'F j, Y', $timestamp ) : $date;
+			$format = get_option( 'ap_library_date_format', 'M j, Y' );
+			$term_name = $timestamp ? date_i18n( $format, $timestamp ) : $date;
 			
 			$result = wp_insert_term( $term_name, $taxonomy, array( 'slug' => $date ) );
 			
@@ -234,9 +235,10 @@ class Ap_Library_Meta_Box {
 		$month = date( 'm', $timestamp );
 		$day   = date( 'd', $timestamp );
 		
+		$format = get_option( 'ap_library_date_format', 'M j, Y' );
 		$year_name  = $year;
 		$month_name = date_i18n( 'F', $timestamp ); // "November"
-		$day_name   = date_i18n( 'j', $timestamp ); // "15"
+		$day_name   = date_i18n( $format, $timestamp );
 
 		// Create/get year term
 		$year_term = get_term_by( 'slug', $year, $taxonomy );

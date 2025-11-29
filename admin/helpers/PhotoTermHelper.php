@@ -94,7 +94,8 @@ class PhotoTermHelper {
     public static function ensure_pdate_term( $date ) {
         $timestamp = strtotime( $date );
         if ( $timestamp && $date !== 'unknown' ) {
-            $human_name = date_i18n( 'F j, Y', $timestamp );
+            $format = get_option( 'ap_library_date_format', 'M j, Y' );
+            $human_name = date_i18n( $format, $timestamp );
             $slug       = date( 'Y-m-d', $timestamp );
         } else {
             $human_name = __( 'Unknown', 'ap-library' );

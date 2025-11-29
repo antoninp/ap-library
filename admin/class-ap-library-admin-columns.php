@@ -105,8 +105,9 @@ class Ap_Library_Admin_Columns {
             $date = get_post_meta( $post_id, APLB_META_PUBLISHED_DATE, true );
             if ( $date ) {
                 $timestamp = strtotime( $date );
+                $format = get_option( 'ap_library_date_format', 'M j, Y' );
                 echo '<span data-date="' . esc_attr( $date ) . '">';
-                echo $timestamp ? esc_html( date_i18n( 'M j, Y', $timestamp ) ) : esc_html( $date );
+                echo $timestamp ? esc_html( date_i18n( $format, $timestamp ) ) : esc_html( $date );
                 echo '</span>';
             } else {
                 echo '&mdash;';
@@ -115,8 +116,9 @@ class Ap_Library_Admin_Columns {
             $date = get_post_meta( $post_id, APLB_META_TAKEN_DATE, true );
             if ( $date ) {
                 $timestamp = strtotime( $date );
+                $format = get_option( 'ap_library_date_format', 'M j, Y' );
                 echo '<span data-date="' . esc_attr( $date ) . '">';
-                echo $timestamp ? esc_html( date_i18n( 'M j, Y', $timestamp ) ) : esc_html( $date );
+                echo $timestamp ? esc_html( date_i18n( $format, $timestamp ) ) : esc_html( $date );
                 echo '</span>';
             } else {
                 echo '&mdash;';
@@ -271,7 +273,8 @@ class Ap_Library_Admin_Columns {
         
         if ( ! $term ) {
             $timestamp = strtotime( $date );
-            $term_name = $timestamp ? date_i18n( 'F j, Y', $timestamp ) : $date;
+            $format = get_option( 'ap_library_date_format', 'M j, Y' );
+            $term_name = $timestamp ? date_i18n( $format, $timestamp ) : $date;
             
             $result = wp_insert_term( $term_name, $taxonomy, array( 'slug' => $date ) );
             
@@ -304,9 +307,10 @@ class Ap_Library_Admin_Columns {
         $month = date( 'm', $timestamp );
         $day   = date( 'd', $timestamp );
         
+        $format = get_option( 'ap_library_date_format', 'M j, Y' );
         $year_name  = $year;
         $month_name = date_i18n( 'F Y', $timestamp );
-        $day_name   = date_i18n( 'F j, Y', $timestamp );
+        $day_name   = date_i18n( $format, $timestamp );
 
         // Create/get year term
         $year_term = get_term_by( 'slug', $year, $taxonomy );
