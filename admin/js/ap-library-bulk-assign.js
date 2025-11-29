@@ -139,24 +139,7 @@
 		updateButtonState();
 	}
 	
-	// Initialize Genre bulk assignment
-	if (typeof APLB_BulkGenres !== 'undefined') {
-		createBulkAssignmentHandler({
-			toolbarId: '#aplb-inline-bulk-genres',
-			selectId: '#aplb-bulk-genre-select',
-			applyBtnId: '#aplb-bulk-genre-apply',
-			replaceCbId: '#aplb-bulk-genre-replace',
-			statusClass: '.aplb-bulk-genre-status',
-			taxonomy: 'aplb_genre',
-			taxonomyLabel: 'genres',
-			restPath: APLB_BulkGenres.restUrl.replace(/^.*\/wp-json\//, ''),
-			successMsg: APLB_BulkGenres.successMessage,
-			errorMsg: APLB_BulkGenres.errorMessage,
-			replaceConfirmMsg: 'You are about to REPLACE existing %taxonomy% on %d photo(s) with %s selected %taxonomy%. This will discard any current %taxonomy% not selected. Continue?'
-		});
-	}
-	
-	// Initialize Portfolio bulk assignment
+	// Initialize Portfolio bulk assignment (insert first so Genre ends up left)
 	if (typeof APLB_BulkPortfolios !== 'undefined') {
 		createBulkAssignmentHandler({
 			toolbarId: '#aplb-inline-bulk-portfolios',
@@ -169,6 +152,23 @@
 			restPath: '/ap-library/v1/assign-portfolios',
 			successMsg: APLB_BulkPortfolios.successMessage || 'Portfolios updated',
 			errorMsg: APLB_BulkPortfolios.errorMessage || 'Error applying portfolios',
+			replaceConfirmMsg: 'You are about to REPLACE existing %taxonomy% on %d photo(s) with %s selected %taxonomy%. This will discard any current %taxonomy% not selected. Continue?'
+		});
+	}
+
+	// Initialize Genre bulk assignment (initialized last so it sits closest to Filter)
+	if (typeof APLB_BulkGenres !== 'undefined') {
+		createBulkAssignmentHandler({
+			toolbarId: '#aplb-inline-bulk-genres',
+			selectId: '#aplb-bulk-genre-select',
+			applyBtnId: '#aplb-bulk-genre-apply',
+			replaceCbId: '#aplb-bulk-genre-replace',
+			statusClass: '.aplb-bulk-genre-status',
+			taxonomy: 'aplb_genre',
+			taxonomyLabel: 'genres',
+			restPath: APLB_BulkGenres.restUrl.replace(/^.*\/wp-json\//, ''),
+			successMsg: APLB_BulkGenres.successMessage,
+			errorMsg: APLB_BulkGenres.errorMessage,
 			replaceConfirmMsg: 'You are about to REPLACE existing %taxonomy% on %d photo(s) with %s selected %taxonomy%. This will discard any current %taxonomy% not selected. Continue?'
 		});
 	}
