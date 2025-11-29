@@ -20,19 +20,71 @@ class Ap_Library_Admin_Columns {
      * @return   array                The modified columns.
      */
     public function add_aplb_photo_thumbnail_column( $columns ) {
-        $new = array();
+        // Define the desired column order
+        $ordered = array();
+        
+        // Add columns in the desired order
+        if ( isset( $columns['cb'] ) ) {
+            $ordered['cb'] = $columns['cb'];
+        }
+        
+        // Thumbnail
+        $ordered['thumbnail'] = __( 'Thumbnail', 'ap-library' );
+        
+        // Title
+        if ( isset( $columns['title'] ) ) {
+            $ordered['title'] = $columns['title'];
+        }
+        
+        // Photo Genre (taxonomy)
+        if ( isset( $columns['taxonomy-aplb_genre'] ) ) {
+            $ordered['taxonomy-aplb_genre'] = $columns['taxonomy-aplb_genre'];
+        }
+        
+        // Portfolios (taxonomy)
+        if ( isset( $columns['taxonomy-aplb_portfolio'] ) ) {
+            $ordered['taxonomy-aplb_portfolio'] = $columns['taxonomy-aplb_portfolio'];
+        }
+        
+        // Photo Keywords (taxonomy)
+        if ( isset( $columns['taxonomy-aplb_keyword'] ) ) {
+            $ordered['taxonomy-aplb_keyword'] = $columns['taxonomy-aplb_keyword'];
+        }
+
+        // Author
+        if ( isset( $columns['author'] ) ) {
+            $ordered['author'] = $columns['author'];
+        }
+        
+        // Taken Date (taxonomy)
+        if ( isset( $columns['taxonomy-aplb_taken_date'] ) ) {
+            $ordered['taxonomy-aplb_taken_date'] = $columns['taxonomy-aplb_taken_date'];
+        }
+
+        // Photo Taken (meta)
+        $ordered['aplb_taken_date'] = __( 'Photo Taken', 'ap-library' );
+        
+        // Published Date (taxonomy)
+        if ( isset( $columns['taxonomy-aplb_published_date'] ) ) {
+            $ordered['taxonomy-aplb_published_date'] = $columns['taxonomy-aplb_published_date'];
+        }
+        
+        // Photo Published (meta)
+        $ordered['aplb_published_date'] = __( 'Photo Published', 'ap-library' );
+
+        // Date (WordPress post date)
+        if ( isset( $columns['date'] ) ) {
+            $ordered['date'] = $columns['date'];
+        }
+
+        // Add any remaining columns that weren't explicitly ordered
         foreach ( $columns as $key => $value ) {
-            $new[ $key ] = $value;
-            if ( $key === 'cb' ) {
-                $new['thumbnail'] = __( 'Thumbnail', 'ap-library' );
-            }
-            // Add date columns before the default 'date' column
-            if ( $key === 'date' ) {
-                $new['aplb_published_date'] = __( 'Photo Published', 'ap-library' );
-                $new['aplb_taken_date'] = __( 'Photo Taken', 'ap-library' );
+            if ( ! isset( $ordered[ $key ] ) ) {
+                $ordered[ $key ] = $value;
             }
         }
-        return $new;
+        
+        return $ordered;
     }
 
     /**
