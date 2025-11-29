@@ -485,6 +485,17 @@ class Ap_Library_Admin {
 				'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
 			]
 		);
+
+		// Portfolio bulk assignment route
+		register_rest_route(
+			'ap-library/v1',
+			'/assign-portfolios',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'rest_assign_portfolios' ],
+				'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+			]
+		);
 	}
 
 	/**
@@ -557,6 +568,98 @@ class Ap_Library_Admin {
 			<div style="clear:both;"></div>
 		</span>
 		<?php
+	}
+
+	/**
+	 * Output the bulk portfolio toolbar on the photo list screen.
+	 *
+	 * Similar UI to genres, allows selecting portfolio terms and applying
+	 * add/replace to selected photos.
+	 *
+	 * @since    Unreleased
+	 */
+	public function render_bulk_portfolio_toolbar() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || $screen->id !== 'edit-aplb_photo' ) { return; }
+		$terms = get_terms( [ 'taxonomy' => 'aplb_portfolio', 'hide_empty' => false ] );
+		?>
+		<span id="aplb-inline-bulk-portfolios" class="aplb-inline-bulk-portfolios" style="display:inline-block; vertical-align:top; margin-left:12px; max-width:480px;">
+			<label for="aplb-bulk-portfolio-select" style="font-weight:600; display:block; margin-bottom:2px;"><?php esc_html_e( 'Bulk Portfolios', 'ap-library' ); ?></label>
+			<select multiple id="aplb-bulk-portfolio-select" style="width:180px; height:120px; margin-right:12px; float:left;">
+				<?php foreach ( $terms as $t ) : ?>
+					<option value="<?php echo esc_attr( $t->term_id ); ?>" data-name="<?php echo esc_attr( $t->name ); ?>"><?php echo esc_html( $t->name ); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<div style="display:inline-block; width:260px;">
+				<label style="display:block; margin:2px 0 4px;"><input type="checkbox" id="aplb-bulk-portfolio-replace" value="1" /> <?php esc_html_e( 'Replace existing portfolios', 'ap-library' ); ?></label>
+				<button type="button" class="button" id="aplb-bulk-portfolio-apply" disabled style="margin-top:4px;"><?php esc_html_e( 'Apply Portfolios to Selected', 'ap-library' ); ?></button>
+				<span class="spinner" style="visibility:hidden; float:none; margin-top:6px;"></span>
+				<span class="aplb-bulk-portfolio-status" style="display:block; min-height:16px; font-size:11px; margin-top:4px;" aria-live="polite"></span>
+				<small style="display:block; color:#666; margin-top:4px; font-size:11px;"><?php esc_html_e( 'Add merges; Replace overwrites.', 'ap-library' ); ?></small>
+			</div>
+			<div style="clear:both;"></div>
+		</span>
+		<script>
+		(function($){
+			function getSelectedPostIds(){
+				var ids=[];
+				$('#the-list input[type="checkbox"][name="post[]"]:checked').each(function(){ ids.push(parseInt($(this).val(),10)); });
+				return ids;
+			}
+			function updateButton(){
+				var hasPosts = getSelectedPostIds().length>0;
+				var hasTerms = $('#aplb-bulk-portfolio-select').val() && $('#aplb-bulk-portfolio-select').val().length>0;
+				$('#aplb-bulk-portfolio-apply').prop('disabled', !(hasPosts && hasTerms));
+			}
+			$(document).on('change','#aplb-bulk-portfolio-select, #the-list input[type="checkbox"][name="post[]"]', updateButton);
+			$('#aplb-bulk-portfolio-apply').on('click', function(){
+				var postIds = getSelectedPostIds();
+				var termIds = ($('#aplb-bulk-portfolio-select').val()||[]).map(function(v){ return parseInt(v,10); });
+				var mode = $('#aplb-bulk-portfolio-replace').is(':checked') ? 'replace' : 'add';
+				var $btn = $(this); var $status = $('.aplb-bulk-portfolio-status'); var $spinner = $btn.siblings('.spinner');
+				$spinner.css('visibility','visible'); $btn.prop('disabled', true); $status.text('');
+				wp.apiFetch({ path: '/ap-library/v1/assign-portfolios', method: 'POST', data: { postIds: postIds, termIds: termIds, mode: mode } })
+				.then(function(res){ $status.text(res.updated.length + ' updated.'); })
+				.catch(function(err){ $status.text('<?php echo esc_js( __( 'Error applying portfolios.', 'ap-library' ) ); ?>'); })
+				.finally(function(){ $spinner.css('visibility','hidden'); updateButton(); });
+			});
+		})(jQuery);
+		</script>
+		<?php
+	}
+
+	/**
+	 * REST callback to assign portfolio terms to multiple photo posts.
+	 *
+	 * @since    Unreleased
+	 */
+	public function rest_assign_portfolios( WP_REST_Request $request ) {
+		$post_ids = (array) $request->get_param( 'postIds' );
+		$term_ids = (array) $request->get_param( 'termIds' );
+		$mode     = $request->get_param( 'mode' );
+		$post_ids = array_filter( array_map( 'intval', $post_ids ) );
+		$term_ids = array_filter( array_map( 'intval', $term_ids ) );
+		if ( empty( $post_ids ) || empty( $term_ids ) ) {
+			return new WP_REST_Response( [ 'success' => false, 'message' => __( 'Missing post or term IDs.', 'ap-library' ) ], 400 );
+		}
+		$updated = [];
+		foreach ( $post_ids as $pid ) {
+			if ( get_post_type( $pid ) !== 'aplb_photo' || ! current_user_can( 'edit_post', $pid ) ) {
+				continue;
+			}
+			if ( $mode === 'replace' ) {
+				$result = wp_set_object_terms( $pid, $term_ids, 'aplb_portfolio' );
+			} else {
+				$current_terms = wp_get_object_terms( $pid, 'aplb_portfolio', [ 'fields' => 'ids' ] );
+				if ( is_wp_error( $current_terms ) ) { $current_terms = []; }
+				$new_terms = array_unique( array_merge( $current_terms, $term_ids ) );
+				$result = wp_set_object_terms( $pid, $new_terms, 'aplb_portfolio' );
+			}
+			if ( ! is_wp_error( $result ) ) {
+				$updated[] = $pid;
+			}
+		}
+		return new WP_REST_Response( [ 'success' => true, 'updated' => $updated, 'mode' => ( $mode === 'replace' ? 'replace' : 'add' ) ], 200 );
 	}
 
 }
