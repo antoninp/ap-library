@@ -167,16 +167,16 @@ class Ap_Library_Admin {
 				$this->version,
 				false
 			);
-			// Bulk genre assignment script (renamed for convention)
+			// Bulk assignment script (unified for genres and portfolios)
 			wp_enqueue_script(
-				'ap-library-bulk-genres',
-				plugin_dir_url(__FILE__) . 'js/ap-library-bulk-genres.js',
+				'ap-library-bulk-assign',
+				plugin_dir_url(__FILE__) . 'js/ap-library-bulk-assign.js',
 				['jquery','wp-api-fetch','underscore'],
 				$this->version,
 				true
 			);
 			wp_localize_script(
-				'ap-library-bulk-genres',
+				'ap-library-bulk-assign',
 				'APLB_BulkGenres',
 				[
 					'nonce'          => wp_create_nonce( 'wp_rest' ),
@@ -186,6 +186,20 @@ class Ap_Library_Admin {
 					'replaceLabel'   => esc_html__( 'Replace existing genres', 'ap-library' ),
 					'successMessage' => esc_html__( 'Genres updated successfully.', 'ap-library' ),
 					'errorMessage'   => esc_html__( 'Failed assigning genres.', 'ap-library' ),
+				]
+			);
+			// Portfolio bulk assignment uses the same script
+			wp_localize_script(
+				'ap-library-bulk-assign',
+				'APLB_BulkPortfolios',
+				[
+					'nonce'          => wp_create_nonce( 'wp_rest' ),
+					'restUrl'        => esc_url_raw( rest_url( 'ap-library/v1/assign-portfolios' ) ),
+					'taxonomy'       => 'aplb_portfolio',
+					'applyLabel'     => esc_html__( 'Apply Portfolios to Selected', 'ap-library' ),
+					'replaceLabel'   => esc_html__( 'Replace existing portfolios', 'ap-library' ),
+					'successMessage' => esc_html__( 'Portfolios updated successfully.', 'ap-library' ),
+					'errorMessage'   => esc_html__( 'Failed assigning portfolios.', 'ap-library' ),
 				]
 			);
 		}
@@ -599,32 +613,6 @@ class Ap_Library_Admin {
 			</div>
 			<div style="clear:both;"></div>
 		</span>
-		<script>
-		(function($){
-			function getSelectedPostIds(){
-				var ids=[];
-				$('#the-list input[type="checkbox"][name="post[]"]:checked').each(function(){ ids.push(parseInt($(this).val(),10)); });
-				return ids;
-			}
-			function updateButton(){
-				var hasPosts = getSelectedPostIds().length>0;
-				var hasTerms = $('#aplb-bulk-portfolio-select').val() && $('#aplb-bulk-portfolio-select').val().length>0;
-				$('#aplb-bulk-portfolio-apply').prop('disabled', !(hasPosts && hasTerms));
-			}
-			$(document).on('change','#aplb-bulk-portfolio-select, #the-list input[type="checkbox"][name="post[]"]', updateButton);
-			$('#aplb-bulk-portfolio-apply').on('click', function(){
-				var postIds = getSelectedPostIds();
-				var termIds = ($('#aplb-bulk-portfolio-select').val()||[]).map(function(v){ return parseInt(v,10); });
-				var mode = $('#aplb-bulk-portfolio-replace').is(':checked') ? 'replace' : 'add';
-				var $btn = $(this); var $status = $('.aplb-bulk-portfolio-status'); var $spinner = $btn.siblings('.spinner');
-				$spinner.css('visibility','visible'); $btn.prop('disabled', true); $status.text('');
-				wp.apiFetch({ path: '/ap-library/v1/assign-portfolios', method: 'POST', data: { postIds: postIds, termIds: termIds, mode: mode } })
-				.then(function(res){ $status.text(res.updated.length + ' updated.'); })
-				.catch(function(err){ $status.text('<?php echo esc_js( __( 'Error applying portfolios.', 'ap-library' ) ); ?>'); })
-				.finally(function(){ $spinner.css('visibility','hidden'); updateButton(); });
-			});
-		})(jQuery);
-		</script>
 		<?php
 	}
 
