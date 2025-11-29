@@ -39,6 +39,7 @@ class Ap_Library_Deactivator {
 		unregister_taxonomy( 'aplb_genre' );
 		unregister_taxonomy( 'aplb_published_date' );
 		unregister_taxonomy( 'aplb_keyword' );
+		unregister_taxonomy( 'aplb_portfolio' );
 		// Old taxonomies removed in consolidation; no-op if missing
 
 		// Flush rewrite rules to remove CPT/taxonomy permalinks

@@ -144,6 +144,11 @@ class Ap_Library {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-archive-rules.php';
 
 		/**
+		 * The class responsible for portfolio features (term meta and ordering).
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ap-library-portfolio.php';
+
+		/**
 		 * The class responsible for query modifications.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-ap-library-query.php';
@@ -225,6 +230,14 @@ class Ap_Library {
 		$archive_rules = new Ap_Library_Archive_Rules();
 		$this->loader->add_action( 'admin_menu', $archive_rules, 'add_rules_submenu' );
 		$this->loader->add_action( 'admin_init', $archive_rules, 'register_rules' );
+
+		// Portfolio hooks (term meta for featured images and menu order for photos)
+		$portfolio = new Ap_Library_Portfolio();
+		$this->loader->add_action( 'aplb_portfolio_edit_form_fields', $portfolio, 'add_portfolio_term_fields', 10, 1 );
+		$this->loader->add_action( 'aplb_portfolio_add_form_fields', $portfolio, 'add_portfolio_term_fields_new' );
+		$this->loader->add_action( 'edited_aplb_portfolio', $portfolio, 'save_portfolio_term_meta', 10, 1 );
+		$this->loader->add_action( 'created_aplb_portfolio', $portfolio, 'save_portfolio_term_meta', 10, 1 );
+		$this->loader->add_action( 'admin_enqueue_scripts', $portfolio, 'enqueue_portfolio_admin_scripts' );
 
 		// Overview menu at bottom for better UX (after task-specific tools)
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu', 99 );

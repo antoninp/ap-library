@@ -82,7 +82,8 @@ class Ap_Library_Custom_Post_Types {
                 'aplb_taken_date',
                 'aplb_genre',
                 'aplb_published_date',
-                'aplb_keyword'
+                'aplb_keyword',
+                'aplb_portfolio'
             ],
             'rewrite' => array( 'slug' => 'photos' ),
         ];

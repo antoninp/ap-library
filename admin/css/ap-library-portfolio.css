@@ -1,0 +1,33 @@
+/**
+ * Portfolio Admin Styles
+ *
+ * @since      Unreleased
+ * @package    Ap_Library
+ * @subpackage Ap_Library/admin/css
+ */
+
+.aplb-portfolio-image-wrapper {
+	max-width: 500px;
+}
+
+.aplb-portfolio-image-preview {
+	margin-bottom: 10px;
+	min-height: 50px;
+	border: 1px dashed #ddd;
+	padding: 10px;
+	background: #fafafa;
+}
+
+.aplb-portfolio-image-preview:empty {
+	display: none;
+}
+
+.aplb-portfolio-image-preview img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+.aplb-remove-image-button {
+	margin-left: 5px;
+}
