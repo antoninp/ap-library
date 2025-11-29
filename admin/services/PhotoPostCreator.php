@@ -22,7 +22,6 @@ class PhotoPostCreator {
         if ( ! wp_attachment_is_image( $image_id ) ) return;
 
         $attachment  = get_post( $image_id );
-        $term_genre  = 'All';
 
         // Extract taken date from EXIF first, fallback to filename/metadata
         require_once plugin_dir_path( dirname( __FILE__ ) ) . '../includes/class-ap-library-exif.php';
@@ -43,14 +42,7 @@ class PhotoPostCreator {
             }
         }
 
-        $genre_term_id = PhotoTermHelper::ensure_genre_term( $term_genre );
         $upload_date   = date( 'Y-m-d', strtotime( $attachment->post_date ) );
-
-        // Tax input (date taxonomies sync from meta later)
-        $tax_input = [];
-        if ( ! empty( $genre_term_id ) ) {
-            $tax_input['aplb_genre'] = [ $genre_term_id ];
-        }
 
         // Build gallery
         $gallery_shortcode = '[gallery ids="' . $image_id . '"]';
@@ -65,7 +57,6 @@ class PhotoPostCreator {
             'post_status' => 'pending',
             'post_author' => get_current_user_id(),
             'post_type'   => 'aplb_photo',
-            'tax_input'   => $tax_input,
         ];
 
         $post_id = wp_insert_post( $new_post );
