@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AP Library 1.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/ap-library\n"
-"POT-Creation-Date: 2025-11-23 00:00:00+00:00\n"
+"POT-Creation-Date: 2025-11-29 00:00:00+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,6 +13,27 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: Manual\n"
 "X-Domain: ap-library\n"
+
+# 1.3.1 New Portfolio & Settings Strings (appended manually)
+#: admin/class-ap-library-portfolio.php
+msgid "Portfolio Cover Image"
+msgstr ""
+
+#: admin/class-ap-library-portfolio.php
+msgid "Change Cover Image"
+msgstr ""
+
+#: admin/class-ap-library-portfolio.php
+msgid "Set Cover Image"
+msgstr ""
+
+#: admin/class-ap-library-portfolio.php
+msgid "Remove Cover Image"
+msgstr ""
+
+#: admin/class-ap-library-portfolio.php
+msgid "Select a cover image for this portfolio. This can be displayed on portfolio listing pages."
+msgstr ""
 
 #: admin/class-ap-library-admin-columns.php:27
 msgid "Thumbnail"
@@ -365,4 +386,64 @@ msgstr ""
 
 #. Author URI of the plugin
 msgid "https://antoninpuleo.com/"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Bulk Portfolios"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Replace existing portfolios"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Apply Portfolios to Selected"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Portfolios updated successfully."
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Failed assigning portfolios."
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Bulk Genres"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Replace existing genres"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Date format:"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Format for displaying dates in photo list columns and taxonomy terms. Applies to newly created dates."
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Short"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Full"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "ISO"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "US"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "EU"
+msgstr ""
+
+#: admin/class-ap-library-admin.php
+msgid "Add merges; Replace overwrites."
 msgstr ""

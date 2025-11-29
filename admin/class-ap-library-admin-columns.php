@@ -5,6 +5,7 @@
  *
  * @link       https://antoninpuleo.com
  * @since      1.0.0
+ * @modified   1.3.1 Reordered columns and applied global date format setting to date meta output.
  *
  * @package    Ap_Library
  * @subpackage Ap_Library/admin

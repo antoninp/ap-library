@@ -6,16 +6,18 @@ require_once plugin_dir_path( __FILE__ ) . '../helpers/PhotoTermHelper.php';
  * Class responsible for creating photo posts when images are uploaded.
  *
  * @since      1.3.0
+ * @modified   1.3.1 Date taxonomy term naming now uses global date format setting.
  */
 class PhotoPostCreator {
 
     /**
      * Create a new 'aplb_photo' post when an image is uploaded.
      *
-     * @since  1.3.0
-     * @param  int  $image_id The ID of the uploaded image.
-     * @param  bool $force    Whether to force post creation regardless of settings.
-     * @return void
+     * @since    1.3.0
+     * @modified 1.3.1 Removed automatic default genre assignment; respects global date format.
+     * @param    int  $image_id The ID of the uploaded image.
+     * @param    bool $force    Whether to force post creation regardless of settings.
+     * @return   void
      */
     public function create_post_on_image_upload( $image_id, $force = false ) {
         if ( ! $force && ! get_option( 'ap_library_auto_create_post_on_upload', false ) ) return;

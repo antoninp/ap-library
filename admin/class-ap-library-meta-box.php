@@ -5,6 +5,7 @@
  *
  * @link       https://antoninpuleo.com/
  * @since      1.0.0
+ * @modified   1.3.1 Date taxonomy sync respects global date format setting.
  *
  * @package    Ap_Library
  * @subpackage Ap_Library/admin

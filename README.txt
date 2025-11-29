@@ -5,7 +5,7 @@ Tags: photography, media, uploads, custom post type, taxonomy, exif, gallery, ar
 Requires at least: 6.5
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -137,6 +137,27 @@ Typical exclusion scenarios:
 
 == Changelog ==
 
+= 1.3.1 - Portfolio Support, Unified Bulk Tools, Date Format Setting =
+- Added: Portfolio taxonomy (`aplb_portfolio`) for curated photo collections (hierarchical & REST-enabled).
+- Added: Portfolio cover image term meta with media uploader on add/edit screens.
+- Added: Bulk portfolio assignment toolbar (Add / Replace) via REST endpoint `/ap-library/v1/assign-portfolios`.
+- Added: Unified bulk assignment script `ap-library-bulk-assign.js` for genres & portfolios (replaces genre-only script).
+- Added: Auto-clearing of selected photo checkboxes and replace checkbox after successful bulk assignment.
+- Added: Global date format setting (Photos → Library Overview) applied to list columns and newly created date taxonomy terms.
+- Added: Custom column order (thumbnail, title, genre, portfolio, keyword, taken date tax, published date tax, author, post date, taken meta, published meta).
+- Updated: Archive Rules now include portfolio taxonomy context (`tax:aplb_portfolio`).
+- Updated: Bulk assignment UI order (Genre toolbar appears left of Portfolio for faster access).
+- Updated: Date taxonomy term creation respects chosen date format for day-level terms.
+- Updated: Settings label clarifies global impact of date format selection.
+- Updated: REST localization consolidated into unified config objects for both taxonomies.
+- Removed: Legacy script `ap-library-bulk-genres.js` replaced by unified `ap-library-bulk-assign.js`.
+- Removed: Automatic default "All" genre assignment on photo creation for author control.
+- Fixed: Missing portfolio archive rule context registration.
+- Fixed: Genre/Portfolio columns not refreshing immediately after bulk operations.
+- Fixed: Replace-mode checkbox persisting checked state post-operation.
+- Fixed: Inconsistent date display (full month names) ignoring abbreviated preference.
+- Developer Notes: New class `Ap_Library_Portfolio` (@since 1.3.1) manages portfolio term meta; date format option `ap_library_date_format` (default `M j, Y`) does not retroactively rename existing terms.
+
 = 1.3.0 - Consolidated to Single Photo CPT (breaking changes) =
 - Added: Bulk genre assignment toolbar on Photos list screen with Add/Replace modes and REST API endpoint `/ap-library/v1/assign-genres`.
 - Added: Configurable photo post creation filters to exclude non-photographs (logos, icons, banners) based on filename keywords, dimensions (min width/height, default 400px), and file size (min KB, default 50KB).
@@ -192,6 +213,14 @@ Typical exclusion scenarios:
 - Custom post type, date meta, base taxonomies, admin UI, and public hooks skeleton.
 
 == Upgrade Notice ==
+
+= 1.3.1 =
+This release adds the Portfolio taxonomy, unified bulk assignment (genres + portfolios), and a global date format setting. After upgrading:
+1. Flush permalinks (Settings → Permalinks → Save) to ensure portfolio archives resolve.
+2. Visit Photos → Library Overview to choose a date format (default short) before creating new date terms.
+3. (Optional) Add portfolio cover images via the Portfolio taxonomy term edit screens.
+4. Use the new Bulk Portfolios toolbar to batch assign portfolios; verify column order updated.
+No database migration is required; existing posts remain intact. Previously created date terms keep their original names.
 
 = 1.3.0 =
 **BREAKING CHANGES:** This release consolidates to a single photo CPT (`aplb_photo`) and renames post types/taxonomies. Existing content will not appear until migrated. After upgrading, visit Settings → Permalinks and click Save. Use Backfill tools to re-sync content. Review the changelog for full migration details.

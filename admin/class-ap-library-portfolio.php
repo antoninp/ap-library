@@ -4,7 +4,7 @@
  *
  * Handles term meta for portfolio featured images and custom ordering.
  *
- * @since      Unreleased
+ * @since      1.3.1
  * @package    Ap_Library
  * @subpackage Ap_Library/admin
  */
@@ -12,7 +12,7 @@
 /**
  * Portfolio admin features class.
  *
- * @since      Unreleased
+ * @since      1.3.1
  * @package    Ap_Library
  * @subpackage Ap_Library/admin
  * @author     Antonin Puleo
@@ -22,7 +22,7 @@ class Ap_Library_Portfolio {
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since    Unreleased
+	 * @since    1.3.1
 	 */
 	public function __construct() {
 	}
@@ -30,7 +30,7 @@ class Ap_Library_Portfolio {
 	/**
 	 * Add custom fields to portfolio taxonomy edit form.
 	 *
-	 * @since    Unreleased
+	 * @since    1.3.1
 	 * @param    WP_Term    $term    Current taxonomy term object.
 	 */
 	public function add_portfolio_term_fields( $term ) {
@@ -67,7 +67,7 @@ class Ap_Library_Portfolio {
 	/**
 	 * Add custom fields to portfolio taxonomy add form.
 	 *
-	 * @since    Unreleased
+	 * @since    1.3.1
 	 */
 	public function add_portfolio_term_fields_new() {
 		?>
@@ -88,7 +88,7 @@ class Ap_Library_Portfolio {
 	/**
 	 * Save portfolio term meta.
 	 *
-	 * @since    Unreleased
+	 * @since    1.3.1
 	 * @param    int    $term_id    Term ID.
 	 */
 	public function save_portfolio_term_meta( $term_id ) {
@@ -105,7 +105,7 @@ class Ap_Library_Portfolio {
 	/**
 	 * Enqueue admin scripts for portfolio term meta.
 	 *
-	 * @since    Unreleased
+	 * @since    1.3.1
 	 * @param    string    $hook    Current admin page hook.
 	 */
 	public function enqueue_portfolio_admin_scripts( $hook ) {

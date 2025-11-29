@@ -272,6 +272,7 @@ class Ap_Library_Admin {
 	 *
 	 * @since    1.0.0
 	 * @modified 1.3.0 Added photo post creation filter settings.
+	 * @modified 1.3.1 Added global date format setting (ap_library_date_format) & portfolio bulk assignment localization.
 	 */
 	private function render_overview_settings_form() {
 		$auto_create = get_option( 'ap_library_auto_create_post_on_upload', false );
@@ -354,6 +355,7 @@ class Ap_Library_Admin {
 	 *
 	 * @since    1.0.0
 	 * @modified 1.3.0 Added handling for photo post creation filter settings.
+	 * @modified 1.3.1 Added saving of global date format setting and validation.
 	 */
 	public function handle_overview_settings() {
 		if (
@@ -614,7 +616,7 @@ class Ap_Library_Admin {
 	 * Similar UI to genres, allows selecting portfolio terms and applying
 	 * add/replace to selected photos.
 	 *
-	 * @since    Unreleased
+	 * @since    1.3.1
 	 */
 	public function render_bulk_portfolio_toolbar() {
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
@@ -643,7 +645,7 @@ class Ap_Library_Admin {
 	/**
 	 * REST callback to assign portfolio terms to multiple photo posts.
 	 *
-	 * @since    Unreleased
+	 * @since    1.3.1
 	 */
 	public function rest_assign_portfolios( WP_REST_Request $request ) {
 		$post_ids = (array) $request->get_param( 'postIds' );
