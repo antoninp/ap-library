@@ -113,18 +113,59 @@
 	/**
 	 * Update table row date cell (WordPress post date column)
 	 */
-	function updateTableCell(postId, newDate) {
+	function updateTableCell(postId, newDate, dateType) {
 		const $row = $('#post-' + postId);
-		const $dateCell = $row.find('td.column-date, td.date');
-		if ($dateCell.length && newDate) {
-			// Format date for display (WordPress usually shows relative time)
-			const dateObj = new Date(newDate);
-			const formattedDate = dateObj.toLocaleDateString('en-US', {
-				year: 'numeric',
-				month: 'short',
-				day: 'numeric'
-			});
-			$dateCell.find('abbr, time').attr('title', newDate).text(formattedDate);
+		
+		if (dateType === 'post_date') {
+			// Update WordPress post date column
+			const $dateCell = $row.find('td.column-date, td.date');
+			if ($dateCell.length && newDate) {
+				// Format date for display (WordPress usually shows relative time)
+				const dateObj = new Date(newDate);
+				const formattedDate = dateObj.toLocaleDateString('en-US', {
+					year: 'numeric',
+					month: 'short',
+					day: 'numeric'
+				});
+				$dateCell.find('abbr, time').attr('title', newDate).text(formattedDate);
+				
+				// Add visual indicator
+				$dateCell.css('background-color', '#e6f7e6').animate({ backgroundColor: 'transparent' }, 2000);
+			}
+		} else if (dateType === 'published_date') {
+			// Update Published Date column
+			const $publishedCell = $row.find('td.column-aplb_published_date');
+			if ($publishedCell.length && newDate) {
+				const dateOnly = newDate.split(' ')[0]; // Extract Y-m-d part
+				const dateObj = new Date(dateOnly);
+				const formattedDate = dateObj.toLocaleDateString('en-US', {
+					year: 'numeric',
+					month: 'short',
+					day: 'numeric'
+				});
+				
+				$publishedCell.html('<span data-date="' + _.escape(dateOnly) + '">' + _.escape(formattedDate) + '</span>');
+				
+				// Add visual indicator
+				$publishedCell.css('background-color', '#e6f7e6').animate({ backgroundColor: 'transparent' }, 2000);
+			}
+		} else if (dateType === 'taken_date') {
+			// Update Taken Date column
+			const $takenCell = $row.find('td.column-aplb_taken_date');
+			if ($takenCell.length && newDate) {
+				const dateOnly = newDate.split(' ')[0]; // Extract Y-m-d part
+				const dateObj = new Date(dateOnly);
+				const formattedDate = dateObj.toLocaleDateString('en-US', {
+					year: 'numeric',
+					month: 'short',
+					day: 'numeric'
+				});
+				
+				$takenCell.html('<span data-date="' + _.escape(dateOnly) + '">' + _.escape(formattedDate) + '</span>');
+				
+				// Add visual indicator
+				$takenCell.css('background-color', '#e6f7e6').animate({ backgroundColor: 'transparent' }, 2000);
+			}
 		}
 	}
 	
@@ -234,7 +275,7 @@
 			if (resp && resp.success) {
 				// Update table cells for updated posts
 				resp.updated.forEach(function(item){
-					updateTableCell(item.postId, item.newDate);
+					updateTableCell(item.postId, item.newDate, dateType);
 				});
 				
 				clearPhotoSelection();
