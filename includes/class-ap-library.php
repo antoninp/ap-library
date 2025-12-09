@@ -201,6 +201,8 @@ class Ap_Library {
 		$this->loader->add_action( 'rest_api_init', $plugin_admin, 'register_rest_routes' );
 		// Bulk portfolio assignment toolbar
 		$this->loader->add_action( 'restrict_manage_posts', $plugin_admin, 'render_bulk_portfolio_toolbar' );
+		// Bulk post date editor toolbar
+		$this->loader->add_action( 'restrict_manage_posts', $plugin_admin, 'render_bulk_date_toolbar' );
 
 		// Columns hooks
 		$columns_manager = $plugin_admin->get_columns_manager();

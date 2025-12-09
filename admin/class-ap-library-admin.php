@@ -175,6 +175,25 @@ class Ap_Library_Admin {
 				$this->version,
 				true
 			);
+			
+			// Bulk date editor script
+			wp_enqueue_script(
+				'ap-library-bulk-date',
+				plugin_dir_url(__FILE__) . 'js/ap-library-bulk-date.js',
+				['jquery', 'wp-api-fetch'],
+				$this->version,
+				true
+			);
+			wp_localize_script(
+				'ap-library-bulk-date',
+				'APLB_BulkDate',
+				[
+					'confirmMsg'     => esc_html__( 'Update post date for %d photos? Components to update: %s', 'ap-library' ),
+					'successMsg'     => esc_html__( 'Post dates updated successfully.', 'ap-library' ),
+					'errorMsg'       => esc_html__( 'Failed to update post dates.', 'ap-library' ),
+				]
+			);
+			
 			wp_localize_script(
 				'ap-library-bulk-assign',
 				'APLB_BulkGenres',
@@ -536,6 +555,17 @@ class Ap_Library_Admin {
 				'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
 			]
 		);
+		
+		// Bulk date update route
+		register_rest_route(
+			'ap-library/v1',
+			'/bulk-update-date',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'rest_bulk_update_date' ],
+				'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+			]
+		);
 	}
 
 	/**
@@ -674,6 +704,208 @@ class Ap_Library_Admin {
 			}
 		}
 		return new WP_REST_Response( [ 'success' => true, 'updated' => $updated, 'mode' => ( $mode === 'replace' ? 'replace' : 'add' ) ], 200 );
+	}
+
+	/**
+	 * Output the bulk post date toolbar on the photo list screen.
+	 *
+	 * Renders an inline toolbar with date component selectors (year, month, day, hour, minute)
+	 * that allows updating specific parts of post_date for selected photos.
+	 *
+	 * @since    1.3.2
+	 */
+	public function render_bulk_date_toolbar() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || $screen->id !== 'edit-aplb_photo' ) { return; }
+		
+		$current_year = (int) date('Y');
+		?>
+		<div id="aplb-inline-bulk-date" class="aplb-inline-bulk-date" style="display:inline-block; vertical-align:top; margin-left:12px; max-width:700px; border-left: 1px solid #ddd; padding-left:12px;">
+			<label style="font-weight:600; display:block; margin-bottom:4px;"><?php esc_html_e( 'Bulk Post Date', 'ap-library' ); ?></label>
+			<div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap;">
+				<!-- Year -->
+				<div style="display:inline-block;">
+					<label style="display:block; margin-bottom:2px; font-size:11px;">
+						<input type="checkbox" id="aplb-bulk-date-year-enable" value="1" />
+						<?php esc_html_e( 'Year', 'ap-library' ); ?>
+					</label>
+					<select id="aplb-bulk-date-year" disabled style="width:80px;">
+						<?php for ($y = $current_year + 5; $y >= $current_year - 50; $y--) : ?>
+							<option value="<?php echo esc_attr($y); ?>" <?php selected($y, $current_year); ?>><?php echo esc_html($y); ?></option>
+						<?php endfor; ?>
+					</select>
+				</div>
+				
+				<!-- Month -->
+				<div style="display:inline-block;">
+					<label style="display:block; margin-bottom:2px; font-size:11px;">
+						<input type="checkbox" id="aplb-bulk-date-month-enable" value="1" />
+						<?php esc_html_e( 'Month', 'ap-library' ); ?>
+					</label>
+					<select id="aplb-bulk-date-month" disabled style="width:70px;">
+						<?php for ($m = 1; $m <= 12; $m++) : ?>
+							<option value="<?php echo esc_attr($m); ?>"><?php echo esc_html(str_pad($m, 2, '0', STR_PAD_LEFT)); ?></option>
+						<?php endfor; ?>
+					</select>
+				</div>
+				
+				<!-- Day -->
+				<div style="display:inline-block;">
+					<label style="display:block; margin-bottom:2px; font-size:11px;">
+						<input type="checkbox" id="aplb-bulk-date-day-enable" value="1" />
+						<?php esc_html_e( 'Day', 'ap-library' ); ?>
+					</label>
+					<select id="aplb-bulk-date-day" disabled style="width:70px;">
+						<?php for ($d = 1; $d <= 31; $d++) : ?>
+							<option value="<?php echo esc_attr($d); ?>"><?php echo esc_html(str_pad($d, 2, '0', STR_PAD_LEFT)); ?></option>
+						<?php endfor; ?>
+					</select>
+				</div>
+				
+				<!-- Hour -->
+				<div style="display:inline-block;">
+					<label style="display:block; margin-bottom:2px; font-size:11px;">
+						<input type="checkbox" id="aplb-bulk-date-hour-enable" value="1" />
+						<?php esc_html_e( 'Hour', 'ap-library' ); ?>
+					</label>
+					<select id="aplb-bulk-date-hour" disabled style="width:70px;">
+						<?php for ($h = 0; $h <= 23; $h++) : ?>
+							<option value="<?php echo esc_attr($h); ?>"><?php echo esc_html(str_pad($h, 2, '0', STR_PAD_LEFT)); ?></option>
+						<?php endfor; ?>
+					</select>
+				</div>
+				
+				<!-- Minute -->
+				<div style="display:inline-block;">
+					<label style="display:block; margin-bottom:2px; font-size:11px;">
+						<input type="checkbox" id="aplb-bulk-date-minute-enable" value="1" />
+						<?php esc_html_e( 'Minute', 'ap-library' ); ?>
+					</label>
+					<select id="aplb-bulk-date-minute" disabled style="width:70px;">
+						<?php for ($min = 0; $min <= 59; $min++) : ?>
+							<option value="<?php echo esc_attr($min); ?>"><?php echo esc_html(str_pad($min, 2, '0', STR_PAD_LEFT)); ?></option>
+						<?php endfor; ?>
+					</select>
+				</div>
+				
+				<!-- Action buttons -->
+				<div style="display:inline-block; margin-top:18px;">
+					<button type="button" class="button" id="aplb-bulk-date-apply" disabled><?php esc_html_e( 'Update Post Dates', 'ap-library' ); ?></button>
+					<span class="spinner" style="visibility:hidden; float:none; margin:0 0 0 4px;"></span>
+				</div>
+			</div>
+			<div style="margin-top:4px;">
+				<span class="aplb-bulk-date-status" style="display:block; min-height:16px; font-size:11px;" aria-live="polite"></span>
+				<small style="display:block; color:#666; font-size:11px;"><?php esc_html_e( 'Check components to update, then select photos and click Update.', 'ap-library' ); ?></small>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * REST callback to bulk update post dates with partial component updates.
+	 *
+	 * Updates only specified date components (year, month, day, hour, minute) while keeping
+	 * other components unchanged for each selected photo.
+	 *
+	 * @since    1.3.2
+	 * @param    WP_REST_Request $request The REST request object containing postIds and components.
+	 * @return   WP_REST_Response Response object with success status and list of updated posts.
+	 */
+	public function rest_bulk_update_date( WP_REST_Request $request ) {
+		$post_ids = (array) $request->get_param( 'postIds' );
+		$components = (array) $request->get_param( 'components' );
+		
+		$post_ids = array_filter( array_map( 'intval', $post_ids ) );
+		
+		if ( empty( $post_ids ) || empty( $components ) ) {
+			return new WP_REST_Response( [ 
+				'success' => false, 
+				'message' => __( 'Missing post IDs or date components.', 'ap-library' ) 
+			], 400 );
+		}
+		
+		$updated = [];
+		$errors = [];
+		
+		foreach ( $post_ids as $pid ) {
+			if ( get_post_type( $pid ) !== 'aplb_photo' || ! current_user_can( 'edit_post', $pid ) ) {
+				continue;
+			}
+			
+			$post = get_post( $pid );
+			if ( ! $post ) {
+				continue;
+			}
+			
+			// Parse current post_date
+			$current_date = $post->post_date;
+			$date_parts = date_parse( $current_date );
+			
+			// Apply new components
+			$new_year   = isset( $components['year'] ) ? (int) $components['year'] : $date_parts['year'];
+			$new_month  = isset( $components['month'] ) ? (int) $components['month'] : $date_parts['month'];
+			$new_day    = isset( $components['day'] ) ? (int) $components['day'] : $date_parts['day'];
+			$new_hour   = isset( $components['hour'] ) ? (int) $components['hour'] : $date_parts['hour'];
+			$new_minute = isset( $components['minute'] ) ? (int) $components['minute'] : $date_parts['minute'];
+			$new_second = $date_parts['second']; // Keep seconds unchanged
+			
+			// Validate date components
+			if ( ! checkdate( $new_month, $new_day, $new_year ) ) {
+				$errors[] = sprintf( 
+					__( 'Invalid date for post #%d: %04d-%02d-%02d', 'ap-library' ), 
+					$pid, $new_year, $new_month, $new_day 
+				);
+				continue;
+			}
+			
+			// Build new date string
+			$new_date = sprintf(
+				'%04d-%02d-%02d %02d:%02d:%02d',
+				$new_year,
+				$new_month,
+				$new_day,
+				$new_hour,
+				$new_minute,
+				$new_second
+			);
+			
+			// Convert to GMT for storage
+			$new_date_gmt = get_gmt_from_date( $new_date );
+			
+			// Update post
+			$result = wp_update_post( [
+				'ID'            => $pid,
+				'post_date'     => $new_date,
+				'post_date_gmt' => $new_date_gmt,
+			], true );
+			
+			if ( ! is_wp_error( $result ) ) {
+				$updated[] = [
+					'postId'  => $pid,
+					'newDate' => $new_date,
+				];
+			} else {
+				$errors[] = sprintf( 
+					__( 'Failed to update post #%d: %s', 'ap-library' ), 
+					$pid, $result->get_error_message() 
+				);
+			}
+		}
+		
+		if ( ! empty( $updated ) ) {
+			return new WP_REST_Response( [ 
+				'success' => true, 
+				'updated' => $updated,
+				'errors'  => $errors,
+			], 200 );
+		} else {
+			return new WP_REST_Response( [ 
+				'success' => false, 
+				'message' => __( 'No posts were updated.', 'ap-library' ),
+				'errors'  => $errors,
+			], 400 );
+		}
 	}
 
 }
