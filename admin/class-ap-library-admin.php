@@ -188,9 +188,12 @@ class Ap_Library_Admin {
 				'ap-library-bulk-date',
 				'APLB_BulkDate',
 				[
-					'confirmMsg'     => esc_html__( 'Update post date for %d photos? Components to update: %s', 'ap-library' ),
-					'successMsg'     => esc_html__( 'Post dates updated successfully.', 'ap-library' ),
-					'errorMsg'       => esc_html__( 'Failed to update post dates.', 'ap-library' ),
+					'confirmMsg'     => esc_html__( 'Update %s for %d photos? Components to update: %s', 'ap-library' ),
+					'successMsg'     => esc_html__( 'Dates updated successfully.', 'ap-library' ),
+					'errorMsg'       => esc_html__( 'Failed to update dates.', 'ap-library' ),
+					'postDateLabel'  => esc_html__( 'Post Date', 'ap-library' ),
+					'publishedDateLabel' => esc_html__( 'Published Date', 'ap-library' ),
+					'takenDateLabel' => esc_html__( 'Taken Date', 'ap-library' ),
 				]
 			);
 			
@@ -720,8 +723,26 @@ class Ap_Library_Admin {
 		
 		$current_year = (int) date('Y');
 		?>
-		<div id="aplb-inline-bulk-date" class="aplb-inline-bulk-date" style="display:inline-block; vertical-align:top; margin-left:12px; max-width:700px; border-left: 1px solid #ddd; padding-left:12px;">
-			<label style="font-weight:600; display:block; margin-bottom:4px;"><?php esc_html_e( 'Bulk Post Date', 'ap-library' ); ?></label>
+		<div id="aplb-inline-bulk-date" class="aplb-inline-bulk-date" style="display:inline-block; vertical-align:top; margin-left:12px; max-width:800px; border-left: 1px solid #ddd; padding-left:12px;">
+			<label style="font-weight:600; display:block; margin-bottom:4px;"><?php esc_html_e( 'Bulk Date Update', 'ap-library' ); ?></label>
+			
+			<!-- Date Type Selection -->
+			<div style="margin-bottom:8px; padding:6px; background:#f0f0f1; border-radius:3px;">
+				<label style="font-size:11px; font-weight:600; display:block; margin-bottom:4px;"><?php esc_html_e( 'Date Type:', 'ap-library' ); ?></label>
+				<label style="margin-right:16px; font-size:12px;">
+					<input type="radio" name="aplb-bulk-date-type" value="post_date" checked />
+					<?php esc_html_e( 'Post Date', 'ap-library' ); ?>
+				</label>
+				<label style="margin-right:16px; font-size:12px;">
+					<input type="radio" name="aplb-bulk-date-type" value="published_date" />
+					<?php esc_html_e( 'Published Date', 'ap-library' ); ?>
+				</label>
+				<label style="font-size:12px;">
+					<input type="radio" name="aplb-bulk-date-type" value="taken_date" />
+					<?php esc_html_e( 'Taken Date', 'ap-library' ); ?>
+				</label>
+			</div>
+			
 			<div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap;">
 				<!-- Year -->
 				<div style="display:inline-block;">
@@ -790,13 +811,13 @@ class Ap_Library_Admin {
 				
 				<!-- Action buttons -->
 				<div style="display:inline-block; margin-top:18px;">
-					<button type="button" class="button" id="aplb-bulk-date-apply" disabled><?php esc_html_e( 'Update Post Dates', 'ap-library' ); ?></button>
+					<button type="button" class="button" id="aplb-bulk-date-apply" disabled><?php esc_html_e( 'Update Dates', 'ap-library' ); ?></button>
 					<span class="spinner" style="visibility:hidden; float:none; margin:0 0 0 4px;"></span>
 				</div>
 			</div>
 			<div style="margin-top:4px;">
 				<span class="aplb-bulk-date-status" style="display:block; min-height:16px; font-size:11px;" aria-live="polite"></span>
-				<small style="display:block; color:#666; font-size:11px;"><?php esc_html_e( 'Check components to update, then select photos and click Update.', 'ap-library' ); ?></small>
+				<small style="display:block; color:#666; font-size:11px;"><?php esc_html_e( 'Select date type, check components to update, then select photos and click Update.', 'ap-library' ); ?></small>
 			</div>
 		</div>
 		<?php
@@ -815,6 +836,7 @@ class Ap_Library_Admin {
 	public function rest_bulk_update_date( WP_REST_Request $request ) {
 		$post_ids = (array) $request->get_param( 'postIds' );
 		$components = (array) $request->get_param( 'components' );
+		$date_type = $request->get_param( 'dateType' ); // 'post_date', 'published_date', or 'taken_date'
 		
 		$post_ids = array_filter( array_map( 'intval', $post_ids ) );
 		
@@ -823,6 +845,11 @@ class Ap_Library_Admin {
 				'success' => false, 
 				'message' => __( 'Missing post IDs or date components.', 'ap-library' ) 
 			], 400 );
+		}
+		
+		// Validate date type
+		if ( ! in_array( $date_type, [ 'post_date', 'published_date', 'taken_date' ], true ) ) {
+			$date_type = 'post_date';
 		}
 		
 		$updated = [];
@@ -838,8 +865,30 @@ class Ap_Library_Admin {
 				continue;
 			}
 			
-			// Parse current post_date
-			$current_date = $post->post_date;
+			// Get current date based on type
+			if ( $date_type === 'post_date' ) {
+				$current_date = $post->post_date;
+			} elseif ( $date_type === 'published_date' ) {
+				$current_date = get_post_meta( $pid, APLB_META_PUBLISHED_DATE, true );
+				if ( empty( $current_date ) ) {
+					$current_date = gmdate( 'Y-m-d', strtotime( $post->post_date ) );
+				}
+				// Add time component if not present (for meta fields stored as date only)
+				if ( strlen( $current_date ) === 10 ) {
+					$current_date .= ' 00:00:00';
+				}
+			} else { // taken_date
+				$current_date = get_post_meta( $pid, APLB_META_TAKEN_DATE, true );
+				if ( empty( $current_date ) ) {
+					$current_date = gmdate( 'Y-m-d', strtotime( $post->post_date ) );
+				}
+				// Add time component if not present
+				if ( strlen( $current_date ) === 10 ) {
+					$current_date .= ' 00:00:00';
+				}
+			}
+			
+			// Parse current date
 			$date_parts = date_parse( $current_date );
 			
 			// Apply new components
@@ -860,7 +909,7 @@ class Ap_Library_Admin {
 			}
 			
 			// Build new date string
-			$new_date = sprintf(
+			$new_date_full = sprintf(
 				'%04d-%02d-%02d %02d:%02d:%02d',
 				$new_year,
 				$new_month,
@@ -870,27 +919,39 @@ class Ap_Library_Admin {
 				$new_second
 			);
 			
-			// Convert to GMT for storage
-			$new_date_gmt = get_gmt_from_date( $new_date );
-			
-			// Update post
-			$result = wp_update_post( [
-				'ID'            => $pid,
-				'post_date'     => $new_date,
-				'post_date_gmt' => $new_date_gmt,
-			], true );
-			
-			if ( ! is_wp_error( $result ) ) {
-				$updated[] = [
-					'postId'  => $pid,
-					'newDate' => $new_date,
-				];
-			} else {
-				$errors[] = sprintf( 
-					__( 'Failed to update post #%d: %s', 'ap-library' ), 
-					$pid, $result->get_error_message() 
-				);
+			// Update based on date type
+			if ( $date_type === 'post_date' ) {
+				// Convert to GMT for storage
+				$new_date_gmt = get_gmt_from_date( $new_date_full );
+				
+				// Update post
+				$result = wp_update_post( [
+					'ID'            => $pid,
+					'post_date'     => $new_date_full,
+					'post_date_gmt' => $new_date_gmt,
+				], true );
+				
+				if ( is_wp_error( $result ) ) {
+					$errors[] = sprintf( 
+						__( 'Failed to update post #%d: %s', 'ap-library' ), 
+						$pid, $result->get_error_message() 
+					);
+					continue;
+				}
+			} elseif ( $date_type === 'published_date' ) {
+				// Store as date only (Y-m-d format)
+				$new_date_string = sprintf( '%04d-%02d-%02d', $new_year, $new_month, $new_day );
+				update_post_meta( $pid, APLB_META_PUBLISHED_DATE, $new_date_string );
+			} else { // taken_date
+				// Store as date only (Y-m-d format)
+				$new_date_string = sprintf( '%04d-%02d-%02d', $new_year, $new_month, $new_day );
+				update_post_meta( $pid, APLB_META_TAKEN_DATE, $new_date_string );
 			}
+			
+			$updated[] = [
+				'postId'  => $pid,
+				'newDate' => $new_date_full,
+			];
 		}
 		
 		if ( ! empty( $updated ) ) {

@@ -1,12 +1,15 @@
 /**
- * Bulk Post Date Editor
+ * Bulk Date Editor
  * Allows updating specific date components (year, month, day, hour, minute) for multiple photos at once
+ * Supports post_date, published_date, and taken_date
  */
 (function($){
 	'use strict';
 	
 	const $toolbar = $('#aplb-inline-bulk-date');
 	if (!$toolbar.length) return;
+	
+	const $dateTypeRadios = $('input[name="aplb-bulk-date-type"]');
 	
 	const $yearCb = $('#aplb-bulk-date-year-enable');
 	const $monthCb = $('#aplb-bulk-date-month-enable');
@@ -23,6 +26,45 @@
 	const $applyBtn = $('#aplb-bulk-date-apply');
 	const $spinner = $toolbar.find('.spinner');
 	const $status = $('.aplb-bulk-date-status');
+	
+	/**
+	 * Get the selected date type
+	 */
+	function getDateType() {
+		return $dateTypeRadios.filter(':checked').val() || 'post_date';
+	}
+	
+	/**
+	 * Get the label for the selected date type
+	 */
+	function getDateTypeLabel() {
+		const dateType = getDateType();
+		if (dateType === 'post_date') {
+			return window.APLB_BulkDate.postDateLabel;
+		} else if (dateType === 'published_date') {
+			return window.APLB_BulkDate.publishedDateLabel;
+		} else {
+			return window.APLB_BulkDate.takenDateLabel;
+		}
+	}
+	
+	/**
+	 * Update visibility of hour/minute controls based on date type
+	 */
+	function updateTimeControlsVisibility() {
+		const dateType = getDateType();
+		const showTime = (dateType === 'post_date');
+		
+		// Show/hide hour and minute controls
+		$hourCb.closest('div').toggle(showTime);
+		$minuteCb.closest('div').toggle(showTime);
+		
+		// If hiding time controls, uncheck them
+		if (!showTime) {
+			$hourCb.prop('checked', false).trigger('change');
+			$minuteCb.prop('checked', false).trigger('change');
+		}
+	}
 	
 	/**
 	 * Get IDs of selected photos
@@ -133,6 +175,13 @@
 		updateButtonState();
 	});
 	
+	// Event listener for date type radio buttons
+	$dateTypeRadios.on('change', function() {
+		updateTimeControlsVisibility();
+		updateButtonState();
+		$status.text('');
+	});
+	
 	// Update button state when photo selection changes
 	$(document).on('change', '#the-list input[type="checkbox"][name="post[]"]', updateButtonState);
 	
@@ -148,6 +197,8 @@
 	$applyBtn.on('click', function(){
 		const postIds = getSelectedPostIds();
 		const components = getDateComponents();
+		const dateType = getDateType();
+		const dateTypeLabel = getDateTypeLabel();
 		
 		if (!postIds.length || !Object.keys(components).length) return;
 		
@@ -160,6 +211,7 @@
 		if (components.minute) componentNames.push('minute');
 		
 		const confirmMsg = window.APLB_BulkDate.confirmMsg
+			.replace('%s', dateTypeLabel)
 			.replace('%d', postIds.length)
 			.replace('%s', componentNames.join(', '));
 		
@@ -174,7 +226,8 @@
 			method: 'POST',
 			data: { 
 				postIds: postIds, 
-				components: components 
+				components: components,
+				dateType: dateType
 			}
 		})
 		.then(function(resp){
@@ -211,6 +264,7 @@
 	
 	// Initialize
 	updateButtonState();
+	updateTimeControlsVisibility();
 	toggleSelectState($yearCb, $yearSelect);
 	toggleSelectState($monthCb, $monthSelect);
 	toggleSelectState($dayCb, $daySelect);
