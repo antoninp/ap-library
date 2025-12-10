@@ -1069,5 +1069,59 @@ class Ap_Library_Admin {
 		}
 	}
 
+	/**
+	 * Render taxonomy filter dropdowns for the photo list view.
+	 *
+	 * Adds filter dropdowns for all photo taxonomies (genre, portfolio, 
+	 * keywords, location, taken date, published date) above the photo list table.
+	 *
+	 * @since    1.4.0
+	 */
+	public function render_taxonomy_filters() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || $screen->id !== 'edit-aplb_photo' ) {
+			return;
+		}
+
+		// Define all filterable taxonomies
+		$taxonomies = [
+			'aplb_genre'          => __( 'Photo Genre', 'ap-library' ),
+			'aplb_portfolio'      => __( 'Portfolios', 'ap-library' ),
+			'aplb_keyword'        => __( 'Photo Keywords', 'ap-library' ),
+			'aplb_location'       => __( 'Photo Locations', 'ap-library' ),
+			'aplb_taken_date'     => __( 'Taken Date', 'ap-library' ),
+			'aplb_published_date' => __( 'Published Date', 'ap-library' ),
+		];
+
+		foreach ( $taxonomies as $taxonomy_slug => $taxonomy_label ) {
+			$selected = isset( $_GET[ $taxonomy_slug ] ) ? sanitize_text_field( wp_unslash( $_GET[ $taxonomy_slug ] ) ) : '';
+
+			$terms = get_terms( [
+				'taxonomy'   => $taxonomy_slug,
+				'hide_empty' => true,
+			] );
+
+			if ( empty( $terms ) || is_wp_error( $terms ) ) {
+				continue;
+			}
+
+			?>
+			<select name="<?php echo esc_attr( $taxonomy_slug ); ?>" id="<?php echo esc_attr( $taxonomy_slug ); ?>-filter">
+				<option value=""><?php echo esc_html( $taxonomy_label ); ?></option>
+				<?php
+				foreach ( $terms as $term ) {
+					?>
+					<option value="<?php echo esc_attr( $term->slug ); ?>" <?php selected( $selected, $term->slug ); ?>>
+						<?php echo esc_html( $term->name ) . ' (' . intval( $term->count ) . ')'; ?>
+					</option>
+					<?php
+				}
+				?>
+			</select>
+			<?php
+		}
+	}
+
 }
+
 

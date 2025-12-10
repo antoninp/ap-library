@@ -205,6 +205,8 @@ class Ap_Library {
 		$this->loader->add_action( 'restrict_manage_posts', $plugin_admin, 'render_bulk_location_toolbar' );
 		// Bulk post date editor toolbar
 		$this->loader->add_action( 'restrict_manage_posts', $plugin_admin, 'render_bulk_date_toolbar' );
+		// Taxonomy filter dropdowns
+		$this->loader->add_action( 'restrict_manage_posts', $plugin_admin, 'render_taxonomy_filters' );
 
 		// Columns hooks
 		$columns_manager = $plugin_admin->get_columns_manager();
@@ -212,6 +214,7 @@ class Ap_Library {
 		$this->loader->add_action( 'manage_aplb_photo_posts_custom_column', $columns_manager, 'render_aplb_photo_thumbnail_column', 10, 2 );
 		$this->loader->add_filter( 'manage_edit-aplb_photo_sortable_columns', $columns_manager, 'make_date_columns_sortable' );
 		$this->loader->add_action( 'pre_get_posts', $columns_manager, 'handle_date_column_sorting' );
+		$this->loader->add_action( 'pre_get_posts', $columns_manager, 'filter_photos_by_taxonomy' );
 		$this->loader->add_action( 'quick_edit_custom_box', $columns_manager, 'add_quick_edit_date_fields', 10, 2 );
 		$this->loader->add_action( 'save_post', $columns_manager, 'save_quick_edit_data' );
 		$this->loader->add_action( 'admin_footer', $columns_manager, 'enqueue_quick_edit_script' );

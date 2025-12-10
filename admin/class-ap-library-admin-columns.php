@@ -406,4 +406,55 @@ class Ap_Library_Admin_Columns {
             <?php
         }
     }
+
+    /**
+     * Filter photos by selected taxonomy in the admin list view.
+     *
+     * Handles the query modification when taxonomy filters are selected.
+     *
+     * @since    1.4.0
+     * @param    WP_Query    $query    The WP_Query instance.
+     */
+    public function filter_photos_by_taxonomy( $query ) {
+        if ( ! is_admin() || ! $query->is_main_query() ) {
+            return;
+        }
+
+        $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+        if ( ! $screen || $screen->id !== 'edit-aplb_photo' ) {
+            return;
+        }
+
+        // Define all filterable taxonomies
+        $taxonomies = [
+            'aplb_genre',
+            'aplb_portfolio',
+            'aplb_keyword',
+            'aplb_location',
+            'aplb_taken_date',
+            'aplb_published_date',
+        ];
+
+        $tax_query = [];
+
+        foreach ( $taxonomies as $taxonomy ) {
+            if ( isset( $_GET[ $taxonomy ] ) && ! empty( $_GET[ $taxonomy ] ) ) {
+                $term_slug = sanitize_text_field( wp_unslash( $_GET[ $taxonomy ] ) );
+                
+                $tax_query[] = [
+                    'taxonomy' => $taxonomy,
+                    'field'    => 'slug',
+                    'terms'    => $term_slug,
+                ];
+            }
+        }
+
+        if ( ! empty( $tax_query ) ) {
+            // If multiple taxonomy filters are set, use 'AND' relationship
+            if ( count( $tax_query ) > 1 ) {
+                $tax_query['relation'] = 'AND';
+            }
+            $query->set( 'tax_query', $tax_query );
+        }
+    }
 }
