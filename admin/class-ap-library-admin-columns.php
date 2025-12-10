@@ -52,6 +52,11 @@ class Ap_Library_Admin_Columns {
             $ordered['taxonomy-aplb_keyword'] = $columns['taxonomy-aplb_keyword'];
         }
 
+        // Photo Locations (taxonomy)
+        if ( isset( $columns['taxonomy-aplb_location'] ) ) {
+            $ordered['taxonomy-aplb_location'] = $columns['taxonomy-aplb_location'];
+        }
+
         // Author
         if ( isset( $columns['author'] ) ) {
             $ordered['author'] = $columns['author'];

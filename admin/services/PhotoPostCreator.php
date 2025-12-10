@@ -81,6 +81,12 @@ class PhotoPostCreator {
             $this->assign_keywords( $post_id, $keywords );
         }
 
+        // Location
+        $location = Ap_Library_EXIF::get_location( $image_id );
+        if ( ! empty( $location ) ) {
+            $this->assign_location( $post_id, $location );
+        }
+
         // Link attachment to post
         wp_update_post( [ 'ID' => $image_id, 'post_parent' => $post_id ] );
         wp_update_post( [ 'ID' => $post_id, 'post_content' => $gallery_html ] );
@@ -116,6 +122,75 @@ class PhotoPostCreator {
         }
         if ( ! empty( $term_ids ) ) {
             wp_set_object_terms( $post_id, $term_ids, $taxonomy, false );
+        }
+    }
+
+    /**
+     * Assign location taxonomy term to a post.
+     * Parses location string (e.g., "City, Region, Country") into hierarchical terms.
+     *
+     * @since 1.4.0
+     * @param int    $post_id  Post ID.
+     * @param string $location Location string from IPTC.
+     */
+    private function assign_location( $post_id, $location ) {
+        $taxonomy = 'aplb_location';
+        if ( ! taxonomy_exists( $taxonomy ) ) return;
+
+        // Parse location string (e.g., "Paris, Île-de-France, France")
+        $parts = array_map( 'trim', explode( ',', $location ) );
+        $parts = array_filter( $parts ); // Remove empty parts
+        
+        if ( empty( $parts ) ) return;
+
+        // Reverse array to go from broadest (Country) to most specific (City)
+        $parts = array_reverse( $parts );
+        
+        $parent_id = 0;
+        $term_id = null;
+        
+        foreach ( $parts as $part ) {
+            $part = sanitize_text_field( $part );
+            $slug = sanitize_title( strtolower( $part ) );
+            
+            // Check if term exists at this hierarchy level with the correct parent
+            $existing = null;
+            $all_terms = get_terms( [
+                'taxonomy' => $taxonomy,
+                'slug' => $slug,
+                'hide_empty' => false,
+            ] );
+            
+            if ( ! empty( $all_terms ) && ! is_wp_error( $all_terms ) ) {
+                // Find term with matching parent
+                foreach ( $all_terms as $term ) {
+                    if ( (int) $term->parent === $parent_id ) {
+                        $existing = $term;
+                        break;
+                    }
+                }
+            }
+            
+            if ( ! $existing ) {
+                // Create new term
+                $created = wp_insert_term( $part, $taxonomy, [ 
+                    'slug' => $slug,
+                    'parent' => $parent_id 
+                ] );
+                
+                if ( ! is_wp_error( $created ) ) {
+                    $term_id = (int) $created['term_id'];
+                    $parent_id = $term_id;
+                }
+            } else {
+                $term_id = (int) $existing->term_id;
+                $parent_id = $term_id;
+            }
+        }
+        
+        // Assign the most specific term (leaf node) to the post
+        if ( $term_id ) {
+            wp_set_object_terms( $post_id, [ $term_id ], $taxonomy, false );
         }
     }
 

@@ -34,6 +34,7 @@ class Ap_Library_Taxonomy {
         $this->register_aplb_published_date_taxonomy();
         $this->register_aplb_keyword_taxonomy();
         $this->register_aplb_portfolio_taxonomy();
+        $this->register_aplb_location_taxonomy();
  
     }
     
@@ -208,6 +209,44 @@ class Ap_Library_Taxonomy {
             'rewrite'             => array( 'slug' => 'portfolio' ),
         ];
         register_taxonomy( 'aplb_portfolio', 'aplb_photo', $args );
+    }
+
+    /**
+     * Register the location taxonomy (auto from IPTC location data).
+     *
+     * @since    1.4.0
+     * @access   private
+     */
+    private function register_aplb_location_taxonomy() {
+
+        $args = [
+            'label'  => esc_html__( 'Photo Locations', 'ap-library' ),
+            'labels' => [
+                'menu_name'          => esc_html__( 'Photo Locations', 'ap-library' ),
+                'name'               => esc_html__( 'Photo Locations', 'ap-library' ),
+                'singular_name'      => esc_html__( 'Location', 'ap-library' ),
+                'add_new_item'       => esc_html__( 'Add new Location', 'ap-library' ),
+                'new_item'           => esc_html__( 'New Location', 'ap-library' ),
+                'edit_item'          => esc_html__( 'Edit Location', 'ap-library' ),
+                'update_item'        => esc_html__( 'Update Location', 'ap-library' ),
+                'view_item'          => esc_html__( 'View Location', 'ap-library' ),
+                'parent_item'        => esc_html__( 'Parent Location', 'ap-library' ),
+                'parent_item_colon'  => esc_html__( 'Parent Location:', 'ap-library' ),
+                'not_found'          => esc_html__( 'No Location found', 'ap-library' ),
+                'not_found_in_trash' => esc_html__( 'No Location found in trash', 'ap-library' ),
+                'all_items'          => esc_html__( 'All Locations', 'ap-library' ),
+            ],
+            'description'         => esc_html__( 'Geographic locations extracted from IPTC metadata. Hierarchical structure: Country → Region → City.', 'ap-library' ),
+            'public'              => true,
+            'show_ui'             => true,
+            'show_in_nav_menus'   => true,
+            'show_admin_column'   => true,
+            'show_in_quick_edit'  => true,
+            'show_in_rest'        => true,
+            'hierarchical'        => true,
+            'rewrite'             => array( 'slug' => 'photo-location' ),
+        ];
+        register_taxonomy( 'aplb_location', 'aplb_photo', $args );
     }
 
 }

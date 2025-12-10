@@ -141,4 +141,70 @@ class Ap_Library_EXIF {
 		}
 		return self::get_keywords( $thumbnail_id );
 	}
+
+	/**
+	 * Extract location from image IPTC metadata.
+	 *
+	 * @since 1.4.0
+	 * @param int $attachment_id Attachment ID.
+	 * @return string Location string or empty string if not found.
+	 */
+	public static function get_location( $attachment_id ) {
+		$file_path = get_attached_file( $attachment_id );
+		if ( ! $file_path || ! file_exists( $file_path ) ) {
+			return '';
+		}
+
+		// Use getimagesize with APP13 to read IPTC segment
+		$info = [];
+		@getimagesize( $file_path, $info );
+		if ( ! empty( $info['APP13'] ) && function_exists( 'iptcparse' ) ) {
+			$iptc = @iptcparse( $info['APP13'] );
+			
+			// IPTC 2#101: Country/Primary Location Name
+			// IPTC 2#092: Sublocation (City)
+			// IPTC 2#090: City
+			// IPTC 2#095: Province/State
+			
+			$location_parts = [];
+			
+			// City/Sublocation
+			if ( ! empty( $iptc['2#092'][0] ) ) {
+				$location_parts[] = trim( $iptc['2#092'][0] );
+			} elseif ( ! empty( $iptc['2#090'][0] ) ) {
+				$location_parts[] = trim( $iptc['2#090'][0] );
+			}
+			
+			// Province/State
+			if ( ! empty( $iptc['2#095'][0] ) ) {
+				$location_parts[] = trim( $iptc['2#095'][0] );
+			}
+			
+			// Country
+			if ( ! empty( $iptc['2#101'][0] ) ) {
+				$location_parts[] = trim( $iptc['2#101'][0] );
+			}
+			
+			if ( ! empty( $location_parts ) ) {
+				return sanitize_text_field( implode( ', ', $location_parts ) );
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Extract location from a post's featured image.
+	 *
+	 * @since 1.4.0
+	 * @param int $post_id Post ID.
+	 * @return string Location string or empty string if not found.
+	 */
+	public static function get_location_from_post( $post_id ) {
+		$thumbnail_id = get_post_thumbnail_id( $post_id );
+		if ( ! $thumbnail_id ) {
+			return '';
+		}
+		return self::get_location( $thumbnail_id );
+	}
 }

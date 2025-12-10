@@ -51,7 +51,8 @@ $aplb_taxonomies = [
     'aplb_genre',
     'aplb_published_date',
     'aplb_keyword',
-    'aplb_portfolio'
+    'aplb_portfolio',
+    'aplb_location'
 ];
 foreach ( $aplb_taxonomies as $taxonomy ) {
     $terms = get_terms( [ 'taxonomy' => $taxonomy, 'hide_empty' => false ] );

@@ -75,10 +75,12 @@
 		}
 		
 		// Event listeners
-		$(document).on('change', 
-			'#the-list input[type="checkbox"][name="post[]"], ' + config.selectId + ', ' + config.replaceCbId, 
-			updateButtonState
-		);
+		// Checkbox changes in the list
+		$(document).on('change', '#the-list input[type="checkbox"][name="post[]"]', updateButtonState);
+		// Select changes (direct binding, not delegated)
+		$select.on('change', updateButtonState);
+		// Replace checkbox changes
+		$(document).on('change', config.replaceCbId, updateButtonState);
 		
 		// Position toolbar after Filter button
 		$(function(){
@@ -152,6 +154,23 @@
 			restPath: '/ap-library/v1/assign-portfolios',
 			successMsg: APLB_BulkPortfolios.successMessage || 'Portfolios updated',
 			errorMsg: APLB_BulkPortfolios.errorMessage || 'Error applying portfolios',
+			replaceConfirmMsg: 'You are about to REPLACE existing %taxonomy% on %d photo(s) with %s selected %taxonomy%. This will discard any current %taxonomy% not selected. Continue?'
+		});
+	}
+
+	// Initialize Location bulk assignment
+	if (typeof APLB_BulkLocations !== 'undefined') {
+		createBulkAssignmentHandler({
+			toolbarId: '#aplb-inline-bulk-locations',
+			selectId: '#aplb-bulk-location-select',
+			applyBtnId: '#aplb-bulk-location-apply',
+			replaceCbId: '#aplb-bulk-location-replace',
+			statusClass: '.aplb-bulk-location-status',
+			taxonomy: 'aplb_location',
+			taxonomyLabel: 'locations',
+			restPath: '/ap-library/v1/assign-locations',
+			successMsg: APLB_BulkLocations.successMessage || 'Locations updated',
+			errorMsg: APLB_BulkLocations.errorMessage || 'Error applying locations',
 			replaceConfirmMsg: 'You are about to REPLACE existing %taxonomy% on %d photo(s) with %s selected %taxonomy%. This will discard any current %taxonomy% not selected. Continue?'
 		});
 	}

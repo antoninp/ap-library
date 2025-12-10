@@ -47,23 +47,29 @@ class Ap_Library_Backfill {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'ap-library' ) );
 		}
 
+		// Handle submissions independently.
+		if ( isset( $_POST['aplb_backfill_taken_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_taken_nonce'], 'aplb_backfill_taken' ) ) {
+			$this->process_taken_date_backfill();
+		}
+		if ( isset( $_POST['aplb_backfill_published_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_published_nonce'], 'aplb_backfill_published' ) ) {
+			$this->process_published_date_backfill();
+		}
+		if ( isset( $_POST['aplb_backfill_keywords_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_keywords_nonce'], 'aplb_backfill_keywords' ) ) {
+			$this->process_keywords_backfill();
+		}
+		if ( isset( $_POST['aplb_backfill_location_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_location_nonce'], 'aplb_backfill_location' ) ) {
+			$this->process_location_backfill();
+		}
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Backfill Photo Metadata', 'ap-library' ); ?></h1>
 			<p><?php esc_html_e( 'Use these tools to populate or regenerate date and keyword taxonomies from media metadata.', 'ap-library' ); ?></p>
-			<div class="notice notice-warning inline"><p><strong><?php esc_html_e( 'Warning:', 'ap-library' ); ?></strong> <?php esc_html_e( 'Backfill operations with "overwrite existing" enabled will replace current data. These changes are permanent and cannot be undone automatically. Consider backing up your database before running overwrite operations.', 'ap-library' ); ?></p></div>
-			<?php
-			// Handle submissions independently.
-			if ( isset( $_POST['aplb_backfill_taken_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_taken_nonce'], 'aplb_backfill_taken' ) ) {
-				$this->process_taken_date_backfill();
-			}
-			if ( isset( $_POST['aplb_backfill_published_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_published_nonce'], 'aplb_backfill_published' ) ) {
-				$this->process_published_date_backfill();
-			}
-			if ( isset( $_POST['aplb_backfill_keywords_nonce'] ) && wp_verify_nonce( $_POST['aplb_backfill_keywords_nonce'], 'aplb_backfill_keywords' ) ) {
-				$this->process_keywords_backfill();
-			}
-			?>
+			<div class="notice notice-warning inline">
+				<p>
+					<strong><?php esc_html_e( 'Warning:', 'ap-library' ); ?></strong>
+					<?php esc_html_e( 'Backfill operations with "overwrite existing" enabled will replace current data. These changes are permanent and cannot be undone automatically. Consider backing up your database before running overwrite operations.', 'ap-library' ); ?>
+				</p>
+			</div>
 
 			<h2><?php esc_html_e( 'Taken Date Backfill', 'ap-library' ); ?></h2>
 			<p><?php esc_html_e( 'Extract EXIF taken dates from featured images and synchronize to hierarchical taxonomy (Year → Month → Day).', 'ap-library' ); ?></p>
@@ -124,6 +130,27 @@ class Ap_Library_Backfill {
 					</tr>
 				</table>
 				<?php submit_button( __( 'Run Keywords Backfill', 'ap-library' ), 'secondary', 'submit', false ); ?>
+			</form>
+
+			<hr />
+
+			<h2><?php esc_html_e( 'Location Backfill', 'ap-library' ); ?></h2>
+			<p><?php esc_html_e( 'Extract IPTC location data from featured images and populate the location taxonomy (Country → Region → City).', 'ap-library' ); ?></p>
+			<form method="post" action="">
+				<?php wp_nonce_field( 'aplb_backfill_location', 'aplb_backfill_location_nonce' ); ?>
+				<table class="form-table">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Options', 'ap-library' ); ?></th>
+						<td>
+							<label>
+								<input type="checkbox" name="overwrite_existing_location" value="1" />
+								<?php esc_html_e( 'Overwrite existing location terms', 'ap-library' ); ?>
+							</label>
+							<p class="description"><?php esc_html_e( 'If unchecked, only posts without location will be processed.', 'ap-library' ); ?></p>
+						</td>
+					</tr>
+				</table>
+				<?php submit_button( __( 'Run Location Backfill', 'ap-library' ), 'secondary', 'submit', false ); ?>
 			</form>
 		</div>
 		<?php
@@ -268,6 +295,106 @@ class Ap_Library_Backfill {
 		echo '<div class="notice notice-success is-dismissible"><p>';
 		echo sprintf(
 			esc_html__( 'Keywords backfill complete! Processed %d posts, updated %d keyword sets.', 'ap-library' ),
+			$processed,
+			$updated
+		);
+		echo '</p></div>';
+	}
+
+	/**
+	 * Process location backfill from IPTC metadata.
+	 *
+	 * @since 1.4.0
+	 */
+	private function process_location_backfill() {
+		if ( ! taxonomy_exists( 'aplb_location' ) ) {
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'Location taxonomy not registered.', 'ap-library' ) . '</p></div>';
+			return;
+		}
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ap-library-exif.php';
+		$overwrite = isset( $_POST['overwrite_existing_location'] ) && '1' === $_POST['overwrite_existing_location'];
+		$args = array(
+			'post_type'      => 'aplb_photo',
+			'posts_per_page' => -1,
+			'post_status'    => 'any',
+		);
+		$photos = get_posts( $args );
+		$processed = 0;
+		$updated   = 0;
+		foreach ( $photos as $post ) {
+			$post_id = $post->ID;
+			$processed++;
+			$existing_loc = wp_get_object_terms( $post_id, 'aplb_location', array( 'fields' => 'ids' ) );
+			if ( ! $overwrite && ! empty( $existing_loc ) ) {
+				continue;
+			}
+			$location = Ap_Library_EXIF::get_location_from_post( $post_id );
+			if ( empty( $location ) ) {
+				continue;
+			}
+			
+			// Parse location string (e.g., "Paris, Île-de-France, France")
+			$parts = array_map( 'trim', explode( ',', $location ) );
+			$parts = array_filter( $parts );
+			
+			if ( empty( $parts ) ) {
+				continue;
+			}
+			
+			// Reverse array to go from broadest (Country) to most specific (City)
+			$parts = array_reverse( $parts );
+			
+			$parent_id = 0;
+			$term_id = null;
+			
+			foreach ( $parts as $part ) {
+				$part = sanitize_text_field( $part );
+				$slug = sanitize_title( strtolower( $part ) );
+				
+				// Check if term exists at this hierarchy level with the correct parent
+				$existing = null;
+				$all_terms = get_terms( array(
+					'taxonomy' => 'aplb_location',
+					'slug' => $slug,
+					'hide_empty' => false,
+				) );
+				
+				if ( ! empty( $all_terms ) && ! is_wp_error( $all_terms ) ) {
+					// Find term with matching parent
+					foreach ( $all_terms as $term ) {
+						if ( (int) $term->parent === $parent_id ) {
+							$existing = $term;
+							break;
+						}
+					}
+				}
+				
+				if ( ! $existing ) {
+					// Create new term
+					$created = wp_insert_term( $part, 'aplb_location', array( 
+						'slug' => $slug,
+						'parent' => $parent_id 
+					) );
+					
+					if ( ! is_wp_error( $created ) ) {
+						$term_id = (int) $created['term_id'];
+						$parent_id = $term_id;
+					}
+				} else {
+					$term_id = (int) $existing->term_id;
+					$parent_id = $term_id;
+				}
+			}
+			
+			// Assign the most specific term (leaf node) to the post
+			if ( $term_id ) {
+				wp_set_object_terms( $post_id, array( $term_id ), 'aplb_location', false );
+				$updated++;
+			}
+		}
+		echo '<div class="notice notice-success is-dismissible"><p>';
+		echo sprintf(
+			esc_html__( 'Location backfill complete! Processed %d posts, updated %d locations.', 'ap-library' ),
 			$processed,
 			$updated
 		);

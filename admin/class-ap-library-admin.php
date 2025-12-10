@@ -224,6 +224,20 @@ class Ap_Library_Admin {
 					'errorMessage'   => esc_html__( 'Failed assigning portfolios.', 'ap-library' ),
 				]
 			);
+			// Location bulk assignment uses the same script
+			wp_localize_script(
+				'ap-library-bulk-assign',
+				'APLB_BulkLocations',
+				[
+					'nonce'          => wp_create_nonce( 'wp_rest' ),
+					'restUrl'        => esc_url_raw( rest_url( 'ap-library/v1/assign-locations' ) ),
+					'taxonomy'       => 'aplb_location',
+					'applyLabel'     => esc_html__( 'Apply Locations to Selected', 'ap-library' ),
+					'replaceLabel'   => esc_html__( 'Replace existing locations', 'ap-library' ),
+					'successMessage' => esc_html__( 'Locations updated successfully.', 'ap-library' ),
+					'errorMessage'   => esc_html__( 'Failed assigning locations.', 'ap-library' ),
+				]
+			);
 		}
 	}
 
@@ -558,6 +572,17 @@ class Ap_Library_Admin {
 				'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
 			]
 		);
+
+		// Location bulk assignment route
+		register_rest_route(
+			'ap-library/v1',
+			'/assign-locations',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'rest_assign_locations' ],
+				'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+			]
+		);
 		
 		// Bulk date update route
 		register_rest_route(
@@ -633,7 +658,7 @@ class Ap_Library_Admin {
 			</select>
 			<div style="display:inline-block; width:260px;">
 				<label style="display:block; margin:2px 0 4px;"><input type="checkbox" id="aplb-bulk-genre-replace" value="1" /> <?php esc_html_e( 'Replace existing genres', 'ap-library' ); ?></label>
-				<button type="button" class="button" id="aplb-bulk-genre-apply" disabled style="margin-top:4px;"><?php esc_html_e( 'Apply Genres to Selected', 'ap-library' ); ?></button>
+				<button type="button" class="button" id="aplb-bulk-genre-apply" disabled style="margin-top:4px; display:inline-block;"><?php esc_html_e( 'Apply Genres to Selected', 'ap-library' ); ?></button>
 				<span class="spinner" style="visibility:hidden; float:none; margin-top:6px;"></span>
 				<span class="aplb-bulk-genre-status" style="display:block; min-height:16px; font-size:11px; margin-top:4px;" aria-live="polite"></span>
 				<small style="display:block; color:#666; margin-top:4px; font-size:11px;"><?php esc_html_e( 'Add merges; Replace overwrites.', 'ap-library' ); ?></small>
@@ -665,9 +690,38 @@ class Ap_Library_Admin {
 			</select>
 			<div style="display:inline-block; width:260px;">
 				<label style="display:block; margin:2px 0 4px;"><input type="checkbox" id="aplb-bulk-portfolio-replace" value="1" /> <?php esc_html_e( 'Replace existing portfolios', 'ap-library' ); ?></label>
-				<button type="button" class="button" id="aplb-bulk-portfolio-apply" disabled style="margin-top:4px;"><?php esc_html_e( 'Apply Portfolios to Selected', 'ap-library' ); ?></button>
+				<button type="button" class="button" id="aplb-bulk-portfolio-apply" disabled style="margin-top:4px; display:inline-block;"><?php esc_html_e( 'Apply Portfolios to Selected', 'ap-library' ); ?></button>
 				<span class="spinner" style="visibility:hidden; float:none; margin-top:6px;"></span>
 				<span class="aplb-bulk-portfolio-status" style="display:block; min-height:16px; font-size:11px; margin-top:4px;" aria-live="polite"></span>
+				<small style="display:block; color:#666; margin-top:4px; font-size:11px;"><?php esc_html_e( 'Add merges; Replace overwrites.', 'ap-library' ); ?></small>
+			</div>
+			<div style="clear:both;"></div>
+		</span>
+		<?php
+	}
+
+	/**
+	 * Render bulk location assignment toolbar.
+	 *
+	 * @since    1.4.0
+	 */
+	public function render_bulk_location_toolbar() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || $screen->id !== 'edit-aplb_photo' ) { return; }
+		$terms = get_terms( [ 'taxonomy' => 'aplb_location', 'hide_empty' => false ] );
+		?>
+		<span id="aplb-inline-bulk-locations" class="aplb-inline-bulk-locations" style="display:inline-block; vertical-align:top; margin-left:12px; max-width:480px;">
+			<label for="aplb-bulk-location-select" style="font-weight:600; display:block; margin-bottom:2px;"><?php esc_html_e( 'Bulk Locations', 'ap-library' ); ?></label>
+			<select multiple id="aplb-bulk-location-select" style="width:180px; height:120px; margin-right:12px; float:left;">
+				<?php foreach ( $terms as $t ) : ?>
+					<option value="<?php echo esc_attr( $t->term_id ); ?>" data-name="<?php echo esc_attr( $t->name ); ?>"><?php echo esc_html( $t->name ); ?></option>
+				<?php endforeach; ?>
+			</select>
+			<div style="display:inline-block; width:260px;">
+				<label style="display:block; margin:2px 0 4px;"><input type="checkbox" id="aplb-bulk-location-replace" value="1" /> <?php esc_html_e( 'Replace existing locations', 'ap-library' ); ?></label>
+				<button type="button" class="button" id="aplb-bulk-location-apply" disabled style="margin-top:4px; display:inline-block;"><?php esc_html_e( 'Apply Locations to Selected', 'ap-library' ); ?></button>
+				<span class="spinner" style="visibility:hidden; float:none; margin-top:6px;"></span>
+				<span class="aplb-bulk-location-status" style="display:block; min-height:16px; font-size:11px; margin-top:4px;" aria-live="polite"></span>
 				<small style="display:block; color:#666; margin-top:4px; font-size:11px;"><?php esc_html_e( 'Add merges; Replace overwrites.', 'ap-library' ); ?></small>
 			</div>
 			<div style="clear:both;"></div>
@@ -701,6 +755,40 @@ class Ap_Library_Admin {
 				if ( is_wp_error( $current_terms ) ) { $current_terms = []; }
 				$new_terms = array_unique( array_merge( $current_terms, $term_ids ) );
 				$result = wp_set_object_terms( $pid, $new_terms, 'aplb_portfolio' );
+			}
+			if ( ! is_wp_error( $result ) ) {
+				$updated[] = $pid;
+			}
+		}
+		return new WP_REST_Response( [ 'success' => true, 'updated' => $updated, 'mode' => ( $mode === 'replace' ? 'replace' : 'add' ) ], 200 );
+	}
+
+	/**
+	 * REST callback to assign location terms to multiple photo posts.
+	 *
+	 * @since    1.4.0
+	 */
+	public function rest_assign_locations( WP_REST_Request $request ) {
+		$post_ids = (array) $request->get_param( 'postIds' );
+		$term_ids = (array) $request->get_param( 'termIds' );
+		$mode     = $request->get_param( 'mode' );
+		$post_ids = array_filter( array_map( 'intval', $post_ids ) );
+		$term_ids = array_filter( array_map( 'intval', $term_ids ) );
+		if ( empty( $post_ids ) || empty( $term_ids ) ) {
+			return new WP_REST_Response( [ 'success' => false, 'message' => __( 'Missing post or term IDs.', 'ap-library' ) ], 400 );
+		}
+		$updated = [];
+		foreach ( $post_ids as $pid ) {
+			if ( get_post_type( $pid ) !== 'aplb_photo' || ! current_user_can( 'edit_post', $pid ) ) {
+				continue;
+			}
+			if ( $mode === 'replace' ) {
+				$result = wp_set_object_terms( $pid, $term_ids, 'aplb_location' );
+			} else {
+				$current_terms = wp_get_object_terms( $pid, 'aplb_location', [ 'fields' => 'ids' ] );
+				if ( is_wp_error( $current_terms ) ) { $current_terms = []; }
+				$new_terms = array_unique( array_merge( $current_terms, $term_ids ) );
+				$result = wp_set_object_terms( $pid, $new_terms, 'aplb_location' );
 			}
 			if ( ! is_wp_error( $result ) ) {
 				$updated[] = $pid;
