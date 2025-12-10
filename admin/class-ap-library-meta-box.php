@@ -170,7 +170,7 @@ class Ap_Library_Meta_Box {
 	 * @param    string    $date       Date in YYYY-MM-DD format.
 	 * @param    string    $taxonomy   Taxonomy name.
 	 */
-	private function sync_date_to_taxonomy( $post_id, $date, $taxonomy ) {
+	public function sync_date_to_taxonomy( $post_id, $date, $taxonomy ) {
 		if ( ! $date || ! taxonomy_exists( $taxonomy ) ) {
 			return;
 		}
@@ -197,7 +197,7 @@ class Ap_Library_Meta_Box {
 	 * @param    string    $taxonomy   Taxonomy name.
 	 * @return   int|null              Term ID or null on error.
 	 */
-	private function sync_flat_date( $date, $taxonomy ) {
+	public function sync_flat_date( $date, $taxonomy ) {
 		$term = get_term_by( 'slug', $date, $taxonomy );
 		
 		if ( ! $term ) {
@@ -225,7 +225,7 @@ class Ap_Library_Meta_Box {
 	 * @param    string    $taxonomy   Taxonomy name.
 	 * @return   int|null              Day term ID or null on error.
 	 */
-	private function sync_hierarchical_date( $date, $taxonomy ) {
+	public function sync_hierarchical_date( $date, $taxonomy ) {
 		$timestamp = strtotime( $date );
 		if ( ! $timestamp ) {
 			return null;

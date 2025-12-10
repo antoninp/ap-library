@@ -827,7 +827,8 @@ class Ap_Library_Admin {
 	 * REST callback to bulk update post dates with partial component updates.
 	 *
 	 * Updates only specified date components (year, month, day, hour, minute) while keeping
-	 * other components unchanged for each selected photo.
+	 * other components unchanged for each selected photo. Also syncs published_date and taken_date
+	 * with their respective taxonomies.
 	 *
 	 * @since    1.3.2
 	 * @param    WP_REST_Request $request The REST request object containing postIds and components.
@@ -851,6 +852,10 @@ class Ap_Library_Admin {
 		if ( ! in_array( $date_type, [ 'post_date', 'published_date', 'taken_date' ], true ) ) {
 			$date_type = 'post_date';
 		}
+		
+		// Get meta box instance for syncing dates to taxonomies
+		require_once plugin_dir_path( __FILE__ ) . 'class-ap-library-meta-box.php';
+		$meta_box = new Ap_Library_Meta_Box();
 		
 		$updated = [];
 		$errors = [];
@@ -919,6 +924,9 @@ class Ap_Library_Admin {
 				$new_second
 			);
 			
+			// Build date-only string for meta fields
+			$new_date_string = sprintf( '%04d-%02d-%02d', $new_year, $new_month, $new_day );
+			
 			// Update based on date type
 			if ( $date_type === 'post_date' ) {
 				// Convert to GMT for storage
@@ -939,13 +947,17 @@ class Ap_Library_Admin {
 					continue;
 				}
 			} elseif ( $date_type === 'published_date' ) {
-				// Store as date only (Y-m-d format)
-				$new_date_string = sprintf( '%04d-%02d-%02d', $new_year, $new_month, $new_day );
+				// Update meta field
 				update_post_meta( $pid, APLB_META_PUBLISHED_DATE, $new_date_string );
+				
+				// Sync to taxonomy
+				$meta_box->sync_date_to_taxonomy( $pid, $new_date_string, 'aplb_published_date' );
 			} else { // taken_date
-				// Store as date only (Y-m-d format)
-				$new_date_string = sprintf( '%04d-%02d-%02d', $new_year, $new_month, $new_day );
+				// Update meta field
 				update_post_meta( $pid, APLB_META_TAKEN_DATE, $new_date_string );
+				
+				// Sync to taxonomy
+				$meta_box->sync_date_to_taxonomy( $pid, $new_date_string, 'aplb_taken_date' );
 			}
 			
 			$updated[] = [
