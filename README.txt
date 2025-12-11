@@ -5,7 +5,7 @@ Tags: photography, media, uploads, custom post type, taxonomy, exif, gallery, ar
 Requires at least: 6.5
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,9 +20,10 @@ AP Library provides a robust foundation to manage a photography library as first
 - Taxonomies:
     - `aplb_published_date` (flat) for published date groupings
     - `aplb_taken_date` (hierarchical) for taken date — Year → Month → Day — enabling clean archives like `/photo-taken/2023/november/15/`
+    - `aplb_location` (hierarchical) for location — Country → State/Province → City — extracted from photo IPTC metadata
     - `aplb_genre` (hierarchical) for your own logical groupings (optional)
     - `aplb_keyword` (flat) for IPTC/EXIF photo keywords automatically extracted from featured images
-- EXIF integration to extract taken dates and IPTC keywords from featured images (creates matching taxonomy terms automatically)
+- EXIF integration to extract taken dates, locations, and IPTC keywords from featured images (creates matching taxonomy terms automatically)
 - Admin UI enhancements (meta box, quick edit integration, sortable columns)
 - Backfill tools to sync existing content
 - Query customization so archives order by `aplb_published_date` by default
@@ -45,6 +46,7 @@ Managed contexts:
 * Genre taxonomy: `aplb_genre`
 * Taken date taxonomy: `aplb_taken_date`
 * Published date taxonomy: `aplb_published_date`
+* Location taxonomy: `aplb_location`
 * Keyword taxonomy: `aplb_keyword`
 * Photos post type archive
 * Author archives
@@ -59,8 +61,9 @@ Changing included post types may hide posts not assigned to the selected types w
 == Installation ==
 
 1. Upload the `ap-library` folder to `/wp-content/plugins/`.
-2. Activate “AP Library” in the Plugins screen.
-3. (Optional) Run the Backfill tool to populate taxonomy terms from existing meta values and generate keywords.
+2. Activate "AP Library" in the Plugins screen.
+3. (Optional) Flush permalinks (Settings → Permalinks → Save) to enable location taxonomy archives.
+4. (Optional) Run the Backfill tool to populate taxonomy terms from existing meta values, generate keywords, and extract location data from IPTC metadata.
 
 == Frequently Asked Questions ==
 
@@ -76,6 +79,9 @@ Yes. On save and during upload processing the plugin attempts to read DateTimeOr
 = How are keywords extracted and assigned? =
 Keywords are automatically extracted from IPTC metadata (field 2#025) embedded in featured images. The plugin uses case-insensitive matching, so "Australia" and "australia" map to the same term with a consistent title-case display name. Keywords are assigned during upload and can be backfilled for existing content.
 
+= How is location data extracted? =
+Location information is extracted from IPTC metadata fields embedded in photos: City/Sublocation (2#092, 2#090), Province/State (2#095), and Country/Primary Location (2#101). The plugin creates a hierarchical taxonomy (Country → State → City) and can backfill existing photos. Location terms are optional; photos without location metadata are unaffected.
+
 == Screenshots ==
 
 1. Photos list with date columns and quick edit.
@@ -85,7 +91,7 @@ Keywords are automatically extracted from IPTC metadata (field 2#025) embedded i
 
 After activation you will find plugin tools under the Photos post type menu:
 - Photos → Library Overview (quick actions, status, general settings)
-- Photos → Backfill (regenerate taken/published dates and keywords)
+- Photos → Backfill (regenerate taken/published dates, keywords, and location)
 - Photos → Archive Rules (configure ordering & enable/disable archive contexts)
 
 == Bulk Genre Assignment ==
@@ -112,6 +118,52 @@ Notes:
 
 This feature significantly reduces repetitive Quick Edit steps when tagging batches of newly created photo posts prior to publishing.
 
+== Bulk Date Tools ==
+
+On the Photos list screen (`edit.php?post_type=aplb_photo`) unified date toolbars let you batch update photo dates without page reloads:
+
+**Bulk Post Date Toolbar**: Update WordPress post dates (published and modified) for multiple photos.
+**Bulk Published Date Toolbar**: Update the custom `aplb_published_date` meta field and synchronize to the `aplb_published_date` taxonomy.
+**Bulk Taken Date Toolbar**: Update the custom `aplb_taken_date` meta field and synchronize to the hierarchical `aplb_taken_date` taxonomy.
+
+Workflow:
+1. Tick the checkboxes of the photos you want to update.
+2. Select a new date using the date picker.
+3. Click "Apply [Date Type]" to update all selected photos.
+4. A success message confirms the update and date columns refresh immediately.
+
+Features:
+* Post date updates (publish/modify) synchronize with taxonomy date fields automatically.
+* Visual indicator (clock icon with timestamp) shows when dates were last updated.
+* Bulk updates respect user capabilities (`edit_post`).
+* All updates run through the REST endpoint (`/wp-json/ap-library/v1/update-dates`).
+* Taxonomy terms are created automatically if they do not exist.
+
+== Bulk Portfolio Assignment ==
+
+On the Photos list screen, a "Bulk Portfolios" toolbar lets you assign one or more Portfolio taxonomy terms (`aplb_portfolio`) to multiple photo posts.
+
+Workflow:
+1. Tick the checkboxes of the photos you want to update.
+2. Select one or more portfolios in the multi‑select box.
+3. (Optional) Toggle "Replace existing portfolios" if you want to overwrite instead of add.
+4. Click "Apply Portfolios to Selected".
+
+Modes:
+* Add (default): Selected portfolios are merged with any existing portfolios on each photo (duplicates suppressed).
+* Replace: Existing portfolios for each selected photo are discarded and replaced with only the selected portfolios.
+
+The update runs through an internal REST endpoint (`/wp-json/ap-library/v1/assign-portfolios`). A success message appears and each affected row's Portfolio column is updated immediately.
+
+== Filtering by Location ==
+
+On the Photos list screen, a dropdown filter allows you to filter photos by location taxonomy terms (`aplb_location`). Select any location (Country, State, or City) to display only photos assigned to that location.
+
+This is helpful when:
+* Reviewing photos from a specific region or destination.
+* Organizing photo collections by geography.
+* Verifying location assignments extracted from IPTC metadata.
+
 == Photo Post Creation Filters ==
 
 To prevent non-photograph images (logos, icons, banners, UI graphics) from being converted to photo posts, the "Create Missing Photo Posts" action applies intelligent filtering.
@@ -136,6 +188,19 @@ Typical exclusion scenarios:
 * Social media graphics: Often caught by dimension ratios or keywords like "banner", "header"
 
 == Changelog ==
+
+= 1.3.2 - Location Taxonomy, Bulk Date Tools, Date Sync Fix =
+- Added: Location taxonomy (`aplb_location`) with hierarchical structure (Country → State/Province → City) extracted from photo IPTC metadata.
+- Added: Automatic location term extraction and assignment from featured image IPTC fields (Country, State, Sublocation, City).
+- Added: Bulk post date toolbar for batch updating post dates (publish/modified dates) on Photos list screen.
+- Added: Unified bulk date toolbar combining post date, published date, and taken date updates via REST endpoint `/ap-library/v1/update-dates`.
+- Added: Visual indicator (clock icon with timestamp) showing when photo dates were last updated.
+- Added: Filter Photos list by taxonomy terms via dropdowns.
+- Added: Archive Rules context for location taxonomy (`tax:aplb_location`) with auto-configuration.
+- Updated: Location taxonomy included in Archive Rules configuration UI.
+- Updated: Backfill tool now supports location term generation from IPTC metadata.
+- Fixed: Meta key and taxonomy date terms not synchronizing when dates updated via bulk date toolbar.
+- Developer Notes: New EXIF methods `get_location()` and `get_location_from_post()` (@since 1.3.2) extract location from photo metadata; new REST endpoint handles bulk date updates; location backfill method `process_location_backfill()` (@since 1.3.2) available on Backfill page.
 
 = 1.3.1 - Portfolio Support, Unified Bulk Tools, Date Format Setting =
 - Added: Portfolio taxonomy (`aplb_portfolio`) for curated photo collections (hierarchical & REST-enabled).
@@ -213,6 +278,14 @@ Typical exclusion scenarios:
 - Custom post type, date meta, base taxonomies, admin UI, and public hooks skeleton.
 
 == Upgrade Notice ==
+
+= 1.3.2 =
+This release adds a new Location taxonomy with IPTC metadata extraction and unified bulk date tools. After upgrading:
+1. Flush permalinks (Settings → Permalinks → Save) to ensure location taxonomy archives resolve.
+2. (Optional) Run the Backfill tool (Photos → Backfill → Location) to extract location data from existing photo IPTC metadata.
+3. Use the new unified bulk date toolbar to batch update post dates, published dates, or taken dates.
+4. (Optional) Add the Location filter dropdown to your Photos list via custom columns if desired.
+No database migration is required; existing posts and taxonomies remain intact. The location taxonomy is optional and backfill only affects photos with location data in their featured image IPTC fields.
 
 = 1.3.1 =
 This release adds the Portfolio taxonomy, unified bulk assignment (genres + portfolios), and a global date format setting. After upgrading:

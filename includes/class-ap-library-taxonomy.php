@@ -176,7 +176,7 @@ class Ap_Library_Taxonomy {
     /**
      * Register the portfolio taxonomy (manual curation).
      *
-     * @since    1.4.0
+     * @since    1.3.2
      * @access   private
      */
     private function register_aplb_portfolio_taxonomy() {
@@ -214,7 +214,7 @@ class Ap_Library_Taxonomy {
     /**
      * Register the location taxonomy (auto from IPTC location data).
      *
-     * @since    1.4.0
+     * @since    1.3.2
      * @access   private
      */
     private function register_aplb_location_taxonomy() {

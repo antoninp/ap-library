@@ -129,7 +129,7 @@ class PhotoPostCreator {
      * Assign location taxonomy term to a post.
      * Parses location string (e.g., "City, Region, Country") into hierarchical terms.
      *
-     * @since 1.4.0
+     * @since 1.3.2
      * @param int    $post_id  Post ID.
      * @param string $location Location string from IPTC.
      */

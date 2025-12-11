@@ -145,7 +145,7 @@ class Ap_Library_EXIF {
 	/**
 	 * Extract location from image IPTC metadata.
 	 *
-	 * @since 1.4.0
+	 * @since 1.3.2
 	 * @param int $attachment_id Attachment ID.
 	 * @return string Location string or empty string if not found.
 	 */
@@ -196,7 +196,7 @@ class Ap_Library_EXIF {
 	/**
 	 * Extract location from a post's featured image.
 	 *
-	 * @since 1.4.0
+	 * @since 1.3.2
 	 * @param int $post_id Post ID.
 	 * @return string Location string or empty string if not found.
 	 */

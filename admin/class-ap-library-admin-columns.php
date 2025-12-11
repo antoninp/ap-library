@@ -412,7 +412,7 @@ class Ap_Library_Admin_Columns {
      *
      * Handles the query modification when taxonomy filters are selected.
      *
-     * @since    1.4.0
+     * @since    1.3.2
      * @param    WP_Query    $query    The WP_Query instance.
      */
     public function filter_photos_by_taxonomy( $query ) {

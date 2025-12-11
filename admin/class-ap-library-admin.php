@@ -703,7 +703,7 @@ class Ap_Library_Admin {
 	/**
 	 * Render bulk location assignment toolbar.
 	 *
-	 * @since    1.4.0
+	 * @since    1.3.2
 	 */
 	public function render_bulk_location_toolbar() {
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
@@ -766,7 +766,7 @@ class Ap_Library_Admin {
 	/**
 	 * REST callback to assign location terms to multiple photo posts.
 	 *
-	 * @since    1.4.0
+	 * @since    1.3.2
 	 */
 	public function rest_assign_locations( WP_REST_Request $request ) {
 		$post_ids = (array) $request->get_param( 'postIds' );
@@ -1075,7 +1075,7 @@ class Ap_Library_Admin {
 	 * Adds filter dropdowns for all photo taxonomies (genre, portfolio, 
 	 * keywords, location, taken date, published date) above the photo list table.
 	 *
-	 * @since    1.4.0
+	 * @since    1.3.2
 	 */
 	public function render_taxonomy_filters() {
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;

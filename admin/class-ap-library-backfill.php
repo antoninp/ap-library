@@ -304,7 +304,7 @@ class Ap_Library_Backfill {
 	/**
 	 * Process location backfill from IPTC metadata.
 	 *
-	 * @since 1.4.0
+	 * @since 1.3.2
 	 */
 	private function process_location_backfill() {
 		if ( ! taxonomy_exists( 'aplb_location' ) ) {
