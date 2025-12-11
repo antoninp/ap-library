@@ -5,7 +5,7 @@
  *
  * @link       https://antoninpuleo.com/
  * @since      1.0.0
- * @modified   1.3.1 Date term creation now uses global date format where applicable.
+ * @modified   1.3.2 Location taxonomy extraction, bulk date updates, date sync improvements.
  *
  * @package    Ap_Library
  * @subpackage Ap_Library/admin

@@ -308,7 +308,7 @@ class Ap_Library_Admin {
 	 *
 	 * @since    1.0.0
 	 * @modified 1.3.0 Added photo post creation filter settings.
-	 * @modified 1.3.1 Added global date format setting (ap_library_date_format) & portfolio bulk assignment localization.
+	 * @modified 1.3.2 Added location backfill section; unified bulk date tools.
 	 */
 	private function render_overview_settings_form() {
 		$auto_create = get_option( 'ap_library_auto_create_post_on_upload', false );
@@ -391,7 +391,7 @@ class Ap_Library_Admin {
 	 *
 	 * @since    1.0.0
 	 * @modified 1.3.0 Added handling for photo post creation filter settings.
-	 * @modified 1.3.1 Added saving of global date format setting and validation.
+	 * @modified 1.3.2 Handles location backfill and bulk date toolbar settings.
 	 */
 	public function handle_overview_settings() {
 		if (
