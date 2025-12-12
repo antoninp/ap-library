@@ -25,9 +25,6 @@
     pointer-events: auto;
     opacity: 1;
 }
-html {
-    scroll-behavior: smooth;
-}
 .back-to-top div:hover {
     animation: btt 1s linear infinite alternate;
 }
@@ -35,22 +32,4 @@ html {
   0%   {transform: scale(1);}
   50%  {transform: scale(1.1);}
   100% {transform: scale(1);}
-}
-
-.wp-block-meow-gallery-gallery .mg-images img:only-child {
-    max-height: 400px !important;
-    height: auto !important;
-    width: auto !important;
-    object-fit: contain;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-}
-.wp-block-meow-gallery-gallery .mg-images {
-    max-height: 400px !important;
-    height: auto !important;
-}
-.wp-block-meow-gallery-gallery .mg-images .mgl-row:only-child {
-    max-height: 400px !important;
-    height: auto !important;
 }

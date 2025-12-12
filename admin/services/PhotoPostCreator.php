@@ -46,13 +46,6 @@ class PhotoPostCreator {
 
         $upload_date   = date( 'Y-m-d', strtotime( $attachment->post_date ) );
 
-        // Build gallery
-        $gallery_shortcode = '[gallery ids="' . $image_id . '"]';
-        $meow_gallery_html = '<!-- wp:meow-gallery/gallery {"images":[{"alt":"","id":' . $image_id . ',"url":"' . esc_url( wp_get_attachment_url( $image_id ) ) . '","caption":""}]} -->'
-            . $gallery_shortcode . '<!-- /wp:meow-gallery/gallery -->';
-
-        $gallery_html = '<!-- wp:group --><div class="wp-block-group single-image">' . $meow_gallery_html . '</div><!-- /wp:group -->';
-
         // Create post
         $new_post = [
             'post_title'  => sanitize_text_field( $attachment->post_title ),
@@ -89,7 +82,6 @@ class PhotoPostCreator {
 
         // Link attachment to post
         wp_update_post( [ 'ID' => $image_id, 'post_parent' => $post_id ] );
-        wp_update_post( [ 'ID' => $post_id, 'post_content' => $gallery_html ] );
     }
 
     /**

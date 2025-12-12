@@ -19,35 +19,6 @@
             });
         }
 
-        // Meow Gallery single image height fix
-        $('.wp-block-meow-gallery-gallery .mg-images').each(function(){
-            var $container = $(this);
-            var $images = $container.find('img');
-            if ($images.length === 1) {
-                $container.css('height', 'auto');
-                $images.css({
-                    'max-height': '400px',
-                    'height': 'auto',
-                    'width': 'auto',
-                    'object-fit': 'contain',
-                    'margin-left': 'auto',
-                    'margin-right': 'auto',
-                    'display': 'block'
-                });
-            }
-        });
-        $('.wp-block-meow-gallery-gallery .mg-images').each(function(){
-            var $container = $(this);
-            var $rows = $container.find('.mgl-row');
-            if ($rows.length === 1) {
-                $rows.css({
-                    'height': 'auto',
-                    'max-height': '400px'
-                });
-            }
-        });
-
-
     });
 
 })( jQuery );
