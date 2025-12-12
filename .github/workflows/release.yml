@@ -1,0 +1,39 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare distribution folder
+        run: |
+          mkdir dist
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='dist' \
+            --exclude='README.md' \
+            --exclude='.gitignore' \
+            ./ dist/ap-library/
+
+      - name: Create zip archive
+        run: |
+          cd dist
+          zip -r ap-library.zip ap-library
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/ap-library.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
