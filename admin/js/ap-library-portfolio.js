@@ -1,7 +1,7 @@
 /**
  * Portfolio Term Meta - Featured Image Upload
  *
- * @since      Unreleased
+ * @since      1.3.1
  * @package    Ap_Library
  * @subpackage Ap_Library/admin/js
  */
