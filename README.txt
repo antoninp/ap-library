@@ -5,7 +5,7 @@ Tags: photography, media, uploads, custom post type, taxonomy, exif, gallery, ar
 Requires at least: 6.5
 Tested up to: 6.8.3
 Requires PHP: 7.4
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -189,6 +189,12 @@ Typical exclusion scenarios:
 
 == Changelog ==
 
+= 1.3.3 - Simplified photo post content =
+- Removed: Photo post HTML gallery content generation on photo creation. Photos now display featured image only without additional gallery markup or styling.
+- Removed: Gallery-related CSS rules and JavaScript handlers for Meow Gallery gallery blocks.
+- Removed: Smooth scroll behavior from global CSS.
+- Added: GitHub Actions release workflow to automatically package plugin for distribution without version numbers in folder name.
+
 = 1.3.2 - Location Taxonomy, Bulk Date Tools, Date Sync Fix =
 - Added: Location taxonomy (`aplb_location`) with hierarchical structure (Country → State/Province → City) extracted from photo IPTC metadata.
 - Added: Automatic location term extraction and assignment from featured image IPTC fields (Country, State, Sublocation, City).
@@ -278,6 +284,9 @@ Typical exclusion scenarios:
 - Custom post type, date meta, base taxonomies, admin UI, and public hooks skeleton.
 
 == Upgrade Notice ==
+
+= 1.3.3 =
+This release simplifies photo display by removing generated gallery content. Photos will now display only featured images without additional HTML or gallery-specific styling. No database migration required; existing posts remain intact.
 
 = 1.3.2 =
 This release adds a new Location taxonomy with IPTC metadata extraction and unified bulk date tools. After upgrading:
