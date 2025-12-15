@@ -180,7 +180,7 @@ class Ap_Library_Archive_Rules {
 									<option value="menu_order" <?php selected( $current['orderby'], 'menu_order' ); ?>><?php esc_html_e( 'Menu Order', 'ap-library' ); ?></option>
 								</select>
 							</td>
-								<td><input type="text" name="meta_key_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $current['meta_key'] ); ?>" placeholder="<?php esc_attr_e( 'aplb_published_date', 'ap-library' ); ?>" /></td>
+							<td><input type="text" name="meta_key_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $current['meta_key'] ); ?>" /></td>
 							<td>
 									<select name="order_<?php echo esc_attr( $key ); ?>">
 									<option value="DESC" <?php selected( $current['order'], 'DESC' ); ?>>DESC</option>
@@ -188,7 +188,7 @@ class Ap_Library_Archive_Rules {
 								</select>
 							</td>
 							<td>
-								<input type="text" name="posts_per_page_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( isset( $current['posts_per_page'] ) ? $current['posts_per_page'] : '' ); ?>" placeholder="<?php esc_attr_e( 'WP default', 'ap-library' ); ?>" style="width:80px;" />
+								<input type="text" name="posts_per_page_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( isset( $current['posts_per_page'] ) ? $current['posts_per_page'] : '' ); ?>" style="width:80px;" />
 								<p class="description" style="margin:0;"><?php esc_html_e( 'Empty = WP default, -1 = all', 'ap-library' ); ?></p>
 							</td>
 						</tr>
